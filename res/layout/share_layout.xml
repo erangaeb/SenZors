@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#ffffff"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:padding="10dp"
+        android:background="#e5e5e5"
+        android:layout_weight="1"
+        android:layout_height="fill_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/list_row_background"
+                android:orientation="vertical"
+                android:layout_marginBottom="10dp">
+
+            <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:visibility="gone"
+                    android:layout_height="45dp">
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="20sp"
+                        android:textColor="#4a4a4a"
+                        android:layout_marginLeft="15dp"
+                        android:layout_alignParentLeft="true"
+                        android:layout_centerVertical="true"
+                        android:id="@+id/sensor_list_row_layout_sensor_name"
+                        android:text="Email">
+                </TextView>
+
+                <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_alignParentBottom="true"
+                        android:background="#cdcbcb">
+                </TextView>
+
+            </RelativeLayout>
+
+            <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="20dp"
+                    android:orientation="vertical" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginBottom="5dp"
+                    android:textColor="#000"
+                    android:text="Email">
+                </TextView>
+
+                <EditText
+                        android:id="@+id/share_layout_email_text"
+                        android:layout_width="fill_parent"
+                        android:layout_height="45dp"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginRight="20dp"
+                        android:textColor="#000"
+                        android:cursorVisible="true"
+                        android:textCursorDrawable="@null"
+                        android:background="@drawable/edit_text_shape"
+                        android:inputType="textEmailAddress"
+                        android:textSize="16sp" >
+                </EditText>
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!--<RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="50dp"
+            android:background="#333333"
+            android:orientation="vertical">
+        <RelativeLayout
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="6dp"
+                android:layout_centerVertical="true"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:background="@drawable/details_button_selector"
+                android:clickable="true"
+                android:layout_weight="1"
+                android:id="@+id/unsharing_layout_done">
+            <TextView
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:textSize="15sp"
+                    android:textColor="#FFF"
+                    android:id="@+id/unsharing_layout_done_text"
+                    android:text="Share">
+            </TextView>
+        </RelativeLayout>
+    </RelativeLayout>-->
+
+</LinearLayout>
