@@ -56,7 +56,7 @@ public class HomeActivity extends FragmentActivity {
         // enable ActionBar app icon to behave as action to toggle nav drawer
         getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setHomeButtonEnabled(true);
-        //getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#161515")));
+        //getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#985a30")));
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
@@ -271,6 +271,6 @@ public class HomeActivity extends FragmentActivity {
         this.startActivity(intent);
         HomeActivity.this.finish();
 
-        HomeActivity.this.overridePendingTransition(R.anim.right_in, R.anim.left_out);
+        HomeActivity.this.overridePendingTransition(R.anim.left_in, R.anim.right_out);
     }
 }

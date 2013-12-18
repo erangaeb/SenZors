@@ -133,8 +133,6 @@ public class GpsReadingService extends Service implements GooglePlayServicesClie
         // Check that Google Play services is available
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(GpsReadingService.this);
 
-        System.out.println("success code " + resultCode);
-
         // If Google Play services is available
         if (ConnectionResult.SUCCESS == resultCode) {
             return true;

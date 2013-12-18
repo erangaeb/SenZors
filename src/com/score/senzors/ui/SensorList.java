@@ -211,7 +211,7 @@ public class SensorList extends Fragment implements Handler.Callback {
             application.setLatLon(latLon);
             Intent intent = new Intent(SensorList.this.getActivity(), MapActivity.class);
             this.startActivity(intent);
-            SensorList.this.getActivity().overridePendingTransition(R.anim.right_in, R.anim.left_out);
+            SensorList.this.getActivity().overridePendingTransition(R.anim.right_in, R.anim.stay_in);
         }
 
         return false;

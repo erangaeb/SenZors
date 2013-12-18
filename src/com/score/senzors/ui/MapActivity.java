@@ -4,10 +4,14 @@ import android.app.ActionBar;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -17,23 +21,27 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.score.senzors.R;
 import com.score.senzors.application.SenzorApplication;
 import com.score.senzors.pojos.LatLon;
+import com.score.senzors.services.GpsReadingService;
 import com.score.senzors.utils.ActivityUtils;
 
-public class MapActivity extends FragmentActivity {
+public class MapActivity extends FragmentActivity implements View.OnClickListener,Handler.Callback {
     /**
      * Note that this may be null if the Google Play services APK is not available.
      */
     private GoogleMap mMap;
+    private ImageButton locationButton;
 
     SenzorApplication application;
 
-    Typeface tf ;
+    Typeface tf;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         application = (SenzorApplication) this.getApplication();
+        locationButton = (ImageButton) findViewById(R.id.current_location);
+        locationButton.setOnClickListener(this);
         tf = Typeface.createFromAsset(this.getAssets(), "fonts/Roboto-Thin.ttf");
 
         // Set up action bar.
@@ -97,6 +105,26 @@ public class MapActivity extends FragmentActivity {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean handleMessage(Message message) {
+        if(message.obj instanceof LatLon) {
+            // we handle LatLon messages only, from here
+            // get address from location
+            LatLon latLon = (LatLon) message.obj;
+
+            // start map activity to display location
+            // display location directly from here
+            ActivityUtils.cancelProgressDialog();
+            application.setLatLon(latLon);
+            moveToLocation(latLon);
+        }
+
+        return false;
+    }
+
+    /**
      * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
      * installed) and the map has not already been instantiated.. This will ensure that we only ever
      * call {@link #setUpMap()} once when {@link #mMap} is not null.
@@ -134,9 +162,18 @@ public class MapActivity extends FragmentActivity {
         // display current location
         LatLon latLon = application.getLatLon();
         LatLng currentCoordinates = new LatLng(Double.parseDouble(latLon.getLat()), Double.parseDouble(latLon.getLon()));
-        mMap.addMarker(new MarkerOptions().position(currentCoordinates).title("Marker"));
-        //mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentCoordinates, 15));
+        mMap.addMarker(new MarkerOptions().position(currentCoordinates).title("My location"));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentCoordinates, 15));
+    }
+
+    /**
+     * Move map to given location
+     * @param latLon
+     */
+    private void moveToLocation(LatLon latLon) {
+        LatLng currentCoordinates = new LatLng(Double.parseDouble(latLon.getLat()), Double.parseDouble(latLon.getLon()));
+        mMap.addMarker(new MarkerOptions().position(currentCoordinates).title("My location"));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentCoordinates, 15));
     }
 
     /**
@@ -146,5 +183,19 @@ public class MapActivity extends FragmentActivity {
     public void onBackPressed() {
         super.onBackPressed();
         MapActivity.this.overridePendingTransition(R.anim.stay_in, R.anim.right_out);
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(v==locationButton) {
+            // get location or send request to server for get frieds location
+            // currently disply my location
+            // start location service to get my location
+            ActivityUtils.showProgressDialog(this, "Accessing location...");
+            application.setRequestFromFriend(false);
+            application.setRequestQuery(null);
+            Intent serviceIntent = new Intent(this, GpsReadingService.class);
+            startService(serviceIntent);
+        }
     }
 }
