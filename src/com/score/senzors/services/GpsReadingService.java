@@ -90,8 +90,9 @@ public class GpsReadingService extends Service implements GooglePlayServicesClie
         System.out.println("###################################");
 
         Location location = locationClient.getLastLocation();
+        locationClient.requestLocationUpdates(locationRequest, this);
 
-        if(location!=null) {
+        /*if(location!=null) {
             System.out.println("###################################");
             System.out.println("***********************************");
             System.out.println("//////// " + location.getLatitude());
@@ -115,7 +116,7 @@ public class GpsReadingService extends Service implements GooglePlayServicesClie
             // so need to get location from location listener
             // register listener here
             locationClient.requestLocationUpdates(locationRequest, this);
-        }
+        }*/
     }
 
     @Override

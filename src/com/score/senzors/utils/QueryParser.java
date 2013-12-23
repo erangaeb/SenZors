@@ -46,7 +46,7 @@ public class QueryParser {
      */
     private static String getUser(String[] tokens) throws InvalidQueryException {
         if(tokens[0].startsWith("@"))
-            return tokens[0];
+            return tokens[0].substring(1, tokens[0].length());
 
         throw new InvalidQueryException();
     }

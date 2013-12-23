@@ -171,6 +171,7 @@ public class MapActivity extends FragmentActivity implements View.OnClickListene
      * @param latLon
      */
     private void moveToLocation(LatLon latLon) {
+        //mMap.clear();
         LatLng currentCoordinates = new LatLng(Double.parseDouble(latLon.getLat()), Double.parseDouble(latLon.getLon()));
         mMap.addMarker(new MarkerOptions().position(currentCoordinates).title("My location"));
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentCoordinates, 15));
