@@ -14,6 +14,8 @@ import android.widget.Toast;
 import com.score.senzors.R;
 import com.score.senzors.application.SenzorApplication;
 import com.score.senzors.pojos.User;
+import com.score.senzors.services.WebSocketService;
+import com.score.senzors.utils.ActivityUtils;
 import com.score.senzors.utils.NetworkUtil;
 
 /**
@@ -92,10 +94,10 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
                 // open web socket and send username password fields
                 // we are authenticate with web sockets
                 if(!application.getWebSocketConnection().isConnected()) {
-                    //ActivityUtils.showProgressDialog(LoginActivity.this, "Connecting to server...");
-                    //Intent serviceIntent = new Intent(LoginActivity.this, WebSocketService.class);
-                    //startService(serviceIntent);
-                    switchToHome();
+                    ActivityUtils.showProgressDialog(LoginActivity.this, "Connecting to server...");
+                    Intent serviceIntent = new Intent(LoginActivity.this, WebSocketService.class);
+                    startService(serviceIntent);
+                    //switchToHome();
                 }
             }
         } else {
@@ -119,16 +121,19 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
      */
     @Override
     public boolean handleMessage(Message message) {
+        ActivityUtils.cancelProgressDialog();
         // we handle string messages only from here
         if(message.obj instanceof String) {
             String payLoad = (String)message.obj;
 
             // successful login returns "Hello"
-            if(payLoad.equalsIgnoreCase("success")) {
+            if(payLoad.equalsIgnoreCase("LoginSUCCESS")) {
                 // un-register login activity from callback
                 switchToHome();
                 return true;
             } else {
+                if(application.getWebSocketConnection().isConnected())
+                    application.getWebSocketConnection().disconnect();
                 Toast.makeText(LoginActivity.this, "Login fail", Toast.LENGTH_LONG).show();
             }
         }

@@ -30,11 +30,12 @@ public class QueryHandler {
      */
     public static void handleLogin(SenzorApplication application) {
         // generate login query with user credentials
+        // sample query - LOGIN #name era #skey 123 @mysensors
         String command = "LOGIN";
         HashMap<String, String> params = new HashMap<String, String>();
-        params.put("username", application.getUser().getUsername());
-        params.put("password", application.getUser().getPassword());
-        String message = QueryParser.getMessage(new Query(command, "", params));
+        params.put("name", application.getUser().getUsername());
+        params.put("skey", application.getUser().getPassword());
+        String message = QueryParser.getMessage(new Query(command, "mysensors", params));
 
         application.getWebSocketConnection().sendTextMessage(message);
     }
@@ -46,6 +47,7 @@ public class QueryHandler {
      * @param payload payload from server
      */
     public static void handleQuery(SenzorApplication application, String payload) {
+        System.out.println(payload);
         try {
             // need to parse query in order to further processing
             Query query = QueryParser.parse(payload);
@@ -134,13 +136,22 @@ public class QueryHandler {
      * @param query parsed query
      */
     private static void handleDataQuery(SenzorApplication application, Query query) {
-        // create LatLon object from query params
-        // we assume incoming query contains lat lon values
-        LatLon latLon = new LatLon(query.getParams().get("lat"), query.getParams().get("lon"));
-        application.setDataQuery(query);
+        if(query.getUser().equalsIgnoreCase("mysensors")) {
+            // this is a status query
+            // @mysensors DATA #msg LoginSuccess
+            // just send status to available handler
+            String status = query.getParams().get("msg");
+            sendMessage(application, status);
+        } else {
+            // from a specific user
+            // create LatLon object from query params
+            // we assume incoming query contains lat lon values
+            LatLon latLon = new LatLon(query.getParams().get("lat"), query.getParams().get("lon"));
+            application.setDataQuery(query);
 
-        // send message to available handler to notify incoming sensor value
-        sendMessage(application, latLon);
+            // send message to available handler to notify incoming sensor value
+            sendMessage(application, latLon);
+        }
     }
 
     /**
