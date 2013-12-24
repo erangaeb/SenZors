@@ -17,6 +17,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.score.senzors.R;
 import com.score.senzors.application.SenzorApplication;
@@ -30,6 +31,7 @@ public class MapActivity extends FragmentActivity implements View.OnClickListene
      */
     private GoogleMap mMap;
     private ImageButton locationButton;
+    private Marker markerNow;
 
     SenzorApplication application;
 
@@ -160,9 +162,12 @@ public class MapActivity extends FragmentActivity implements View.OnClickListene
     private void setUpMap() {
         //mMap.setMyLocationEnabled(true);
         // display current location
+        if(markerNow != null)
+            markerNow.remove();
+
         LatLon latLon = application.getLatLon();
         LatLng currentCoordinates = new LatLng(Double.parseDouble(latLon.getLat()), Double.parseDouble(latLon.getLon()));
-        mMap.addMarker(new MarkerOptions().position(currentCoordinates).title("My location"));
+        markerNow = mMap.addMarker(new MarkerOptions().position(currentCoordinates).title("My location"));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentCoordinates, 15));
     }
 
@@ -171,9 +176,11 @@ public class MapActivity extends FragmentActivity implements View.OnClickListene
      * @param latLon
      */
     private void moveToLocation(LatLon latLon) {
-        //mMap.clear();
+        if(markerNow != null)
+            markerNow.remove();
+
         LatLng currentCoordinates = new LatLng(Double.parseDouble(latLon.getLat()), Double.parseDouble(latLon.getLon()));
-        mMap.addMarker(new MarkerOptions().position(currentCoordinates).title("My location"));
+        markerNow = mMap.addMarker(new MarkerOptions().position(currentCoordinates).title("My new location"));
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentCoordinates, 15));
     }
 
@@ -195,6 +202,7 @@ public class MapActivity extends FragmentActivity implements View.OnClickListene
             ActivityUtils.showProgressDialog(this, "Accessing location...");
             application.setRequestFromFriend(false);
             application.setRequestQuery(null);
+            application.setCallback(this);
             Intent serviceIntent = new Intent(this, GpsReadingService.class);
             startService(serviceIntent);
         }
