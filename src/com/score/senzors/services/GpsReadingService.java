@@ -89,34 +89,7 @@ public class GpsReadingService extends Service implements GooglePlayServicesClie
         System.out.println("//////////LocationConnected////////");
         System.out.println("###################################");
 
-        Location location = locationClient.getLastLocation();
         locationClient.requestLocationUpdates(locationRequest, this);
-
-        /*if(location!=null) {
-            System.out.println("###################################");
-            System.out.println("***********************************");
-            System.out.println("//////// " + location.getLatitude());
-            System.out.println("//////// " + location.getLongitude());
-            System.out.println("###################################");
-
-            if(application.isRequestFromFriend()) {
-                // send location to server via web socket
-                handleLocationRequestFromSever(location);
-            } else {
-                // send location result to sensor list via message
-                handleLocationRequestFromSensorList(location);
-            }
-
-            // disconnect location clint
-            // stop service
-            locationClient.disconnect();
-            stopSelf();
-        } else {
-            // not current location available
-            // so need to get location from location listener
-            // register listener here
-            locationClient.requestLocationUpdates(locationRequest, this);
-        }*/
     }
 
     @Override
@@ -157,6 +130,8 @@ public class GpsReadingService extends Service implements GooglePlayServicesClie
 
     @Override
     public void onLocationChanged(Location location) {
+        System.out.println(location.getLatitude());
+        System.out.println(location.getLongitude());
         // get location and send to appropriate handle
         // the close location updates
         // stop service

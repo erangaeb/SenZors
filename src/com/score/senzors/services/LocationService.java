@@ -10,7 +10,6 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Message;
-import android.provider.Settings;
 import com.score.senzors.application.SenzorApplication;
 import com.score.senzors.pojos.LatLon;
 import com.score.senzors.pojos.Query;
@@ -27,11 +26,9 @@ public class LocationService extends Service {
 
     SenzorApplication application;
 
-    public LocationManager locationManager;
-    private static final int TWO_MINUTES = 1000 * 60 * 2;
-    private Location currentBestLocation = null;
-
-    LocListener listener;
+    private LocationManager locationManager;
+    private LocListener listener;
+    private String locationProvider;
 
     @Override
     public void onCreate() {
@@ -40,42 +37,28 @@ public class LocationService extends Service {
         application = (SenzorApplication) getApplication();
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         listener = new LocListener();
-
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        boolean enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        Criteria criteria = new Criteria();
+        locationProvider = locationManager.getBestProvider(criteria, false);
+        Location location = locationManager.getLastKnownLocation(locationProvider);
 
-        // Check if enabled and if not send user to the GSP settings
-        // Better solution would be to display a dialog and suggesting to
-        // go to the settings
-        if (!enabled) {
-            Intent intent1 = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-            intent1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            this.startActivity(intent1);
+        System.out.println("Provider " + locationProvider + " has been selected.");
+
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, listener);
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, listener);
+        //locationManager.requestLocationUpdates(locationProvider, 0, 0, listener);
+        // Initialize the location fields
+        /*if (location != null) {
+            System.out.println("Provider " + locationProvider + " has been selected.");
+            //listener.onLocationChanged(location);
+            locationManager.requestLocationUpdates(locationProvider, 0, 0, listener);
         } else {
-            currentBestLocation = getLastBestLocation();
-
-            Criteria criteria = new Criteria();
-            //criteria.setAccuracy(Criteria.ACCURACY_FINE);
-            //criteria.setCostAllowed(false);
-
-            String provider = locationManager.getBestProvider(criteria, false);
-            Location location = locationManager.getLastKnownLocation(provider);
-
-            locationManager.requestLocationUpdates(provider, 0, 0, listener);
-            //mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, listener);
-            //mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, listener);
-
-            listener.onLocationChanged(location);
-
-            // Initialize the location fields
-            if (location == null) {
-                //Location not available
-                locationManager.removeUpdates(listener);
-            }
-        }
+            // start location updates
+            locationManager.requestLocationUpdates(locationProvider, 0, 0, listener);
+        }*/
 
         return START_STICKY;
     }
@@ -88,7 +71,6 @@ public class LocationService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        //locationManager.removeUpdates(listener);
         destroyManager();
 
         System.out.println("###################################");
@@ -104,20 +86,12 @@ public class LocationService extends Service {
             System.out.println("//////// " + location.getLatitude());
             System.out.println("###################################");
 
-            makeUseOfNewLocation(location);
-
-            if(currentBestLocation == null){
-                currentBestLocation = location;
-            }
-
-            //FlowController.isTriggerEventReceived = true;
-            //mCobytLocationCallback.onLocationChanged(currentBestLocation);
             if(application.isRequestFromFriend()) {
                 // send location to server via web socket
-                handleLocationRequestFromSever(currentBestLocation);
+                handleLocationRequestFromSever(location);
             } else {
                 // send location result to sensor list via message
-                handleLocationRequestFromSensorList(currentBestLocation);
+                handleLocationRequestFromSensorList(location);
             }
 
             stopSelf();
@@ -132,99 +106,9 @@ public class LocationService extends Service {
         public void onStatusChanged(String provider, int status, Bundle extras) {}
     }
 
-    /**
-     * This method returns the last know location, between the GPS and the Network one.
-     * For this method newer is best :)
-     *
-     * @return the last know best location
-     */
-    private Location getLastBestLocation() {
-        Location locationGPS = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        Location locationNet = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-
-        long GPSLocationTime = 0;
-        if (null != locationGPS) { GPSLocationTime = locationGPS.getTime(); }
-
-        long NetLocationTime = 0;
-
-        if (null != locationNet) {
-            NetLocationTime = locationNet.getTime();
-        }
-
-        if ( 0 < GPSLocationTime - NetLocationTime ) {
-            return locationGPS;
-        }
-        else{
-            return locationNet;
-        }
-
-    }
-
-    void makeUseOfNewLocation(Location location) {
-        if ( isBetterLocation(location, currentBestLocation) ) {
-            currentBestLocation = location;
-        }
-    }
-
-    /** Determines whether one Location reading is better than the current Location fix
-     * @param location  The new Location that you want to evaluate
-     * @param currentBestLocation  The current Location fix, to which you want to compare the new one
-     */
-    protected boolean isBetterLocation(Location location, Location currentBestLocation) {
-        if (currentBestLocation == null) {
-            // A new location is always better than no location
-            return true;
-        }
-
-        // Check whether the new location fix is newer or older
-        long timeDelta = location.getTime() - currentBestLocation.getTime();
-        boolean isSignificantlyNewer = timeDelta > TWO_MINUTES;
-        boolean isSignificantlyOlder = timeDelta < -TWO_MINUTES;
-        boolean isNewer = timeDelta > 0;
-
-        // If it's been more than two minutes since the current location, use the new location
-        // because the user has likely moved
-        if (isSignificantlyNewer) {
-            return true;
-            // If the new location is more than two minutes older, it must be worse
-        } else if (isSignificantlyOlder) {
-            return false;
-        }
-
-        // Check whether the new location fix is more or less accurate
-        int accuracyDelta = (int) (location.getAccuracy() - currentBestLocation.getAccuracy());
-        boolean isLessAccurate = accuracyDelta > 0;
-        boolean isMoreAccurate = accuracyDelta < 0;
-        boolean isSignificantlyLessAccurate = accuracyDelta > 200;
-
-        // Check if the old and new location are from the same provider
-        boolean isFromSameProvider = isSameProvider(location.getProvider(),
-                currentBestLocation.getProvider());
-
-        // Determine location quality using a combination of timeliness and accuracy
-        if (isMoreAccurate) {
-            return true;
-        } else if (isNewer && !isLessAccurate) {
-            return true;
-        } else if (isNewer && !isSignificantlyLessAccurate && isFromSameProvider) {
-            return true;
-        }
-        return false;
-    }
-
-    /** Checks whether two providers are the same */
-    private boolean isSameProvider(String provider1, String provider2) {
-        if (provider1 == null) {
-            return provider2 == null;
-        }
-        return provider1.equals(provider2);
-    }
-
     public void destroyManager() {
-
         if(locationManager != null){
             locationManager.removeUpdates(listener);
-
             locationManager = null;
         }
     }
