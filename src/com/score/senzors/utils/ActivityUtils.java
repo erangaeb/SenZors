@@ -71,4 +71,13 @@ public class ActivityUtils {
         }
     }
 
+    /**
+     * Get custom typeface
+     * @param context activity context
+     * @return typeface
+     */
+    public static Typeface getThinTypeFace(Context context) {
+        return null;
+    }
+
 }

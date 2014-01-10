@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,19 +32,30 @@ import java.util.ArrayList;
  */
 public class SensorList extends Fragment implements Handler.Callback {
 
-    SenzorApplication application;
+    private static final String TAG = SensorList.class.getName();
+    private SenzorApplication application;
 
-    // use to populate list
+    // list view components
     private ListView sensorListView;
     private ArrayList<Sensor> sensorList;
     private SensorListAdapter adapter;
 
-    // empty view when display on no sensors available
-    ViewStub emptyView;
+    // empty view to display when no sensors available
+    private ViewStub emptyView;
 
-    // set custom font
-    Typeface face;
-    Typeface tf ;
+    // use custom font here
+    private Typeface typeface;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.d(TAG, "OnCreateView: creating view");
+        ViewGroup root = (ViewGroup) inflater.inflate(R.layout.sensor_list_layout, container, false);
+
+        return root;
+    }
 
     /**
      * {@inheritDoc}
@@ -52,13 +64,71 @@ public class SensorList extends Fragment implements Handler.Callback {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        Log.d(TAG, "OnActivityCreated: activity created");
         application = (SenzorApplication) getActivity().getApplication();
-        application.setCallback(this);
+        typeface = Typeface.createFromAsset(this.getActivity().getAssets(), "fonts/Roboto-Thin.ttf");
 
         initEmptyView();
+        initSensorListView();
+        initSensorList();
+        displaySensorList();
+    }
 
-        tf = Typeface.createFromAsset(this.getActivity().getAssets(), "fonts/Roboto-Thin.ttf");
+    /**
+     * {@inheritDoc}
+     */
+    public void onResume() {
+        super.onResume();
 
+        // register handler from here
+        Log.d(TAG, "OnResume: set handler callback SensorList fragment");
+        application.setCallback(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void onPause() {
+        super.onPause();
+
+        // un-register handler from here
+        Log.d(TAG, "OnPause: reset handler callback SensorList fragment");
+        application.setCallback(null);
+    }
+
+    /**
+     * Initialize UI components
+     */
+    private void initSensorListView() {
+        Log.d(TAG, "initSensorListView: initializing list view components");
+        sensorListView = (ListView)getActivity().findViewById(R.id.sensor_list_layout_sensor_list);
+
+        // add header and footer for list
+        View headerView = View.inflate(this.getActivity(), R.layout.list_header, null);
+        View footerView = View.inflate(this.getActivity(), R.layout.list_header, null);
+        sensorListView.addHeaderView(headerView);
+        sensorListView.addFooterView(footerView);
+
+        // set up click listener
+        sensorListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.d(TAG, "onItemClick: click on sensor list item");
+                if(position>0 && position <= sensorList.size()) {
+                    Sensor sensor = sensorList.get(position-1);
+                    handleSensorListItemClick(sensor);
+                }
+            }
+        });
+    }
+
+    /**
+     * Initialize sensor list according to the currently selected sensor type, there are two scenarios
+     *  1. Display My.SenZors
+     *  2. Display Friends.SenZors
+     */
+    private void initSensorList() {
+        Log.d(TAG, "InitSensorList: initializing sensor list");
         // two sensor types to display
         //  1. My senzors
         //  2. Friends senzors
@@ -67,93 +137,17 @@ public class SensorList extends Fragment implements Handler.Callback {
             //  1. initialize my sensors
             //  2. initialize location listener
             //  3. create list view
-            initMySensors();
-            initSensorListView();
-
-            int titleId = getResources().getIdentifier("action_bar_title", "id", "android");
-            TextView yourTextView = (TextView) (this.getActivity().findViewById(titleId));
-            yourTextView.setTextColor(getResources().getColor(R.color.white));
-            yourTextView.setTypeface(tf, Typeface.BOLD);
-
-            getActivity().getActionBar().setTitle("My.SenZors");
+            Log.d(TAG, "InitSensorList: init my sensors");
+            sensorList = application.getMySensorList();
+            setUpActionBarTitle("My.SenZors");
         } else {
             // display friends sensors
             //  1. initialize friends sensor list
             //  2. create list view
-            initFriendsSensors();
-            initSensorListView();
-
-            int titleId = getResources().getIdentifier("action_bar_title", "id", "android");
-            TextView yourTextView = (TextView) (this.getActivity().findViewById(titleId));
-            yourTextView.setTextColor(getResources().getColor(R.color.white));
-            yourTextView.setTypeface(tf, Typeface.BOLD);
-
-            getActivity().getActionBar().setTitle("Friends.SenZors");
+            Log.d(TAG, "InitSensorList: init friends sensors");
+            sensorList = application.getFiendSensorList();
+            setUpActionBarTitle("Friends.SenZors");
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-        ViewGroup root = (ViewGroup) inflater.inflate(R.layout.sensor_list_layout, null);
-        initUI(root);
-
-        return root;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        // reset callback
-        application.setCallback(this);
-    }
-
-    /**
-     * Initialize UI components
-     */
-    private void initUI(View view) {
-        sensorListView = (ListView)view.findViewById(R.id.sensor_list_layout_sensor_list);
-
-        // initialize custom font
-        face = Typeface.createFromAsset(getActivity().getAssets(), "fonts/vegur_2.otf");
-
-        // add header and footer for list
-        View headerView = View.inflate(this.getActivity(), R.layout.list_header, null);
-        View footerView = View.inflate(this.getActivity(), R.layout.list_header, null);
-        sensorListView.addHeaderView(headerView);
-        sensorListView.addFooterView(footerView);
-
-        sensorListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Sensor sensor = sensorList.get(position-1);
-
-                if(NetworkUtil.isAvailableNetwork(SensorList.this.getActivity())) {
-
-                    if(sensor.isMySensor()) {
-                        // start location service to get my location
-                        ActivityUtils.showProgressDialog(SensorList.this.getActivity(), "Accessing location...");
-                        application.setRequestFromFriend(false);
-                        application.setRequestQuery(null);
-                        Intent serviceIntent = new Intent(getActivity(), GpsReadingService.class);
-                        getActivity().startService(serviceIntent);
-                    } else {
-                        // friend sensor
-                        // so need to get request to server
-                        // send query to get data
-                        if(application.getWebSocketConnection().isConnected()) {
-                            ActivityUtils.showProgressDialog(SensorList.this.getActivity(), "Accessing location ...");
-                            application.getWebSocketConnection().sendTextMessage("GET #gps " + "@" + sensor.getUser());
-                        }
-                    }
-                } else {
-                    Toast.makeText(SensorList.this.getActivity(), "Cannot connect to server, Please check your network connection", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
     }
 
     /**
@@ -161,37 +155,90 @@ public class SensorList extends Fragment implements Handler.Callback {
      * empty view need to be display when no sensors available
      */
     private void initEmptyView() {
+        Log.d(TAG, "InitEmptyView: initializing empty view");
         emptyView = (ViewStub) getActivity().findViewById(R.id.sensor_list_layout_empty_view);
         View inflatedEmptyView = emptyView.inflate();
         TextView emptyText = (TextView) inflatedEmptyView.findViewById(R.id.empty_text);
-        emptyText.setText("No friends sensors available");
-        emptyText.setTypeface(face);
+        emptyText.setText("No Friends.SenZors available");
+        emptyText.setTypeface(typeface, Typeface.BOLD);
     }
 
     /**
-     * Initialize sensor managers and sensor list
-     * Get available sensors and current sensor data
+     * Display sensor list
+     * Basically setup list adapter if have items to display otherwise display empty view
      */
-    private void initMySensors() {
-        sensorList = application.getMySensorList();
-
-        // TODO add other important sensors to list
-    }
-
-    private void initFriendsSensors() {
-        sensorList = application.getFiendSensorList();
-    }
-
-    /**
-     * Create sensor list
-     */
-    private void initSensorListView() {
+    private void displaySensorList() {
         // construct list adapter
         if(sensorList.size()>0) {
+            Log.d(TAG, "DisplaySensorList: display sensor list");
             adapter = new SensorListAdapter(SensorList.this.getActivity(), sensorList);
             sensorListView.setAdapter(adapter);
         } else {
+            Log.d(TAG, "DisplaySensorList: display empty view");
             sensorListView.setEmptyView(emptyView);
+        }
+    }
+
+    /**
+     * Set action bar title according to currently selected sensor type
+     * Set custom font to title
+     * @param title action bar title
+     */
+    private void setUpActionBarTitle(String title) {
+        Log.d(TAG, "SetUpActionBarTitle: set action bar title and custom font");
+        int titleId = getResources().getIdentifier("action_bar_title", "id", "android");
+        TextView yourTextView = (TextView) (this.getActivity().findViewById(titleId));
+        yourTextView.setTextColor(getResources().getColor(R.color.white));
+        yourTextView.setTypeface(typeface, Typeface.BOLD);
+
+        getActivity().getActionBar().setTitle(title);
+    }
+
+    /**
+     * Handle list item click, there are tow scenarios here
+     *  1. If clicked item is my sensor, get my current location via location service and display in a map
+     *  2. If clicked item is friends sensor, send a GET query to server in order to get the friends location
+     * @param sensor selected sensor
+     */
+    private void handleSensorListItemClick(Sensor sensor) {
+        if(sensor != null) {
+            if(sensor.isMySensor()) {
+                // start location service to get my location
+                Log.d(TAG, "handleSensorListItemClick: click on my sensor item(this is location)");
+                if(NetworkUtil.isAvailableNetwork(SensorList.this.getActivity())) {
+                    Log.d(TAG, "handleSensorListItemClick: starting service to get my location");
+                    ActivityUtils.showProgressDialog(SensorList.this.getActivity(), "Accessing location...");
+                    application.setRequestFromFriend(false);
+                    application.setRequestQuery(null);
+                    Intent serviceIntent = new Intent(getActivity(), GpsReadingService.class);
+                    getActivity().startService(serviceIntent);
+                } else {
+                    Log.w(TAG, "handleSensorListItemClick: not network connection available");
+                    Toast.makeText(SensorList.this.getActivity(), "Cannot connect to service, please check your network connection", Toast.LENGTH_LONG).show();
+                }
+            } else {
+                // friend sensor
+                // so need to get request to server
+                // send query to get data
+                Log.d(TAG, "handleSensorListItemClick: click on friend sensor item");
+                if(NetworkUtil.isAvailableNetwork(SensorList.this.getActivity())) {
+                    Log.d(TAG, "handleSensorListItemClick: starting service to get my location");
+                    if(application.getWebSocketConnection().isConnected()) {
+                        Log.d(TAG, "handleSensorListItemClick: starting service to get my location");
+                        ActivityUtils.showProgressDialog(SensorList.this.getActivity(), "Accessing location ...");
+                        application.getWebSocketConnection().sendTextMessage("GET #lat #lon " + "@" + sensor.getUser());
+                    } else {
+                        Log.w(TAG, "handleSensorListItemClick: web socket not connected");
+                        Toast.makeText(SensorList.this.getActivity(), "You are disconnected from senZors service", Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Log.w(TAG, "handleSensorListItemClick: no network connection available");
+                    Toast.makeText(SensorList.this.getActivity(), "Cannot connect to server, please check your network connection", Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+        else {
+            Log.e(TAG, "handleSensorListItemClick: invalid list item click(sensor is null)");
         }
     }
 
@@ -200,51 +247,24 @@ public class SensorList extends Fragment implements Handler.Callback {
      */
     @Override
     public boolean handleMessage(Message message) {
+        Log.d(TAG, "HandleMessage: message from server");
         if(message.obj instanceof LatLon) {
             // we handle LatLon messages only, from here
             // get address from location
+            Log.d(TAG, "HandleMessage: message is a LatLon object so display map activity");
+            ActivityUtils.cancelProgressDialog();
             LatLon latLon = (LatLon) message.obj;
-            //new GetAddressTask(SensorList.this).execute(latLon);
 
             // start map activity to display location
-            ActivityUtils.cancelProgressDialog();
             application.setLatLon(latLon);
             Intent intent = new Intent(SensorList.this.getActivity(), MapActivity.class);
             this.startActivity(intent);
             SensorList.this.getActivity().overridePendingTransition(R.anim.right_in, R.anim.stay_in);
+        } else {
+            Log.e(TAG, "HandleMessage: message not a LatLon object");
         }
 
         return false;
-    }
-
-    /**
-     * Execute after finish the GetAddressTask
-     * @param address location address
-     */
-    public void onPostAddressTask(String address) {
-        // cancel dialog first
-        ActivityUtils.cancelProgressDialog();
-
-        if(application.getSensorType().equalsIgnoreCase(SenzorApplication.MY_SENSORS)) {
-            // update my location
-            // reload adapter to display new sensor value
-            // currently only have one sensor, that's why we update 1st element always
-            application.getMySensorList().get(0).setSensorValue(address);
-            application.getMySensorList().get(0).setAvailable(true);
-            adapter.reloadAdapter(sensorList);
-        } else {
-            // when data receives update matching sensor(at friend sensor list) with incoming sensor value
-            // we assume here incoming query contains gps value of user
-            for(Sensor sensor: application.getFiendSensorList()) {
-                // find updating sensor
-                if(sensor.getUser().equalsIgnoreCase(application.getDataQuery().getUser())) {
-                    // query user and sensor user should be match
-                    sensor.setSensorValue(address);
-                    sensor.setAvailable(true);
-                    adapter.reloadAdapter(application.getFiendSensorList());
-                }
-            }
-        }
     }
 
 }

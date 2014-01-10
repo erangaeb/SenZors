@@ -172,6 +172,8 @@ public class GpsReadingService extends Service implements GooglePlayServicesClie
         params.put("lat", Double.toString(location.getLatitude()));
         params.put("lon", Double.toString(location.getLongitude()));
         String message = QueryParser.getMessage(new Query(command, user, params));
+        System.out.println("-----------------");
+        System.out.println(message);
 
         // send data to server
         if(application.getWebSocketConnection().isConnected()) {

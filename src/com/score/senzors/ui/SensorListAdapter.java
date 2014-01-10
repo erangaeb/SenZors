@@ -34,19 +34,12 @@ public class SensorListAdapter extends BaseAdapter {
      * @param sensorList sharing user list
      */
     public SensorListAdapter(Context context, ArrayList<Sensor> sensorList) {
-        face = Typeface.createFromAsset(context.getAssets(), "fonts/vegur_2.otf");
+        face = Typeface.createFromAsset(context.getAssets(), "fonts/Roboto-Thin.ttf");
 
         this.context = context;
         this.sensorList = sensorList;
     }
 
-    /**
-     * Reload content in adapter
-     */
-    public void reloadAdapter(ArrayList<Sensor> sensorList) {
-        this.sensorList = sensorList;
-        notifyDataSetChanged();
-    }
     /**
      * Get size of sensor list
      * @return userList size
@@ -103,8 +96,8 @@ public class SensorListAdapter extends BaseAdapter {
             holder.share = (RelativeLayout) view.findViewById(R.id.sensor_list_row_layout_share);
 
             // set custom font
-            holder.sensorUser.setTypeface(face);
-            holder.sensorValue.setTypeface(face);
+            holder.sensorUser.setTypeface(face, Typeface.BOLD);
+            holder.sensorValue.setTypeface(face, Typeface.BOLD);
 
             view.setTag(holder);
         } else {

@@ -1,11 +1,15 @@
 package com.score.senzors.ui;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
@@ -17,6 +21,7 @@ import com.score.senzors.pojos.User;
 import com.score.senzors.services.WebSocketService;
 import com.score.senzors.utils.ActivityUtils;
 import com.score.senzors.utils.NetworkUtil;
+import com.score.senzors.utils.QueryHandler;
 
 /**
  * Activity class for login
@@ -25,12 +30,18 @@ import com.score.senzors.utils.NetworkUtil;
  */
 public class LoginActivity extends Activity implements View.OnClickListener, Handler.Callback {
 
-    // form fields
+    private static final String TAG = LoginActivity.class.getName();
+
+    private SenzorApplication application;
+    private DataUpdateReceiver dataUpdateReceiver;
+
+    // UI fields
     private EditText username;
     private EditText password;
+    private TextView appName;
+    private TextView appDescription;
+    private TextView loginText;
     private RelativeLayout loginButton;
-
-    SenzorApplication application;
 
     /**
      * {@inheritDoc}
@@ -41,33 +52,56 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
 
         application = (SenzorApplication) this.getApplication();
         application.setCallback(this);
+        Log.d(TAG, "OnCreate: set handler callback LoginActivity");
 
-        initUI();
+        initUi();
+        Log.d(TAG, "OnCreate: activity created");
     }
 
     /**
-     * Initialize layout components
+     * {@inheritDoc}
      */
-    private void initUI() {
+    protected void onResume() {
+        super.onResume();
+
+        // register broadcast receiver from here
+        Log.d(TAG, "OnResume: registering broadcast receiver");
+        if (dataUpdateReceiver == null) dataUpdateReceiver = new DataUpdateReceiver();
+        IntentFilter intentFilter = new IntentFilter(WebSocketService.WEB_SOCKET_CONNECTED);
+        registerReceiver(dataUpdateReceiver, intentFilter);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected void onPause() {
+        super.onPause();
+
+        // un-register broadcast receiver from here
+        Log.d(TAG, "OnPause: un-registering broadcast receiver");
+        if (dataUpdateReceiver != null) unregisterReceiver(dataUpdateReceiver);
+    }
+
+    /**
+     * Initialize UI components
+     */
+    private void initUi() {
+        Typeface typefaceThin = Typeface.createFromAsset(getAssets(), "fonts/Roboto-Thin.ttf");
+        Typeface typefaceBlack = Typeface.createFromAsset(getAssets(), "fonts/Roboto-Black.ttf");
+
         username = (EditText) findViewById(R.id.login_layout_username);
         password = (EditText) findViewById(R.id.login_layout_password);
         loginButton = (RelativeLayout) findViewById(R.id.login_button_panel);
+        appName = (TextView) findViewById(R.id.sensor_text);
+        appDescription = (TextView) findViewById(R.id.sensor_text1);
+        loginText = (TextView) findViewById(R.id.edit_invoice_layout_mark_as_paid_text);
         loginButton.setOnClickListener(LoginActivity.this);
 
-        Typeface tf = Typeface.createFromAsset(getAssets(),
-                "fonts/Roboto-Thin.ttf");
-        Typeface tf1 = Typeface.createFromAsset(getAssets(),
-                "fonts/Roboto-Black.ttf");
-        TextView tv = (TextView) findViewById(R.id.sensor_text);
-        TextView tv1 = (TextView) findViewById(R.id.sensor_text1);
-        TextView loginText = (TextView) findViewById(R.id.edit_invoice_layout_mark_as_paid_text);
-        TextView username = (TextView) findViewById(R.id.login_layout_username);
-        TextView password = (TextView) findViewById(R.id.login_layout_password);
-        tv.setTypeface(tf1);
-        tv1.setTypeface(tf, Typeface.BOLD);
-        loginText.setTypeface(tf, Typeface.BOLD);
-        username.setTypeface(tf);
-        password.setTypeface(tf);
+        appName.setTypeface(typefaceBlack);
+        appDescription.setTypeface(typefaceThin, Typeface.BOLD);
+        loginText.setTypeface(typefaceThin, Typeface.BOLD);
+        username.setTypeface(typefaceThin);
+        password.setTypeface(typefaceThin);
     }
 
     /**
@@ -76,37 +110,45 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
     @Override
     public void onClick(View v) {
         if (v==loginButton) {
-            System.out.println("click login");
+            Log.d(TAG, "OnClick: click login");
             login();
         }
     }
 
     /**
      * Login action
+     * Connect to web socket and send username password to server
      */
     private void login() {
         if(NetworkUtil.isAvailableNetwork(LoginActivity.this)) {
             if(!username.getText().toString().trim().equals("") && !password.getText().toString().trim().equals("")) {
                 // create user and share in application
-                application.setUser(new User(username.getText().toString().trim(), username.getText().toString().trim(),
-                        password.getText().toString().trim()));
+                application.setUser(new User(username.getText().toString().trim(), username.getText().toString().trim(),password.getText().toString().trim()));
+                Log.d(TAG, "Login: user shared in application");
 
                 // open web socket and send username password fields
                 // we are authenticate with web sockets
                 if(!application.getWebSocketConnection().isConnected()) {
-                    ActivityUtils.showProgressDialog(LoginActivity.this, "Connecting to server...");
+                    Log.d(TAG, "Login: not connected to web socket");
+                    Log.d(TAG, "Login: connecting to web socket via service");
+                    ActivityUtils.showProgressDialog(LoginActivity.this, "Connecting to senZors...");
                     Intent serviceIntent = new Intent(LoginActivity.this, WebSocketService.class);
                     startService(serviceIntent);
-                    //switchToHome();
+                } else {
+                    Log.d(TAG, "Login: already connected to web socket");
                 }
+            } else {
+                Log.d(TAG, "Login: empty username/password");
             }
         } else {
+            Log.w(TAG, "Login: no network connection");
             Toast.makeText(LoginActivity.this, "Cannot connect to server, Please check your network connection", Toast.LENGTH_LONG).show();
         }
     }
 
     /**
      * Switch to home activity
+     * This method will be call after successful login
      */
     private void switchToHome() {
         Intent intent = new Intent(this, HomeActivity.class);
@@ -121,24 +163,52 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
      */
     @Override
     public boolean handleMessage(Message message) {
+        Log.d(TAG, "HandleMessage: message from server");
         ActivityUtils.cancelProgressDialog();
+
         // we handle string messages only from here
         if(message.obj instanceof String) {
             String payLoad = (String)message.obj;
+            Log.d(TAG, "HandleMessage: message is a string - " + payLoad);
 
-            // successful login returns "Hello"
+            // successful login returns "LoginSUCCESS"
             if(payLoad.equalsIgnoreCase("LoginSUCCESS")) {
                 // un-register login activity from callback
+                Log.d(TAG, "HandleMessage: login success");
                 switchToHome();
                 return true;
             } else {
-                if(application.getWebSocketConnection().isConnected())
+                Log.d(TAG, "HandleMessage: login fail");
+                if(application.getWebSocketConnection().isConnected()) {
+                    Log.d(TAG, "HandleMessage: disconnect from web socket");
                     application.getWebSocketConnection().disconnect();
+                }
+
                 Toast.makeText(LoginActivity.this, "Login fail", Toast.LENGTH_LONG).show();
             }
+        } else {
+            Log.e(TAG, "HandleMessage: message is NOT a string(may be location object)");
         }
 
         return false;
+    }
+
+    /**
+     * Register this receiver to get connect/ disconnect messages from web socket
+     * Need to do relevant action according to the message, actions as below
+     *  1. connect - send login query to server via web socket connections
+     *  2. disconnect - logout user
+     */
+    private class DataUpdateReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "OnReceive: received broadcast message");
+            if (intent.getAction().equals(WebSocketService.WEB_SOCKET_CONNECTED)) {
+                // send login request to server
+                Log.d(TAG, "OnReceive: received broadcast message " + WebSocketService.WEB_SOCKET_CONNECTED);
+                QueryHandler.handleLogin(application);
+            }
+        }
     }
 
 }

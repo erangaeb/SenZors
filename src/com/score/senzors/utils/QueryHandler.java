@@ -24,6 +24,8 @@ import java.util.HashMap;
  */
 public class QueryHandler {
 
+    private static final String TAG = QueryParser.class.getName();
+
     /**
      * Generate login query and send to server
      * @param application application object instance
@@ -37,6 +39,7 @@ public class QueryHandler {
         params.put("skey", application.getUser().getPassword());
         String message = QueryParser.getMessage(new Query(command, "mysensors", params));
 
+        System.out.println("login message " + message);
         application.getWebSocketConnection().sendTextMessage(message);
     }
 
@@ -105,7 +108,9 @@ public class QueryHandler {
      */
     private static void handleShareQuery(SenzorApplication application, Query query) {
         // add new sensor to friend sensor list that shared in application
-        application.getFiendSensorList().add(new Sensor(query.getUser(), "Location", "Location", false, false));
+        Sensor sensor = new Sensor(query.getUser(), "Location", "Location", false, false);
+        if(!application.getFiendSensorList().contains(sensor))
+            application.getFiendSensorList().add(sensor);
 
         // currently we have to launch friend sensor
         // update notification to notify user about incoming query/ share request

@@ -59,4 +59,19 @@ public class Sensor {
     public void setAvailable(boolean available) {
         isAvailable = available;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof Sensor) {
+            Sensor toCompare = (Sensor) obj;
+            return (this.user.equalsIgnoreCase(toCompare.getUser()) && this.sensorName.equalsIgnoreCase(toCompare.getSensorName()));
+        }
+
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return (this.user + this.sensorName).hashCode();
+    }
 }

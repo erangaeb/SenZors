@@ -3,7 +3,6 @@ package com.score.senzors.utils;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import com.score.senzors.services.WebSocketService;
@@ -39,19 +38,19 @@ public class NotificationUtils {
         Intent resultIntent = new Intent(webSocketService, HomeActivity.class);
         resultIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(webSocketService);
+        /*TaskStackBuilder stackBuilder = TaskStackBuilder.create(webSocketService);
         // Adds the back stack
         stackBuilder.addParentStack(HomeActivity.class);
         // Adds the Intent to the top of the stack
         stackBuilder.addNextIntent(resultIntent);
 
         // Gets a PendingIntent containing the entire back stack
-        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);*/
+        PendingIntent pendingIntent = PendingIntent.getActivity(webSocketService, 0, resultIntent, 0);
 
         // Build notification
         builder.setContentTitle("SenZors")
-                .setContentText("Touch for launch SenZors").setSmallIcon(R.drawable.app_icon121)
-                .setContentIntent(resultPendingIntent).build();
+                .setContentText("Touch for launch SenZors").setSmallIcon(R.drawable.app_icon121).setContentIntent(pendingIntent).build();
 
         Notification notification = builder.build();
         notification.flags |= Notification.FLAG_FOREGROUND_SERVICE;

@@ -1,5 +1,6 @@
 package com.score.senzors.utils;
 
+import android.util.Log;
 import com.score.senzors.exceptions.InvalidQueryException;
 import com.score.senzors.pojos.Query;
 
@@ -15,6 +16,8 @@ import java.util.List;
  */
 public class QueryParser {
 
+    private static final String TAG = QueryParser.class.getName();
+
     // define query commands
     // we support only for 3 commands in mobile
     private static List<String> commandList = Arrays.asList("GET", "SHARE", "DATA");
@@ -25,6 +28,7 @@ public class QueryParser {
      * @return Query object
      */
     public static Query parse(String message) throws InvalidQueryException {
+        Log.d(TAG, "Parse: parsing query " + message);
         // split message and put in linked list
         // we need to user pop operation here
         String[] tokens = message.split(" ");
@@ -33,6 +37,9 @@ public class QueryParser {
         String command = getCommand(tokens);
         String user = getUser(tokens);
         HashMap<String, String> params = getParams(tokens);
+        Log.d(TAG, "Parse: command " + command);
+        Log.d(TAG, "Parse: user " + user);
+        Log.d(TAG, "Parse: params " + params);
 
         return new Query(command, user, params);
     }
@@ -100,13 +107,16 @@ public class QueryParser {
                     throw new InvalidQueryException();
                 }
             } else {
-                // other queries(SHARE and GET) only contains param
+                // other queries(SHARE and GET) only contains param, no values
                 // @user1 SHARE #gps
-                // @user1 GET #gps
+                // @user1 GET #lat #lon
                 // @user1 GET #tp
                 // we remove # sing and store in the map
+                // map contains entries like
+                //  ('lat' 'lat')
+                //  ('lon', 'lon')
                 String paramValue = tokens[i].substring(1, tokens[i].length());
-                paramMap.put("param", paramValue);
+                paramMap.put(paramValue, paramValue);
             }
         }
 
@@ -120,12 +130,14 @@ public class QueryParser {
      * @return query string
      */
     public static String getMessage(Query query) {
+        Log.d(TAG, "GetMessage: getting message");
         String message = query.getCommand();
 
         for(String key : query.getParams().keySet()) {
             // iterate over parameter map and add to query
-            if (key.equalsIgnoreCase("param")) {
+            if (key.equalsIgnoreCase(query.getParams().get(key))) {
                 // GET or SHARE query
+                // param and value equal since no value to store (SHARE #lat #lon @user1)
                 message = message.concat(" ").concat("#").concat(query.getParams().get(key));
             } else {
                 // LOGIN or DATA query
@@ -139,6 +151,7 @@ public class QueryParser {
             message = message.concat(" ").concat("@").concat(query.getUser());
         }
 
+        Log.d(TAG, "GetMessage: message " + message);
         return message;
     }
 
@@ -146,8 +159,8 @@ public class QueryParser {
         try {
             String query = "@user1 DATA #lat 2.3434 #lon 34.45454";
             String query1 = "@user1 DATA #msg LOGINOK";
-            String query2 = "@user1 SHARE #gps";
-            String query3 = "@user1 GET #gps";
+            String query2 = "@user1 SHARE #lat #lon";
+            String query3 = "@user1 GET #lat #lon";
             String[] tokens = query.split(" ");
             String[] tokens1 = query1.split(" ");
             String[] tokens2 = query2.split(" ");
@@ -176,20 +189,32 @@ public class QueryParser {
             HashMap<String, String> valMap4 = new HashMap<String, String>();
             valMap4.put("name", "eranga");
             valMap4.put("key", "123");
-            Query query4= new Query("LOGIN", "", valMap4);
+            Query query4= new Query("LOGIN", "mysensors", valMap4);
             System.out.println(QueryParser.getMessage(query4));
             System.out.println("----------------");
 
             HashMap<String, String> valMap5 = new HashMap<String, String>();
-            valMap5.put("param", "gps");
+            valMap5.put("lat", "lat");
+            valMap5.put("lon", "lon");
             Query query5 = new Query("SHARE", "eranga", valMap5);
             System.out.println(QueryParser.getMessage(query5));
             System.out.println("----------------");
 
             HashMap<String, String> valMap6 = new HashMap<String, String>();
-            valMap6.put("param", "gps");
+            valMap6.put("lat", "lat");
+            valMap6.put("lon", "lon");
             Query query6 = new Query("GET", "user1", valMap6);
             System.out.println(QueryParser.getMessage(query6));
+            System.out.println("----------------");
+
+            ArrayList<Sensor> sensors = new ArrayList<Sensor>();
+            sensors.add(new Sensor("test", "testsen", "", true, false));
+            sensors.add(new Sensor("test1", "testsen", "", true, false));
+            sensors.add(new Sensor("test2", "testsen", "", true, false));
+
+            System.out.println("----------------");
+            System.out.println(sensors.contains(new Sensor("test", "Testsen", "", true, false)));
+            System.out.println(sensors.contains(new Sensor("test", "testsen1", "", true, false)));
             System.out.println("----------------");
         } catch (InvalidQueryException e) {
             System.out.println(e.toString());

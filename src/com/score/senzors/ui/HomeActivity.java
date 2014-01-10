@@ -1,15 +1,18 @@
 package com.score.senzors.ui;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -19,7 +22,8 @@ import android.widget.ListView;
 import com.score.senzors.application.SenzorApplication;
 import com.score.senzors.pojos.DrawerItem;
 import com.score.senzors.R;
-import com.score.senzors.utils.NotificationUtils;
+import com.score.senzors.services.WebSocketService;
+import com.score.senzors.utils.ActivityUtils;
 
 import java.util.ArrayList;
 
@@ -31,16 +35,19 @@ import java.util.ArrayList;
  */
 public class HomeActivity extends FragmentActivity {
 
-    // drawer components
-    ArrayList<DrawerItem> drawerItemList;
-    DrawerAdapter adapter;
+    private static final String TAG = HomeActivity.class.getName();
+
+    private SenzorApplication application;
+    private DataUpdateReceiver dataUpdateReceiver;
+
+    // Ui components
     private ListView drawerListView;
     private DrawerLayout drawerLayout;
     private HomeActionBarDrawerToggle homeActionBarDrawerToggle;
 
-    SenzorApplication application;
-
-    Typeface tf;
+    // drawer components
+    private ArrayList<DrawerItem> drawerItemList;
+    private DrawerAdapter drawerAdapter;
 
     /**
      * {@inheritDoc}
@@ -51,30 +58,61 @@ public class HomeActivity extends FragmentActivity {
         setContentView(R.layout.home_layout);
 
         application = (SenzorApplication)this.getApplication();
-        tf = Typeface.createFromAsset(getAssets(), "fonts/Roboto-Thin.ttf");
-
-        // enable ActionBar app icon to behave as action to toggle nav drawer
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-        getActionBar().setHomeButtonEnabled(true);
-        //getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#985a30")));
-
-        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-
-        // set a custom shadow that overlays the main content when the drawer
-        // opens
-        drawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
 
         initDrawer();
-        homeActionBarDrawerToggle = new HomeActionBarDrawerToggle(this, drawerLayout);
-        drawerLayout.setDrawerListener(homeActionBarDrawerToggle);
-
+        initDrawerList();
         loadSensors();
+
+        Log.d(TAG, "OnCreate: fragment activity created");
     }
 
     /**
-     * Initialize Drawer menu
+     * {@inheritDoc}
+     */
+    protected void onResume() {
+        super.onResume();
+
+        // register broadcast receiver from here
+        Log.d(TAG, "OnResume: registering broadcast receiver");
+        if (dataUpdateReceiver == null) dataUpdateReceiver = new DataUpdateReceiver();
+        IntentFilter intentFilter = new IntentFilter(WebSocketService.WEB_SOCKET_DISCONNECTED);
+        registerReceiver(dataUpdateReceiver, intentFilter);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected void onPause() {
+        super.onPause();
+
+        // un-register broadcast receiver from here
+        Log.d(TAG, "OnPause: un-registering broadcast receiver");
+        if (dataUpdateReceiver != null) unregisterReceiver(dataUpdateReceiver);
+    }
+
+    /**
+     * Initialize Drawer UI components
      */
     private void initDrawer() {
+        // enable ActionBar app icon to behave as action to toggle nav drawer
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setHomeButtonEnabled(true);
+
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+        // set a custom shadow that overlays the main content when the drawer opens
+        // set up drawer listener
+        drawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+        homeActionBarDrawerToggle = new HomeActionBarDrawerToggle(this, drawerLayout);
+        drawerLayout.setDrawerListener(homeActionBarDrawerToggle);
+
+        Log.d(TAG, "InitDrawer: drawer initialized");
+    }
+
+    /**
+     * Initialize Drawer list
+     */
+    private void initDrawerList() {
         // initialize drawer content
         // need to determine selected item according to the currently selected sensor type
         drawerItemList = new ArrayList<DrawerItem>();
@@ -86,13 +124,14 @@ public class HomeActivity extends FragmentActivity {
             drawerItemList.add(new DrawerItem("Friends.SenZors", R.drawable.share_normal, R.drawable.share, true));
         }
 
-        adapter = new DrawerAdapter(HomeActivity.this, drawerItemList);
-
+        drawerAdapter = new DrawerAdapter(HomeActivity.this, drawerItemList);
         drawerListView = (ListView) findViewById(R.id.drawer);
+
         if (drawerListView != null)
-            drawerListView.setAdapter(adapter);
+            drawerListView.setAdapter(drawerAdapter);
 
         drawerListView.setOnItemClickListener(new DrawerItemClickListener());
+        Log.d(TAG, "InitDrawerList: initialized drawer list");
     }
 
     /**
@@ -145,23 +184,26 @@ public class HomeActivity extends FragmentActivity {
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-		/*
-		 * The action bar home/up should open or close the drawer.
-		 * ActionBarDrawerToggle will take care of this.
-		 */
+		// The action bar home/up should open or close the drawer.
+		// ActionBarDrawerToggle will take care of this.
         if (homeActionBarDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
 
         switch (item.getItemId()) {
             case R.id.action_help:
+                Log.d(TAG, "OnOptionsItemSelected: help action clicked");
                 // TODO display help view
                 break;
             case R.id.action_logout:
-                if(application.getWebSocketConnection().isConnected())
+                Log.d(TAG, "OnOptionsItemSelected: logout action clicked");
+                if(application.getWebSocketConnection().isConnected()) {
+                    Log.d(TAG, "OnOptionsItemSelected: web socket connected, so disconnect it");
+                    ActivityUtils.showProgressDialog(HomeActivity.this, "Disconnecting from senZors...");
                     application.getWebSocketConnection().disconnect();
-                NotificationUtils.cancelNotification();
-                switchToLogin();
+                } else {
+                    Log.d(TAG, "OnOptionsItemSelected: web socket not connected");
+                }
 
                 break;
         }
@@ -184,7 +226,6 @@ public class HomeActivity extends FragmentActivity {
          */
         @Override
         public void onDrawerClosed(View view) {
-            //getActionBar().setTitle("My.senzors");
             invalidateOptionsMenu();
         }
 
@@ -193,7 +234,6 @@ public class HomeActivity extends FragmentActivity {
          */
         @Override
         public void onDrawerOpened(View drawerView) {
-            //getActionBar().setTitle("My.senzors");
             invalidateOptionsMenu();
         }
     }
@@ -207,7 +247,6 @@ public class HomeActivity extends FragmentActivity {
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             // Highlight the selected item, update the title, and close the drawer
             // update selected item and title, then close the drawer
-            //drawerListView.setItemChecked(position, true);
             drawerLayout.closeDrawer(drawerListView);
 
             //  reset content in drawer list
@@ -229,7 +268,7 @@ public class HomeActivity extends FragmentActivity {
                 drawerItemList.get(1).setSelected(true);
             }
 
-            adapter.notifyDataSetChanged();
+            drawerAdapter.notifyDataSetChanged();
         }
     }
 
@@ -244,8 +283,8 @@ public class HomeActivity extends FragmentActivity {
         // and add the transaction to the back stack so the user can navigate back
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.main, sensorListFragment);
-        //transaction.addToBackStack(null);
         transaction.commit();
+        Log.d(TAG, "LoadSensors: load sensor list fragment");
     }
 
     /**
@@ -259,12 +298,13 @@ public class HomeActivity extends FragmentActivity {
         // and add the transaction to the back stack so the user can navigate back
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.main, friendListFragment);
-        //transaction.addToBackStack(null);
         transaction.commit();
+        Log.d(TAG, "LoadFriends: load friend list fragment");
     }
 
     /**
-     *
+     * Navigate to login activity
+     * This happens when logout
      */
     private void switchToLogin() {
         Intent intent = new Intent(this, LoginActivity.class);
@@ -272,5 +312,26 @@ public class HomeActivity extends FragmentActivity {
         HomeActivity.this.finish();
 
         HomeActivity.this.overridePendingTransition(R.anim.left_in, R.anim.right_out);
+        Log.d(TAG, "SwitchToLogin: switched to login activity");
     }
+
+    /**
+     * Register this receiver to get disconnect messages from web socket
+     * Need to do relevant action according to the message, actions as below
+     *  1. connect - send login query to server via web socket connections
+     *  2. disconnect - disconnect from server
+     */
+    private class DataUpdateReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "OnReceive: received broadcast message");
+            ActivityUtils.cancelProgressDialog();
+            if (intent.getAction().equals(WebSocketService.WEB_SOCKET_DISCONNECTED)) {
+                // cancel existing notifications after disconnect
+                Log.d(TAG, "OnReceive: received broadcast message " + WebSocketService.WEB_SOCKET_DISCONNECTED);
+                switchToLogin();
+            }
+        }
+    }
+
 }
