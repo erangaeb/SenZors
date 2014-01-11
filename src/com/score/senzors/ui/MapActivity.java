@@ -79,8 +79,20 @@ public class MapActivity extends FragmentActivity implements View.OnClickListene
     protected void onResume() {
         super.onResume();
 
-        Log.d(TAG, "OnResume: setting up map");
+        Log.d(TAG, "OnResume: setting up map, set handler callback MapActivity");
+        application.setCallback(this);
         setUpMapIfNeeded();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected void onPause() {
+        super.onPause();
+
+        // un-register handler from here
+        Log.d(TAG, "OnPause: reset handler callback MapActivity");
+        application.setCallback(null);
     }
 
     /**
@@ -225,7 +237,6 @@ public class MapActivity extends FragmentActivity implements View.OnClickListene
             ActivityUtils.showProgressDialog(this, "Accessing location...");
             application.setRequestFromFriend(false);
             application.setRequestQuery(null);
-            application.setCallback(this);
             Intent serviceIntent = new Intent(this, GpsReadingService.class);
             startService(serviceIntent);
         } else if(v==mapActivity) {

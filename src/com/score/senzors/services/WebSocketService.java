@@ -19,17 +19,22 @@ import de.tavendo.autobahn.WebSocketException;
 public class WebSocketService extends Service {
 
     private static final String TAG = WebSocketService.class.getName();
+    private SenzorApplication application;
 
     public static final String WEB_SOCKET_CONNECTED = "WEB_SOCKET_CONNECTED";
     public static final String WEB_SOCKET_DISCONNECTED = "WEB_SOCKET_DISCONNECTED";
 
-    private SenzorApplication application;
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onCreate() {
         application = (SenzorApplication) getApplication();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         // connect to web socket from here
@@ -40,12 +45,18 @@ public class WebSocketService extends Service {
         return START_STICKY;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public IBinder onBind(Intent intent) {
         // We don't provide binding, so return null
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onDestroy() {
         Log.d(TAG, "OnDestroy: service destroyed");

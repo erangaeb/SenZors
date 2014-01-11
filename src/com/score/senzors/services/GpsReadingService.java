@@ -6,6 +6,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Message;
+import android.util.Log;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -22,8 +23,8 @@ public class GpsReadingService extends Service implements GooglePlayServicesClie
                                                           GooglePlayServicesClient.OnConnectionFailedListener,
                                                           com.google.android.gms.location.LocationListener {
 
-    SenzorApplication application;
-    private LocationClient locationClient;
+    private static final String TAG = GpsReadingService.class.getName();
+    private SenzorApplication application;
 
     // Milliseconds per second
     private static final int MILLISECONDS_PER_SECOND = 1000;
@@ -37,13 +38,15 @@ public class GpsReadingService extends Service implements GooglePlayServicesClie
     private static final long FASTEST_INTERVAL = MILLISECONDS_PER_SECOND * FASTEST_INTERVAL_IN_SECONDS;
 
     // Define an object that holds accuracy and frequency parameters
-    LocationRequest locationRequest;
+    private LocationClient locationClient;
+    private LocationRequest locationRequest;
 
-    /*
-     Called before service  onStart method is called.All Initialization part goes here
-    */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onCreate() {
+        Log.d(TAG, "OnCreate: creating service");
         application = (SenzorApplication) getApplication();
         locationClient = new LocationClient(getApplicationContext(), this,this);
 
@@ -57,46 +60,49 @@ public class GpsReadingService extends Service implements GooglePlayServicesClie
         locationRequest.setFastestInterval(FASTEST_INTERVAL);
     }
 
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        System.out.println("###################################");
-        System.out.println("//////LocationService Started//////");
-        System.out.println("###################################");
-
-        if (isServicesConnected())
-            locationClient.connect();
+        Log.d(TAG, "OnStartCommand: starting service");
+        if (isServicesConnected()) locationClient.connect();
 
         // If we get killed, after returning from here, restart
         return START_STICKY;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public IBinder onBind(Intent intent) {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        System.out.println("###################################");
-        System.out.println("//////LocationConnection Fail//////");
-        System.out.println("###################################");
+        Log.e(TAG, "OnConnectionFailed: connection fail");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onConnected(Bundle arg0) {
-        System.out.println("###################################");
-        System.out.println("//////////LocationConnected////////");
-        System.out.println("###################################");
-
+        Log.d(TAG, "OnConnected: location client connected");
         locationClient.requestLocationUpdates(locationRequest, this);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onDisconnected() {
-        System.out.println("###################################");
-        System.out.println("////////LocationDisconnected///////");
-        System.out.println("###################################");
+        Log.d(TAG, "OnDisconnected: location client disconnected");
     }
 
     /**
@@ -109,29 +115,32 @@ public class GpsReadingService extends Service implements GooglePlayServicesClie
 
         // If Google Play services is available
         if (ConnectionResult.SUCCESS == resultCode) {
+            Log.d(TAG, "IsServicesConnected: google play service available");
             return true;
         } else {
+            Log.e(TAG, "IsServicesConnected: google play service not available");
             return false;
         }
     }
 
-    /*
-     Called when Service running in background is stopped.
-     Remove location update to stop receiving gps reading
-    */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onDestroy() {
-        System.out.println("###################################");
-        System.out.println("/////LocationService Destroyed/////");
-        System.out.println("###################################");
-
         super.onDestroy();
+        Log.d(TAG, "OnDestroy: service destroyed");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onLocationChanged(Location location) {
-        System.out.println(location.getLatitude());
-        System.out.println(location.getLongitude());
+        Log.d(TAG, "OnLocationChanged: location changed");
+        Log.d(TAG, "OnLocationChanged: lat - " + location.getLatitude());
+        Log.d(TAG, "OnLocationChanged: lon - " + location.getLongitude());
+
         // get location and send to appropriate handle
         // the close location updates
         // stop service
@@ -150,8 +159,10 @@ public class GpsReadingService extends Service implements GooglePlayServicesClie
              * The current Activity is the listener, so
              * the argument is "this".
              */
-             locationClient.removeLocationUpdates(this);
+            Log.d(TAG, "OnLocationChanged: removed location updates");
+            locationClient.removeLocationUpdates(this);
         }
+
         /*
          * After disconnect() is called, the client is
          * considered "dead".
@@ -166,18 +177,21 @@ public class GpsReadingService extends Service implements GooglePlayServicesClie
      * @param location current location
      */
     private void handleLocationRequestFromSever(Location location) {
+        Log.d(TAG, "HandleLocationRequestFromSever: location request from server");
+
         String command = "DATA";
         String user = application.getRequestQuery().getUser();
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("lat", Double.toString(location.getLatitude()));
         params.put("lon", Double.toString(location.getLongitude()));
         String message = QueryParser.getMessage(new Query(command, user, params));
-        System.out.println("-----------------");
-        System.out.println(message);
 
         // send data to server
         if(application.getWebSocketConnection().isConnected()) {
+            Log.d(TAG, "HandleLocationRequestFromSever: web socket connected, so sending reply to server");
             application.getWebSocketConnection().sendTextMessage(message);
+        } else {
+            Log.e(TAG, "HandleLocationRequestFromSever: web socket not connected");
         }
     }
 
@@ -187,13 +201,17 @@ public class GpsReadingService extends Service implements GooglePlayServicesClie
      * @param location current location
      */
     private void handleLocationRequestFromSensorList(Location location) {
+        Log.d(TAG, "HandleLocationRequestFromSensorList: location request from app");
         LatLon latLon = new LatLon(Double.toString(location.getLatitude()), Double.toString(location.getLongitude()));
 
         // send message to available handler
         Message message = Message.obtain();
         message.obj = latLon;
         if (application.getHandler()!=null) {
+            Log.d(TAG, "HandleLocationRequestFromSensorList: send message to available handler");
             application.getHandler().sendMessage(message);
+        } else {
+            Log.e(TAG, "HandleLocationRequestFromSensorList: no available handler");
         }
     }
 }
