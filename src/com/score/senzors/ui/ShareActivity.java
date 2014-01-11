@@ -68,6 +68,7 @@ public class ShareActivity extends Activity implements Handler.Callback {
      * Initialize UI components
      */
     private void initUI() {
+        Log.d(TAG, "InitUI: initializing UI components");
         Typeface typefaceThin = Typeface.createFromAsset(this.getAssets(), "fonts/Roboto-Thin.ttf");
 
         emailEditText = (EditText) findViewById(R.id.share_layout_email_text);
