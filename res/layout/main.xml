@@ -32,7 +32,7 @@
         </fragment>
 
 
-        <ImageButton
+        <!--<ImageButton
             android:id="@+id/current_location"
             android:layout_height="54dp"
             android:layout_width="54dp"
@@ -41,6 +41,48 @@
             android:layout_marginRight="15sp"
             android:layout_marginTop="15sp"
             android:src="@android:drawable/ic_menu_mylocation">
-        </ImageButton>
+        </ImageButton>-->
+        <RelativeLayout
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:visibility="visible"
+                android:layout_marginBottom="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:id="@+id/map_location"
+                android:background="@drawable/share_button_selector">
+
+            <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/location">
+            </ImageView>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:visibility="visible"
+                android:layout_marginBottom="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_alignParentBottom="true"
+                android:id="@+id/map_activity"
+                android:layout_toLeftOf="@id/map_location"
+                android:background="@drawable/share_button_selector">
+
+            <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/activity">
+            </ImageView>
+
+        </RelativeLayout>
+
+
+
     </RelativeLayout>
 </RelativeLayout>

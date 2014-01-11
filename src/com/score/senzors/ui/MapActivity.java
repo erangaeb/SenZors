@@ -2,6 +2,7 @@ package com.score.senzors.ui;
 
 import android.app.ActionBar;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
@@ -12,26 +13,28 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.*;
 import com.score.senzors.R;
 import com.score.senzors.application.SenzorApplication;
 import com.score.senzors.pojos.LatLon;
 import com.score.senzors.services.GpsReadingService;
 import com.score.senzors.utils.ActivityUtils;
 
-public class MapActivity extends FragmentActivity implements View.OnClickListener,Handler.Callback {
+public class MapActivity extends FragmentActivity implements View.OnClickListener,Handler.Callback, GoogleMap.OnMarkerClickListener {
     /**
      * Note that this may be null if the Google Play services APK is not available.
      */
     private GoogleMap mMap;
-    private ImageButton locationButton;
     private Marker markerNow;
+    private  Circle circle;
+
+    private RelativeLayout mapLocation;
+    private RelativeLayout mapActivity;
 
     SenzorApplication application;
 
@@ -41,9 +44,15 @@ public class MapActivity extends FragmentActivity implements View.OnClickListene
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+
+
         application = (SenzorApplication) this.getApplication();
-        locationButton = (ImageButton) findViewById(R.id.current_location);
-        locationButton.setOnClickListener(this);
+        //locationButton = (ImageButton) findViewById(R.id.current_location);
+        //locationButton.setOnClickListener(this);
+        mapLocation = (RelativeLayout) findViewById(R.id.map_location);
+        mapActivity = (RelativeLayout) findViewById(R.id.map_activity);
+        mapLocation.setOnClickListener(MapActivity.this);
+        mapActivity.setOnClickListener(MapActivity.this);
         tf = Typeface.createFromAsset(this.getAssets(), "fonts/Roboto-Thin.ttf");
 
         // Set up action bar.
@@ -145,7 +154,9 @@ public class MapActivity extends FragmentActivity implements View.OnClickListene
         // Do a null check to confirm that we have not already instantiated the map.
         if (mMap == null) {
             // Try to obtain the map from the SupportMapFragment.
+            // disable zoom controller
             mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
+            mMap.getUiSettings().setZoomControlsEnabled(false);
             // Check if we were successful in obtaining the map.
             if (mMap != null) {
                 setUpMap();
@@ -165,10 +176,23 @@ public class MapActivity extends FragmentActivity implements View.OnClickListene
         if(markerNow != null)
             markerNow.remove();
 
+        if(circle != null) {
+            circle.remove();
+        }
+
         LatLon latLon = application.getLatLon();
         LatLng currentCoordinates = new LatLng(Double.parseDouble(latLon.getLat()), Double.parseDouble(latLon.getLon()));
-        markerNow = mMap.addMarker(new MarkerOptions().position(currentCoordinates).title("My location"));
+        markerNow = mMap.addMarker(new MarkerOptions().position(currentCoordinates).title("My location").icon(BitmapDescriptorFactory.fromResource(R.drawable.bluedot)));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentCoordinates, 15));
+
+        // ... get a map.
+        // Add a circle in Sydney
+        circle = mMap.addCircle(new CircleOptions()
+                .center(currentCoordinates)
+                .radius(500)
+                .strokeColor(0xFF0000FF)
+                .strokeWidth(0.5f)
+                .fillColor(0x110000FF));
     }
 
     /**
@@ -176,12 +200,26 @@ public class MapActivity extends FragmentActivity implements View.OnClickListene
      * @param latLon
      */
     private void moveToLocation(LatLon latLon) {
-        if(markerNow != null)
+        if(markerNow != null) {
             markerNow.remove();
+        }
+
+        if(circle != null) {
+            circle.remove();
+        }
 
         LatLng currentCoordinates = new LatLng(Double.parseDouble(latLon.getLat()), Double.parseDouble(latLon.getLon()));
-        markerNow = mMap.addMarker(new MarkerOptions().position(currentCoordinates).title("My new location"));
+        markerNow = mMap.addMarker(new MarkerOptions().position(currentCoordinates).title("My new location").icon(BitmapDescriptorFactory.fromResource(R.drawable.bluedot)));
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentCoordinates, 15));
+
+        // ... get a map.
+        // Add a circle in Sydney
+        circle = mMap.addCircle(new CircleOptions()
+                .center(currentCoordinates)
+                .radius(500)
+                .strokeColor(0xFF0000FF)
+                .strokeWidth(0.5f)
+                .fillColor(0x110000FF));
     }
 
     /**
@@ -195,9 +233,9 @@ public class MapActivity extends FragmentActivity implements View.OnClickListene
 
     @Override
     public void onClick(View v) {
-        if(v==locationButton) {
-            // get location or send request to server for get frieds location
-            // currently disply my location
+        if(v==mapLocation) {
+            // get location or send request to server for get friends location
+            // currently display my location
             // start location service to get my location
             ActivityUtils.showProgressDialog(this, "Accessing location...");
             application.setRequestFromFriend(false);
@@ -205,6 +243,17 @@ public class MapActivity extends FragmentActivity implements View.OnClickListene
             application.setCallback(this);
             Intent serviceIntent = new Intent(this, GpsReadingService.class);
             startService(serviceIntent);
+        } else if(v==mapActivity) {
+            // TODO get activity
         }
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        if (marker.equals(marker)) {
+            /* My Location dot callback ... */
+        }
+
+        return true;
     }
 }

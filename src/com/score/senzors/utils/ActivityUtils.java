@@ -49,7 +49,7 @@ public class ActivityUtils {
         progressDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.setContentView(R.layout.progress_dialog_layout);
-        progressDialog.getWindow().setLayout(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        progressDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
         // set dialog texts
         TextView messageText = (TextView) progressDialog.findViewById(R.id.progress_message);
