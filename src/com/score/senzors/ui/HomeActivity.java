@@ -199,7 +199,9 @@ public class HomeActivity extends FragmentActivity {
                 Log.d(TAG, "OnOptionsItemSelected: logout action clicked");
                 if(application.getWebSocketConnection().isConnected()) {
                     Log.d(TAG, "OnOptionsItemSelected: web socket connected, so disconnect it");
+                    Log.d(TAG, "OnOptionsItemSelected: force to disconnect web socket");
                     ActivityUtils.showProgressDialog(HomeActivity.this, "Disconnecting from senZors...");
+                    application.setForceToDisconnect(true);
                     application.getWebSocketConnection().disconnect();
                 } else {
                     Log.d(TAG, "OnOptionsItemSelected: web socket not connected");

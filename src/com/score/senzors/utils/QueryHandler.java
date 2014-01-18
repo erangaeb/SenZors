@@ -2,6 +2,7 @@ package com.score.senzors.utils;
 
 import android.content.Intent;
 import android.os.Message;
+import android.util.Log;
 import com.score.senzors.application.SenzorApplication;
 import com.score.senzors.exceptions.InvalidQueryException;
 import com.score.senzors.pojos.LatLon;
@@ -24,7 +25,7 @@ import java.util.HashMap;
  */
 public class QueryHandler {
 
-    private static final String TAG = QueryParser.class.getName();
+    private static final String TAG = QueryHandler.class.getName();
 
     /**
      * Generate login query and send to server
@@ -115,6 +116,7 @@ public class QueryHandler {
         // currently we have to launch friend sensor
         // update notification to notify user about incoming query/ share request
         application.setSensorType(SenzorApplication.FRIENDS_SENSORS);
+        Log.d(TAG, "HandleShareQuery: received query with type " + application.getSensorType());
         NotificationUtils.updateNotification(application.getApplicationContext(), "Location @" + query.getUser());
     }
 

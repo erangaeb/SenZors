@@ -63,7 +63,7 @@ public class MapActivity extends FragmentActivity implements View.OnClickListene
         // button will take the user one step up in the application's hierarchy.
         final ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setTitle("U1 #Location");
+        actionBar.setTitle(application.getCurrentSensor().getUser()+" #Location");
 
         // set action bar font type
         int titleId = getResources().getIdentifier("action_bar_title", "id", "android");
@@ -233,6 +233,7 @@ public class MapActivity extends FragmentActivity implements View.OnClickListene
             // get location or send request to server for get friends location
             // currently display my location
             // start location service to get my location
+            // TODO if this sensor is from friend get friends location , we currently displaying our location
             Log.d(TAG, "OnClick: click on location, get current location");
             ActivityUtils.showProgressDialog(this, "Accessing location...");
             application.setRequestFromFriend(false);

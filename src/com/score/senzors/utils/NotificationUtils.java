@@ -84,7 +84,7 @@ public class NotificationUtils {
      */
     public static void cancelNotification() {
         if(notificationManager!=null) {
-            notificationManager.cancel(SERVICE_NOTIFICATION_ID);
+            //notificationManager.cancel(SERVICE_NOTIFICATION_ID);
             notificationManager.cancel(MESSAGE_NOTIFICATION_ID);
         }
     }

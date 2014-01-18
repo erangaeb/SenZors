@@ -24,6 +24,10 @@ public class WebSocketService extends Service {
     public static final String WEB_SOCKET_CONNECTED = "WEB_SOCKET_CONNECTED";
     public static final String WEB_SOCKET_DISCONNECTED = "WEB_SOCKET_DISCONNECTED";
 
+    // Keep track with how many times we tried to connect to web socket
+    // maximum try 5 times with 5 seconds break
+    private static int REQUEST_COUNT = 0;
+
     /**
      * {@inheritDoc}
      */
@@ -42,7 +46,7 @@ public class WebSocketService extends Service {
         connectToWebSocket(application);
 
         // If we get killed, after returning from here, restart
-        return START_STICKY;
+        return START_NOT_STICKY;
     }
 
     /**
@@ -59,15 +63,16 @@ public class WebSocketService extends Service {
      */
     @Override
     public void onDestroy() {
+        // here we
+        //  1. cancel all notifications
+        //  2. delete all sensors in my sensor list
+        //  3. send broadcast message about service disconnecting
+        stopForeground(true);
+        NotificationUtils.cancelNotification();
+        application.emptyMySensors();
+        Intent disconnectMessage = new Intent(WebSocketService.WEB_SOCKET_DISCONNECTED);
+        sendBroadcast(disconnectMessage);
         Log.d(TAG, "OnDestroy: service destroyed");
-
-        // close web socket connection here
-        if(application.getWebSocketConnection().isConnected()) {
-            application.getWebSocketConnection().disconnect();
-            Log.d(TAG, "OnDestroy: close web socket connection");
-        } else {
-            Log.d(TAG, "OnDestroy: not connected to web socket");
-        }
     }
 
     /**
@@ -84,9 +89,11 @@ public class WebSocketService extends Service {
                 public void onOpen() {
                     // connected to web socket so notify it to activity
                     Log.d(TAG, "ConnectToWebSocket: open web socket");
-                    Intent connectMessage = new Intent(WebSocketService.WEB_SOCKET_CONNECTED);
-                    sendBroadcast(connectMessage);
+                    WebSocketService.REQUEST_COUNT = 0;
+                    QueryHandler.handleLogin(application);
                     NotificationUtils.initNotification(WebSocketService.this);
+                    //Intent connectMessage = new Intent(WebSocketService.WEB_SOCKET_CONNECTED);
+                    //sendBroadcast(connectMessage);
                 }
 
                 @Override
@@ -99,17 +106,46 @@ public class WebSocketService extends Service {
                 @Override
                 public void onClose(int code, String reason) {
                     Log.d(TAG, "ConnectToWebSocket: web socket closed");
-                    NotificationUtils.cancelNotification();
-                    Intent disconnectMessage = new Intent(WebSocketService.WEB_SOCKET_DISCONNECTED);
-                    sendBroadcast(disconnectMessage);
-                    stopForeground(true);
-
-                    // TODO start service again
-                    // TODO no need to stop service instead connect to web socket again
+                    Log.d(TAG, "ConnectToWebSocket: code - " + code);
+                    Log.d(TAG, "ConnectToWebSocket: reason - " + reason);
+                    if(application.isForceToDisconnect()) {
+                        Log.d(TAG, "ConnectToWebSocket: forced to disconnect, so stop the service");
+                        stopService(new Intent(getApplicationContext(), WebSocketService.class));
+                    } else {
+                        Log.d(TAG, "ConnectToWebSocket: NOT forced to disconnect, so reconnect again");
+                        if(code<4000) reconnectToWebSocket();
+                    }
                 }
             });
         } catch (WebSocketException e) {
             Log.e(TAG, "ConnectToWebSocket: error connecting to web socket", e);
+        }
+    }
+
+    /**
+     * Reconnect to web socket when connection drops
+     * We maximum try 5 times, after that ignore connecting
+     */
+    private void reconnectToWebSocket() {
+        if(WebSocketService.REQUEST_COUNT <=5) {
+            try {
+                if(application.getWebSocketConnection().isConnected()) {
+                    Log.e(TAG, "ReconnectToWebSocket: web socket already connected");
+                } else {
+                    // sleep for while and connect again
+                    Thread.sleep(5000);
+                    Log.e(TAG, "ReconnectToWebSocket: trying to re-connect " + (WebSocketService.REQUEST_COUNT+1) + " times");
+                    Log.d(TAG, "ReconnectToWebSocket: NOT force to close web socket");
+                    application.setForceToDisconnect(false);
+                    connectToWebSocket(application);
+                    WebSocketService.REQUEST_COUNT++;
+                }
+            } catch (InterruptedException e) {
+                Log.e(TAG, "ReconnectToWebSocket: error sleeping thread", e);
+            }
+        } else {
+            stopService(new Intent(getApplicationContext(), WebSocketService.class));
+            Log.d(TAG, "ReconnectToWebSocket: maximum re-connect count exceed");
         }
     }
 

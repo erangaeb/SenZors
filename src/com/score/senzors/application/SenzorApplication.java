@@ -65,6 +65,15 @@ public class SenzorApplication extends Application {
     // this location display on google map
     LatLon latLon;
 
+    // keep track with current senzor
+    // we mainly focus on type of current sensor, all the logic depends on the sensor type
+    Sensor currentSensor;
+
+    // We disconnect from web socket two ways
+    //  1. when log out - in here we don't need to reconnect to web socket
+    //  2. automatic disconnect(because of network drop of server error) - in her we need to re connect to web socket
+    boolean forceToDisconnect;
+
     /**
      * {@inheritDoc}
      */
@@ -78,10 +87,11 @@ public class SenzorApplication extends Application {
         setSensorType(MY_SENSORS);
         setFiendSensorList(new ArrayList<Sensor>());
         setMySensorList(new ArrayList<Sensor>());
-        mySensorList.add(new Sensor("I'm", "Location", "LocationValue", true, false));
 
         // initially we ready to response request from friend
+        // we don't want to force to disconnect from web socket
         setRequestFromFriend(true);
+        setForceToDisconnect(true);
     }
 
     public User getUser() {
@@ -176,6 +186,41 @@ public class SenzorApplication extends Application {
 
     public void setLatLon(LatLon latLon) {
         this.latLon = latLon;
+    }
+
+    public Sensor getCurrentSensor() {
+        return currentSensor;
+    }
+
+    public void setCurrentSensor(Sensor currentSensor) {
+        this.currentSensor = currentSensor;
+    }
+
+    public boolean isForceToDisconnect() {
+        return forceToDisconnect;
+    }
+
+    public void setForceToDisconnect(boolean forceToDisconnect) {
+        this.forceToDisconnect = forceToDisconnect;
+    }
+
+    /**
+     * Initialize my sensor list
+     * Get all available sensors of me and add to sensor list shared in application
+     */
+    public void initMySensors() {
+        // we only support location sensor
+        // TODO add more available sensors
+        mySensorList.add(new Sensor(getUser().getUsername(), "Location", "LocationValue", true, false));
+    }
+
+    /**
+     * Delete all sensors in my sensor list
+     */
+    public void emptyMySensors() {
+        for(Sensor sensor: this.mySensorList) {
+            mySensorList.remove(sensor);
+        }
     }
 
     public String getRandomLocation() {

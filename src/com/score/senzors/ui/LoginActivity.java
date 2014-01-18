@@ -21,6 +21,7 @@ import com.score.senzors.pojos.User;
 import com.score.senzors.services.WebSocketService;
 import com.score.senzors.utils.ActivityUtils;
 import com.score.senzors.utils.NetworkUtil;
+import com.score.senzors.utils.PreferenceUtils;
 import com.score.senzors.utils.QueryHandler;
 
 /**
@@ -131,9 +132,11 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
                 if(!application.getWebSocketConnection().isConnected()) {
                     Log.d(TAG, "Login: not connected to web socket");
                     Log.d(TAG, "Login: connecting to web socket via service");
+                    Log.d(TAG, "Login: force to disconnect web socket");
                     ActivityUtils.showProgressDialog(LoginActivity.this, "Connecting to senZors...");
                     Intent serviceIntent = new Intent(LoginActivity.this, WebSocketService.class);
                     startService(serviceIntent);
+                    application.setForceToDisconnect(true);
                 } else {
                     Log.d(TAG, "Login: already connected to web socket");
                 }
@@ -173,14 +176,19 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
 
             // successful login returns "LoginSUCCESS"
             if(payLoad.equalsIgnoreCase("LoginSUCCESS")) {
-                // un-register login activity from callback
                 Log.d(TAG, "HandleMessage: login success");
+                Log.d(TAG, "HandleMessage: NOT force to disconnect web socket");
+                PreferenceUtils.saveUser(LoginActivity.this, application.getUser());
+                application.initMySensors();
+                application.setForceToDisconnect(false);
                 switchToHome();
                 return true;
             } else {
                 Log.d(TAG, "HandleMessage: login fail");
                 if(application.getWebSocketConnection().isConnected()) {
                     Log.d(TAG, "HandleMessage: disconnect from web socket");
+                    Log.d(TAG, "HandleMessage: force to disconnect web socket");
+                    application.setForceToDisconnect(true);
                     application.getWebSocketConnection().disconnect();
                 }
 

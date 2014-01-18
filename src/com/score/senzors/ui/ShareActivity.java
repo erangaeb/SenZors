@@ -38,7 +38,7 @@ public class ShareActivity extends Activity implements Handler.Callback {
 
         application = (SenzorApplication) getApplication();
 
-        initUI();
+        initUi();
         Log.d(TAG, "OnCreate: activity created");
     }
 
@@ -67,7 +67,7 @@ public class ShareActivity extends Activity implements Handler.Callback {
     /**
      * Initialize UI components
      */
-    private void initUI() {
+    private void initUi() {
         Log.d(TAG, "InitUI: initializing UI components");
         Typeface typefaceThin = Typeface.createFromAsset(this.getAssets(), "fonts/Roboto-Thin.ttf");
 
@@ -139,7 +139,7 @@ public class ShareActivity extends Activity implements Handler.Callback {
             if(NetworkUtil.isAvailableNetwork(ShareActivity.this)) {
                 // construct query and send to server via web socket
                 if(application.getWebSocketConnection().isConnected()) {
-                    Log.w(TAG, "Login: sending query to server");
+                    Log.w(TAG, "Share: sending query to server");
                     application.getWebSocketConnection().sendTextMessage(query);
                 } else {
                     Log.w(TAG, "Share: not connected to web socket");

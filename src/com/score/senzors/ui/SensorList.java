@@ -68,6 +68,8 @@ public class SensorList extends Fragment implements Handler.Callback {
         application = (SenzorApplication) getActivity().getApplication();
         typeface = Typeface.createFromAsset(this.getActivity().getAssets(), "fonts/Roboto-Thin.ttf");
 
+        Log.d(TAG, "OnActivityCreated: sensor type " + application.getSensorType());
+
         initEmptyView();
         initSensorListView();
         initSensorList();
@@ -79,6 +81,8 @@ public class SensorList extends Fragment implements Handler.Callback {
      */
     public void onResume() {
         super.onResume();
+
+        // TODO refresh sensor list if need
 
         // register handler from here
         Log.d(TAG, "OnResume: set handler callback SensorList fragment");
@@ -116,6 +120,7 @@ public class SensorList extends Fragment implements Handler.Callback {
                 Log.d(TAG, "onItemClick: click on sensor list item");
                 if(position>0 && position <= sensorList.size()) {
                     Sensor sensor = sensorList.get(position-1);
+                    application.setCurrentSensor(sensor);
                     handleSensorListItemClick(sensor);
                 }
             }
@@ -132,6 +137,7 @@ public class SensorList extends Fragment implements Handler.Callback {
         // two sensor types to display
         //  1. My senzors
         //  2. Friends senzors
+        Log.d(TAG, "InitSensorList: sensor type " + application.getSensorType());
         if(application.getSensorType().equalsIgnoreCase(SenzorApplication.MY_SENSORS)) {
             // display my sensors
             //  1. initialize my sensors
