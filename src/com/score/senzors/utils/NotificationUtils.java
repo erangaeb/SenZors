@@ -37,15 +37,6 @@ public class NotificationUtils {
 
         Intent resultIntent = new Intent(webSocketService, HomeActivity.class);
         resultIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-
-        /*TaskStackBuilder stackBuilder = TaskStackBuilder.create(webSocketService);
-        // Adds the back stack
-        stackBuilder.addParentStack(HomeActivity.class);
-        // Adds the Intent to the top of the stack
-        stackBuilder.addNextIntent(resultIntent);
-
-        // Gets a PendingIntent containing the entire back stack
-        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);*/
         PendingIntent pendingIntent = PendingIntent.getActivity(webSocketService, 0, resultIntent, 0);
 
         // Build notification
@@ -84,7 +75,6 @@ public class NotificationUtils {
      */
     public static void cancelNotification() {
         if(notificationManager!=null) {
-            //notificationManager.cancel(SERVICE_NOTIFICATION_ID);
             notificationManager.cancel(MESSAGE_NOTIFICATION_ID);
         }
     }

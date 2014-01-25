@@ -2,6 +2,7 @@ package com.score.senzors.ui;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,7 +26,8 @@ public class SensorListAdapter extends BaseAdapter {
     private ArrayList<Sensor> sensorList;
 
     // set custom font
-    Typeface face;
+    Typeface typefaceThin;
+    Typeface typefaceBlack;
 
     /**
      * Initialize context variables
@@ -34,7 +36,8 @@ public class SensorListAdapter extends BaseAdapter {
      * @param sensorList sharing user list
      */
     public SensorListAdapter(Context context, ArrayList<Sensor> sensorList) {
-        face = Typeface.createFromAsset(context.getAssets(), "fonts/Roboto-Thin.ttf");
+        typefaceThin = Typeface.createFromAsset(context.getAssets(), "fonts/Roboto-Thin.ttf");
+        typefaceBlack = Typeface.createFromAsset(context.getAssets(), "fonts/Roboto-Black.ttf");
 
         this.context = context;
         this.sensorList = sensorList;
@@ -91,13 +94,15 @@ public class SensorListAdapter extends BaseAdapter {
 
             //create view holder to store reference to child views
             holder = new ViewHolder();
+            holder.sensorName = (TextView) view.findViewById(R.id.sensor_name_text);
             holder.sensorUser = (TextView) view.findViewById(R.id.sensor_list_row_layout_sensor_user);
             holder.sensorValue = (TextView) view.findViewById(R.id.sensor_list_row_layout_sensor_value);
             holder.share = (RelativeLayout) view.findViewById(R.id.sensor_list_row_layout_share);
 
             // set custom font
-            holder.sensorUser.setTypeface(face, Typeface.BOLD);
-            holder.sensorValue.setTypeface(face, Typeface.BOLD);
+            holder.sensorName.setTypeface(typefaceThin, Typeface.BOLD);
+            holder.sensorUser.setTypeface(typefaceBlack);
+            holder.sensorValue.setTypeface(typefaceThin, Typeface.BOLD);
 
             view.setTag(holder);
         } else {
@@ -129,26 +134,30 @@ public class SensorListAdapter extends BaseAdapter {
         // enable share and change color of view
         view.setBackgroundResource(R.drawable.my_sensor_background);
         viewHolder.share.setVisibility(View.GONE);
+        viewHolder.sensorName.setBackgroundResource(R.drawable.circle_shape_red);
+        viewHolder.sensorUser.setTextColor(Color.parseColor("#d96459"));
 
         if(sensor.isAvailable()) {
-            viewHolder.sensorUser.setText(sensor.getUser() + " at");
+            viewHolder.sensorUser.setText("@" + sensor.getUser());
             viewHolder.sensorValue.setText(sensor.getSensorValue());
         } else {
-            viewHolder.sensorUser.setText(sensor.getUser() + " at");
+            viewHolder.sensorUser.setText("@" + sensor.getUser());
             viewHolder.sensorValue.setText(R.string.tap_here);
         }
     }
 
     private void setUpFriendSensor(Sensor sensor, View view, ViewHolder viewHolder) {
         // disable share and change color of view
-        view.setBackgroundResource(R.drawable.friend_sensor_background);
+        view.setBackgroundResource(R.drawable.my_sensor_background);
         viewHolder.share.setVisibility(View.GONE);
+        viewHolder.sensorName.setBackgroundResource(R.drawable.circle_shape_green);
+        viewHolder.sensorUser.setTextColor(Color.parseColor("#11b29c"));
 
         if(sensor.isAvailable()) {
-            viewHolder.sensorUser.setText(sensor.getUser() + " at");
+            viewHolder.sensorUser.setText("@" + sensor.getUser());
             viewHolder.sensorValue.setText(sensor.getSensorValue());
         } else {
-            viewHolder.sensorUser.setText(sensor.getUser() + " at");
+            viewHolder.sensorUser.setText("@" + sensor.getUser());
             viewHolder.sensorValue.setText(R.string.tap_here);
         }
     }
@@ -157,6 +166,7 @@ public class SensorListAdapter extends BaseAdapter {
      * Keep reference to children view to avoid unnecessary calls
      */
     static class ViewHolder {
+        TextView sensorName;
         TextView sensorUser;
         TextView sensorValue;
         RelativeLayout share;

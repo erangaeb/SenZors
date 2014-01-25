@@ -13,14 +13,19 @@
         android:layout_width="match_parent"
         android:layout_height="100dp">
 
-        <ImageView
+        <TextView
                 android:layout_marginTop="12dp"
-                android:layout_width="100dp"
-                android:layout_height="90dp"
+                android:id="@+id/sensor_name_text"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
-                android:background="@drawable/map2">
-        </ImageView>
+                android:text="#GPS"
+                android:gravity="center"
+                android:textSize="20sp"
+                android:textColor="#FFFFFF"
+                android:background="@drawable/circle_shape_green">
+        </TextView>
 
         <LinearLayout
                 android:layout_alignParentRight="true"
@@ -74,8 +79,6 @@
             </RelativeLayout>-->
         </LinearLayout>
 
-
-
         <TextView
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -87,13 +90,14 @@
     </RelativeLayout>
 
     <TextView
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="0dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="23sp"
+        android:textSize="25sp"
         android:id="@+id/sensor_list_row_layout_sensor_user"
-        android:textColor="#4a4a4a"
-        android:text="I'm at"
+        android:textColor="#5e7d9a"
+        android:textStyle="bold"
+        android:text="eranga"
         android:layout_gravity="center_horizontal"
         android:layout_centerHorizontal="true">
     </TextView>
