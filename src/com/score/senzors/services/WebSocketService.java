@@ -2,6 +2,7 @@ package com.score.senzors.services;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.IBinder;
 import android.util.Log;
 import com.score.senzors.application.SenzorApplication;
@@ -25,8 +26,9 @@ public class WebSocketService extends Service {
     public static final String WEB_SOCKET_DISCONNECTED = "WEB_SOCKET_DISCONNECTED";
 
     // Keep track with how many times we tried to connect to web socket
-    // maximum try 5 times with 5 seconds break
-    private static int REQUEST_COUNT = 0;
+    // maximum try 10 times
+    private static int RECONNECT_COUNT = 0;
+    private static int MAX_RECONNECT_COUNT = 10;
 
     /**
      * {@inheritDoc}
@@ -89,7 +91,7 @@ public class WebSocketService extends Service {
                 public void onOpen() {
                     // connected to web socket so notify it to activity
                     Log.d(TAG, "ConnectToWebSocket: open web socket");
-                    WebSocketService.REQUEST_COUNT = 0;
+                    WebSocketService.RECONNECT_COUNT = 0;
                     QueryHandler.handleLogin(application);
                     NotificationUtils.initNotification(WebSocketService.this);
                     //Intent connectMessage = new Intent(WebSocketService.WEB_SOCKET_CONNECTED);
@@ -113,7 +115,7 @@ public class WebSocketService extends Service {
                         stopService(new Intent(getApplicationContext(), WebSocketService.class));
                     } else {
                         Log.d(TAG, "ConnectToWebSocket: NOT forced to disconnect, so reconnect again");
-                        if(code<4000) reconnectToWebSocket();
+                        if(code<4000) new WebSocketReConnector().execute();
                     }
                 }
             });
@@ -124,28 +126,58 @@ public class WebSocketService extends Service {
 
     /**
      * Reconnect to web socket when connection drops
-     * We maximum try 5 times, after that ignore connecting
+     * We maximum try 10 times, after that ignore connecting
      */
     private void reconnectToWebSocket() {
-        if(WebSocketService.REQUEST_COUNT <=5) {
-            try {
-                if(application.getWebSocketConnection().isConnected()) {
-                    Log.e(TAG, "ReconnectToWebSocket: web socket already connected");
-                } else {
-                    // sleep for while and connect again
-                    Thread.sleep(5000);
-                    Log.e(TAG, "ReconnectToWebSocket: trying to re-connect " + (WebSocketService.REQUEST_COUNT+1) + " times");
-                    Log.d(TAG, "ReconnectToWebSocket: NOT force to close web socket");
-                    application.setForceToDisconnect(false);
-                    connectToWebSocket(application);
-                    WebSocketService.REQUEST_COUNT++;
-                }
-            } catch (InterruptedException e) {
-                Log.e(TAG, "ReconnectToWebSocket: error sleeping thread", e);
+        if(WebSocketService.RECONNECT_COUNT<=WebSocketService.MAX_RECONNECT_COUNT) {
+            if(application.getWebSocketConnection().isConnected()) {
+                Log.e(TAG, "ReconnectToWebSocket: web socket already connected");
+            } else {
+                Log.e(TAG, "ReconnectToWebSocket: trying to re-connect " + (WebSocketService.RECONNECT_COUNT+1) + " times");
+                Log.d(TAG, "ReconnectToWebSocket: NOT force to close web socket");
+                application.setForceToDisconnect(false);
+                connectToWebSocket(application);
+                WebSocketService.RECONNECT_COUNT++;
             }
         } else {
             stopService(new Intent(getApplicationContext(), WebSocketService.class));
             Log.d(TAG, "ReconnectToWebSocket: maximum re-connect count exceed");
+        }
+    }
+
+    /**
+     * Async task use to reconnect web socket
+     * When web socket is disconnected we are trying to reconnect it via this task
+     */
+    private class WebSocketReConnector extends AsyncTask<Void, Void, Void> {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected Void doInBackground(Void... params) {
+            Log.d(TAG, "WebSocketReConnector: reconnecting via async task");
+            try {
+                // sleep for a while before reconnect
+                // sleep for random time interval
+                if(WebSocketService.RECONNECT_COUNT<=WebSocketService.MAX_RECONNECT_COUNT/2)
+                    Thread.sleep(5000);
+                else
+                    Thread.sleep(10000);
+                reconnectToWebSocket();
+            } catch (InterruptedException e) {
+                Log.e(TAG, "WebSocketReConnector: error sleeping thread", e);
+            }
+
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
         }
     }
 
