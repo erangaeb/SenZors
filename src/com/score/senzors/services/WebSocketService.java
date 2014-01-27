@@ -46,6 +46,7 @@ public class WebSocketService extends Service {
         // connect to web socket from here
         Log.d(TAG, "OnStartCommand: starting service");
         connectToWebSocket(application);
+        application.setServiceRunning(true);
 
         // If we get killed, after returning from here, restart
         return START_NOT_STICKY;
@@ -66,11 +67,13 @@ public class WebSocketService extends Service {
     @Override
     public void onDestroy() {
         // here we
-        //  1. cancel all notifications
+        //  1. cancel/update all notifications
         //  2. delete all sensors in my sensor list
         //  3. send broadcast message about service disconnecting
         stopForeground(true);
-        NotificationUtils.cancelNotification();
+        if(application.isForceToDisconnect()) NotificationUtils.cancelNotification();
+        else NotificationUtils.updateServiceNotification();
+        application.setServiceRunning(false);
         application.emptyMySensors();
         Intent disconnectMessage = new Intent(WebSocketService.WEB_SOCKET_DISCONNECTED);
         sendBroadcast(disconnectMessage);
@@ -94,8 +97,6 @@ public class WebSocketService extends Service {
                     WebSocketService.RECONNECT_COUNT = 0;
                     QueryHandler.handleLogin(application);
                     NotificationUtils.initNotification(WebSocketService.this);
-                    //Intent connectMessage = new Intent(WebSocketService.WEB_SOCKET_CONNECTED);
-                    //sendBroadcast(connectMessage);
                 }
 
                 @Override

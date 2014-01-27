@@ -70,6 +70,17 @@ public class NotificationUtils {
     }
 
     /**
+     * Update service notification icon and text when disconnect from the service
+     */
+    public static void updateServiceNotification() {
+        builder.setContentText("Disconnected from service").setSmallIcon(R.drawable.app_icon_disconnect);
+        Notification notification = builder.build();
+        notification.flags |= Notification.FLAG_AUTO_CANCEL;
+
+        notificationManager.notify(SERVICE_NOTIFICATION_ID, notification);
+    }
+
+    /**
      * Cancel notification
      * need to cancel when disconnect from web socket
      */

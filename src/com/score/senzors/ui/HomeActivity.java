@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 import com.score.senzors.application.SenzorApplication;
 import com.score.senzors.pojos.DrawerItem;
 import com.score.senzors.R;
@@ -77,6 +78,13 @@ public class HomeActivity extends FragmentActivity {
         if (dataUpdateReceiver == null) dataUpdateReceiver = new DataUpdateReceiver();
         IntentFilter intentFilter = new IntentFilter(WebSocketService.WEB_SOCKET_DISCONNECTED);
         registerReceiver(dataUpdateReceiver, intentFilter);
+
+        // check web socket connected, if not redirect to login
+        if(!application.isServiceRunning()) {
+            Log.d(TAG, "OnResume: disconnected from web socket, so redirect to login");
+            Toast.makeText(this, "Disconnected from service", Toast.LENGTH_LONG).show();
+            switchToLogin();
+        }
     }
 
     /**

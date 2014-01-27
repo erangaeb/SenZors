@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -175,19 +176,25 @@ public class MapActivity extends FragmentActivity implements View.OnClickListene
         if(marker != null) marker.remove();
         if(circle != null) circle.remove();
 
-        LatLon latLon = application.getLatLon();
-        LatLng currentCoordinates = new LatLng(Double.parseDouble(latLon.getLat()), Double.parseDouble(latLon.getLon()));
-        marker = map.addMarker(new MarkerOptions().position(currentCoordinates).title("My location").icon(BitmapDescriptorFactory.fromResource(R.drawable.bluedot)));
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(currentCoordinates, 15));
+        // add location marker
+        try {
+            LatLon latLon = application.getLatLon();
+            LatLng currentCoordinates = new LatLng(Double.parseDouble(latLon.getLat()), Double.parseDouble(latLon.getLon()));
+            marker = map.addMarker(new MarkerOptions().position(currentCoordinates).title("My location").icon(BitmapDescriptorFactory.fromResource(R.drawable.bluedot)));
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(currentCoordinates, 15));
 
-        // ... get a map.
-        // Add a circle in Sydney
-        circle = map.addCircle(new CircleOptions()
-                .center(currentCoordinates)
-                .radius(500)
-                .strokeColor(0xFF0000FF)
-                .strokeWidth(0.5f)
-                .fillColor(0x110000FF));
+            // ... get a map.
+            // Add a circle in Sydney
+            circle = map.addCircle(new CircleOptions()
+                    .center(currentCoordinates)
+                    .radius(500)
+                    .strokeColor(0xFF0000FF)
+                    .strokeWidth(0.5f)
+                    .fillColor(0x110000FF));
+        } catch (NumberFormatException e) {
+            Toast.makeText(this, "Invalid location", Toast.LENGTH_LONG).show();
+            Log.d(TAG, "setUpMap: invalid lat lon parameters");
+        }
     }
 
     /**
@@ -202,18 +209,23 @@ public class MapActivity extends FragmentActivity implements View.OnClickListene
         if(circle != null) circle.remove();
 
         // add location marker
-        LatLng currentCoordinates = new LatLng(Double.parseDouble(latLon.getLat()), Double.parseDouble(latLon.getLon()));
-        marker = map.addMarker(new MarkerOptions().position(currentCoordinates).title("My new location").icon(BitmapDescriptorFactory.fromResource(R.drawable.bluedot)));
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(currentCoordinates, 15));
+        try {
+            LatLng currentCoordinates = new LatLng(Double.parseDouble(latLon.getLat()), Double.parseDouble(latLon.getLon()));
+            marker = map.addMarker(new MarkerOptions().position(currentCoordinates).title("My new location").icon(BitmapDescriptorFactory.fromResource(R.drawable.bluedot)));
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(currentCoordinates, 15));
 
-        // ... get a map
-        // Add a circle
-        circle = map.addCircle(new CircleOptions()
-                .center(currentCoordinates)
-                .radius(500)
-                .strokeColor(0xFF0000FF)
-                .strokeWidth(0.5f)
-                .fillColor(0x110000FF));
+            // ... get a map
+            // Add a circle
+            circle = map.addCircle(new CircleOptions()
+                    .center(currentCoordinates)
+                    .radius(500)
+                    .strokeColor(0xFF0000FF)
+                    .strokeWidth(0.5f)
+                    .fillColor(0x110000FF));
+        } catch (NumberFormatException e) {
+            Toast.makeText(this, "Invalid location", Toast.LENGTH_LONG).show();
+            Log.d(TAG, "MoveToLocation: invalid lat lon parameters");
+        }
     }
 
     /**

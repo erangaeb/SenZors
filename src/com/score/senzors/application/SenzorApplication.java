@@ -74,6 +74,9 @@ public class SenzorApplication extends Application {
     //  2. automatic disconnect(because of network drop of server error) - in her we need to re connect to web socket
     boolean forceToDisconnect;
 
+    // keep track with weather web socket service is running or not
+    boolean isServiceRunning;
+
     /**
      * {@inheritDoc}
      */
@@ -92,6 +95,7 @@ public class SenzorApplication extends Application {
         // we don't want to force to disconnect from web socket
         setRequestFromFriend(true);
         setForceToDisconnect(true);
+        setServiceRunning(false);
     }
 
     public User getUser() {
@@ -202,6 +206,14 @@ public class SenzorApplication extends Application {
 
     public void setForceToDisconnect(boolean forceToDisconnect) {
         this.forceToDisconnect = forceToDisconnect;
+    }
+
+    public boolean isServiceRunning() {
+        return isServiceRunning;
+    }
+
+    public void setServiceRunning(boolean serviceRunning) {
+        isServiceRunning = serviceRunning;
     }
 
     /**
