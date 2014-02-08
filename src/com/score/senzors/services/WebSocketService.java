@@ -8,8 +8,14 @@ import android.util.Log;
 import com.score.senzors.application.SenzorApplication;
 import com.score.senzors.utils.NotificationUtils;
 import com.score.senzors.utils.QueryHandler;
+import com.score.senzors.utils.WebSocketClient;
 import de.tavendo.autobahn.WebSocketConnectionHandler;
 import de.tavendo.autobahn.WebSocketException;
+import org.apache.http.message.BasicNameValuePair;
+
+import java.net.URI;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Service for listen to a web socket
@@ -28,7 +34,7 @@ public class WebSocketService extends Service {
     // Keep track with how many times we tried to connect to web socket
     // maximum try 10 times
     private static int RECONNECT_COUNT = 0;
-    private static int MAX_RECONNECT_COUNT = 10;
+    private static int MAX_RECONNECT_COUNT = 14;
 
     /**
      * {@inheritDoc}
@@ -45,7 +51,8 @@ public class WebSocketService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         // connect to web socket from here
         Log.d(TAG, "OnStartCommand: starting service");
-        connectToWebSocket(application);
+        //connectToWebSocket(application);
+        connectYahooo();
         application.setServiceRunning(true);
 
         // If we get killed, after returning from here, restart
@@ -75,6 +82,7 @@ public class WebSocketService extends Service {
         else NotificationUtils.updateServiceNotification();
         application.setServiceRunning(false);
         application.emptyMySensors();
+
         Intent disconnectMessage = new Intent(WebSocketService.WEB_SOCKET_DISCONNECTED);
         sendBroadcast(disconnectMessage);
         Log.d(TAG, "OnDestroy: service destroyed");
@@ -125,23 +133,74 @@ public class WebSocketService extends Service {
         }
     }
 
+    private void connectYahooo() {
+        List<BasicNameValuePair> extraHeaders = Arrays.asList(
+                new BasicNameValuePair("Cookie", "session=abcd")
+        );
+
+        WebSocketClient client = new WebSocketClient(URI.create(SenzorApplication.WEB_SOCKET_URI), new WebSocketClient.Listener() {
+            @Override
+            public void onConnect() {
+                Log.d(TAG, "Connected!");
+                QueryHandler.handleLogin(application);
+            }
+
+            @Override
+            public void onMessage(String message) {
+                Log.d(TAG, String.format("Got string message! %s", message));
+                QueryHandler.handleQuery(application, message);
+            }
+
+            @Override
+            public void onMessage(byte[] data) {
+                Log.d(TAG, String.format("Got binary message! %s", data));
+            }
+
+            @Override
+            public void onDisconnect(int code, String reason) {
+                Log.d(TAG, String.format("Disconnected! Code: %d Reason: %s", code, reason));
+                Log.d(TAG, "ConnectToWebSocket: web socket closed");
+                Log.d(TAG, "ConnectToWebSocket: code - " + code);
+                Log.d(TAG, "ConnectToWebSocket: reason - " + reason);
+                if(application.isForceToDisconnect()) {
+                    Log.d(TAG, "ConnectToWebSocket: forced to disconnect, so stop the service");
+                    stopService(new Intent(getApplicationContext(), WebSocketService.class));
+                } else {
+                    Log.d(TAG, "ConnectToWebSocket: NOT forced to disconnect, so reconnect again");
+                    if(code<4000) new WebSocketReConnector().execute();
+                }
+            }
+
+            @Override
+            public void onError(Exception error) {
+                Log.e(TAG, "Yahoooooooooooooo!", error);
+                Log.e(TAG, "Error!", error);
+            }
+
+        }, extraHeaders);
+
+        client.connect();
+        application.setWebSocketClient(client);
+    }
+
     /**
      * Reconnect to web socket when connection drops
      * We maximum try 10 times, after that ignore connecting
      */
     private void reconnectToWebSocket() {
         if(WebSocketService.RECONNECT_COUNT<=WebSocketService.MAX_RECONNECT_COUNT) {
-            if(application.getWebSocketConnection().isConnected()) {
+            if(application.getWebSocketClient().isConnected()) {
                 Log.e(TAG, "ReconnectToWebSocket: web socket already connected");
             } else {
                 Log.e(TAG, "ReconnectToWebSocket: trying to re-connect " + (WebSocketService.RECONNECT_COUNT+1) + " times");
                 Log.d(TAG, "ReconnectToWebSocket: NOT force to close web socket");
                 application.setForceToDisconnect(false);
-                connectToWebSocket(application);
+                connectYahooo();
                 WebSocketService.RECONNECT_COUNT++;
             }
         } else {
             stopService(new Intent(getApplicationContext(), WebSocketService.class));
+            stopService(new Intent(getApplicationContext(), PingService.class));
             Log.d(TAG, "ReconnectToWebSocket: maximum re-connect count exceed");
         }
     }

@@ -7,6 +7,7 @@ import com.score.senzors.pojos.LatLon;
 import com.score.senzors.pojos.Query;
 import com.score.senzors.pojos.Sensor;
 import com.score.senzors.pojos.User;
+import com.score.senzors.utils.WebSocketClient;
 import de.tavendo.autobahn.WebSocket;
 import de.tavendo.autobahn.WebSocketConnection;
 
@@ -30,11 +31,14 @@ public class SenzorApplication extends Application {
     // need to connect this server when starting the app
     //public final static String WEB_SOCKET_URI = "ws://10.2.4.14:9000";
     //public final static String WEB_SOCKET_URI = "ws://mysensors.ucsc.lk:9000";
-    public final static String WEB_SOCKET_URI = "ws://connect.mysensors.mobi:8080";
+    public final static String WEB_SOCKET_URI = "ws://echo.websocket.org";
+    //public final static String WEB_SOCKET_URI = "ws://connect.mysensors.mobi:8080";
 
     // web socket connection share in application
     // we are using one instance of web socket in all over the application
     public final WebSocket webSocketConnection = new WebSocketConnection();
+
+    public WebSocketClient webSocketClient;
 
     // currently logged in user
     private User user;
@@ -233,6 +237,14 @@ public class SenzorApplication extends Application {
         for(Sensor sensor: this.mySensorList) {
             mySensorList.remove(sensor);
         }
+    }
+
+    public WebSocketClient getWebSocketClient() {
+        return webSocketClient;
+    }
+
+    public void setWebSocketClient(WebSocketClient webSocketClient) {
+        this.webSocketClient = webSocketClient;
     }
 
     public String getRandomLocation() {

@@ -18,6 +18,7 @@ import android.widget.Toast;
 import com.score.senzors.R;
 import com.score.senzors.application.SenzorApplication;
 import com.score.senzors.pojos.User;
+import com.score.senzors.services.PingService;
 import com.score.senzors.services.WebSocketService;
 import com.score.senzors.utils.ActivityUtils;
 import com.score.senzors.utils.NetworkUtil;
@@ -175,12 +176,14 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
             Log.d(TAG, "HandleMessage: message is a string - " + payLoad);
 
             // successful login returns "LoginSUCCESS"
-            if(payLoad.equalsIgnoreCase("LoginSUCCESS")) {
+            if(!payLoad.equalsIgnoreCase("LoginSUCCESS")) {
                 Log.d(TAG, "HandleMessage: login success");
                 Log.d(TAG, "HandleMessage: NOT force to disconnect web socket");
                 PreferenceUtils.saveUser(LoginActivity.this, application.getUser());
                 application.initMySensors();
                 application.setForceToDisconnect(false);
+                Intent serviceIntent = new Intent(LoginActivity.this, PingService.class);
+                startService(serviceIntent);
                 switchToHome();
                 return true;
             } else {

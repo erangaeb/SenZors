@@ -18,6 +18,7 @@ import com.score.senzors.R;
 import com.score.senzors.utils.ActivityUtils;
 import com.score.senzors.utils.NetworkUtil;
 
+
 /**
  * Activity class for sharing
  * Implement sharing related functions
@@ -138,9 +139,10 @@ public class ShareActivity extends Activity implements Handler.Callback {
         if(!email.equalsIgnoreCase("")) {
             if(NetworkUtil.isAvailableNetwork(ShareActivity.this)) {
                 // construct query and send to server via web socket
-                if(application.getWebSocketConnection().isConnected()) {
+                if(application.getWebSocketClient().isConnected()) {
                     Log.w(TAG, "Share: sending query to server");
-                    application.getWebSocketConnection().sendTextMessage(query);
+                    //application.getWebSocketConnection().sendTextMessage(query);
+                    application.getWebSocketClient().send(query);
                 } else {
                     Log.w(TAG, "Share: not connected to web socket");
                     Toast.makeText(ShareActivity.this, "You are disconnected from senZors service", Toast.LENGTH_LONG).show();
@@ -176,8 +178,9 @@ public class ShareActivity extends Activity implements Handler.Callback {
         if(message.obj instanceof String) {
             String payLoad = (String)message.obj;
             Log.d(TAG, "HandleMessage: message is a string " + payLoad);
+            Toast.makeText(ShareActivity.this, payLoad, Toast.LENGTH_LONG).show();
 
-            // successful login returns "ShareDone"
+            /*// successful login returns "ShareDone"
             if(payLoad.equalsIgnoreCase("ShareDone")) {
                 Log.d(TAG, "HandleMessage: sharing success");
                 Toast.makeText(ShareActivity.this, "Sensor has been shared successfully", Toast.LENGTH_LONG).show();
@@ -188,7 +191,7 @@ public class ShareActivity extends Activity implements Handler.Callback {
             } else {
                 Log.d(TAG, "HandleMessage: sharing fail");
                 Toast.makeText(ShareActivity.this, "Sharing fail", Toast.LENGTH_LONG).show();
-            }
+            }*/
         }
 
         return false;

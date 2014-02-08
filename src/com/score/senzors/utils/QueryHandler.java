@@ -41,7 +41,8 @@ public class QueryHandler {
         String message = QueryParser.getMessage(new Query(command, "mysensors", params));
 
         System.out.println("login message " + message);
-        application.getWebSocketConnection().sendTextMessage(message);
+        //application.getWebSocketConnection().sendTextMessage(message);
+        application.getWebSocketClient().send(message);
     }
 
     /**
@@ -77,6 +78,7 @@ public class QueryHandler {
                 System.out.println("INVALID/UN-SUPPORTING query");
             }
         } catch (InvalidQueryException e) {
+            sendMessage(application, payload);
             System.out.println(e);
         }
     }
