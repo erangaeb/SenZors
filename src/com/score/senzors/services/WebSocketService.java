@@ -114,7 +114,6 @@ public class WebSocketService extends Service {
                     if(application.isForceToDisconnect()) {
                         Log.d(TAG, "ConnectToWebSocket: forced to disconnect, so stop the service");
                         stopService(new Intent(getApplicationContext(), WebSocketService.class));
-                        stopService(new Intent(getApplicationContext(), PingService.class));
                     } else {
                         Log.d(TAG, "ConnectToWebSocket: NOT forced to disconnect, so reconnect again");
                         if(code<4000) new WebSocketReConnector().execute();
@@ -143,7 +142,6 @@ public class WebSocketService extends Service {
             }
         } else {
             stopService(new Intent(getApplicationContext(), WebSocketService.class));
-            stopService(new Intent(getApplicationContext(), PingService.class));
             Log.d(TAG, "ReconnectToWebSocket: maximum re-connect count exceed");
         }
     }
