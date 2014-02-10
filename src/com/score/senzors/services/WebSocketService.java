@@ -1,10 +1,14 @@
 package com.score.senzors.services;
 
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.util.Log;
+import com.score.senzors.R;
 import com.score.senzors.application.SenzorApplication;
 import com.score.senzors.utils.NotificationUtils;
 import com.score.senzors.utils.QueryHandler;
@@ -71,8 +75,16 @@ public class WebSocketService extends Service {
         //  2. delete all sensors in my sensor list
         //  3. send broadcast message about service disconnecting
         stopForeground(true);
-        if(application.isForceToDisconnect()) NotificationUtils.cancelNotification();
-        else NotificationUtils.updateServiceNotification();
+        if(application.isForceToDisconnect()) {
+            NotificationUtils.cancelNotification(this);
+        } else {
+            Notification notification = NotificationUtils.getNotification(WebSocketService.this, R.drawable.app_icon_disconnect,
+                    getString(R.string.app_name), getString(R.string.disconnected));
+            notification.flags |= Notification.FLAG_AUTO_CANCEL;
+            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.notify(NotificationUtils.SERVICE_NOTIFICATION_ID, notification);
+        }
+
         application.setServiceRunning(false);
         application.emptyMySensors();
         Intent disconnectMessage = new Intent(WebSocketService.WEB_SOCKET_DISCONNECTED);
@@ -96,7 +108,10 @@ public class WebSocketService extends Service {
                     Log.d(TAG, "ConnectToWebSocket: open web socket");
                     WebSocketService.RECONNECT_COUNT = 0;
                     QueryHandler.handleLogin(application);
-                    NotificationUtils.initNotification(WebSocketService.this);
+                    Notification notification = NotificationUtils.getNotification(WebSocketService.this, R.drawable.app_icon121,
+                            getString(R.string.app_name), getString(R.string.launch_senzors));
+                    notification.flags |= Notification.FLAG_FOREGROUND_SERVICE;
+                    startForeground(NotificationUtils.SERVICE_NOTIFICATION_ID, notification);
                 }
 
                 @Override
@@ -130,7 +145,7 @@ public class WebSocketService extends Service {
      * We maximum try 10 times, after that ignore connecting
      */
     private void reconnectToWebSocket() {
-        if(WebSocketService.RECONNECT_COUNT<=WebSocketService.MAX_RECONNECT_COUNT) {
+        if(WebSocketService.RECONNECT_COUNT <= WebSocketService.MAX_RECONNECT_COUNT) {
             if(application.getWebSocketConnection().isConnected()) {
                 Log.e(TAG, "ReconnectToWebSocket: web socket already connected");
             } else {
