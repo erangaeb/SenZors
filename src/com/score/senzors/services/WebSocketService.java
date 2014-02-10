@@ -28,7 +28,7 @@ public class WebSocketService extends Service {
     // Keep track with how many times we tried to connect to web socket
     // maximum try 10 times
     private static int RECONNECT_COUNT = 0;
-    private static int MAX_RECONNECT_COUNT = 10;
+    private static int MAX_RECONNECT_COUNT = 14;
 
     /**
      * {@inheritDoc}
@@ -114,6 +114,7 @@ public class WebSocketService extends Service {
                     if(application.isForceToDisconnect()) {
                         Log.d(TAG, "ConnectToWebSocket: forced to disconnect, so stop the service");
                         stopService(new Intent(getApplicationContext(), WebSocketService.class));
+                        stopService(new Intent(getApplicationContext(), PingService.class));
                     } else {
                         Log.d(TAG, "ConnectToWebSocket: NOT forced to disconnect, so reconnect again");
                         if(code<4000) new WebSocketReConnector().execute();
@@ -142,6 +143,7 @@ public class WebSocketService extends Service {
             }
         } else {
             stopService(new Intent(getApplicationContext(), WebSocketService.class));
+            stopService(new Intent(getApplicationContext(), PingService.class));
             Log.d(TAG, "ReconnectToWebSocket: maximum re-connect count exceed");
         }
     }
@@ -161,7 +163,7 @@ public class WebSocketService extends Service {
             try {
                 // sleep for a while before reconnect
                 // sleep for random time interval
-                if(WebSocketService.RECONNECT_COUNT<=WebSocketService.MAX_RECONNECT_COUNT/2)
+                if(WebSocketService.RECONNECT_COUNT <= WebSocketService.MAX_RECONNECT_COUNT/2)
                     Thread.sleep(5000);
                 else
                     Thread.sleep(10000);
