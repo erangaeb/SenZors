@@ -87,14 +87,14 @@ public class FriendListAdapter extends BaseAdapter {
         if (view == null) {
             //inflate sharing_list_row_layout
             LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = layoutInflater.inflate(R.layout.attribute_list_row_layout, viewGroup, false);
+            view = layoutInflater.inflate(R.layout.sharing_list_row_layout, viewGroup, false);
 
             //create view holder to store reference to child views
             holder = new ViewHolder();
-            holder.name = (TextView) view.findViewById(R.id.attribute_name);
-            holder.email = (TextView) view.findViewById(R.id.attribute_value);
+            //holder.name = (TextView) view.findViewById(R.id.attribute_name);
+            holder.email = (TextView) view.findViewById(R.id.sharing_list_row_layout_email);
 
-            holder.name.setTypeface(face);
+            //holder.name.setTypeface(face);
             holder.email.setTypeface(face);
 
             view.setTag(holder);
@@ -104,7 +104,7 @@ public class FriendListAdapter extends BaseAdapter {
         }
 
         // bind text with view holder content view for efficient use
-        holder.name.setText(user.getUsername());
+        //holder.name.setText(user.getUsername());
         holder.email.setText(user.getEmail());
         view.setBackgroundResource(R.drawable.friend_list_selector);
 
@@ -115,7 +115,7 @@ public class FriendListAdapter extends BaseAdapter {
      * Keep reference to children view to avoid unnecessary calls
      */
     static class ViewHolder {
-        TextView name;
+        //TextView name;
         TextView email;
     }
 }

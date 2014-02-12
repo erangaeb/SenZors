@@ -263,7 +263,7 @@ public class SensorList extends Fragment implements Handler.Callback {
 
             // start map activity to display location
             application.setLatLon(latLon);
-            Intent intent = new Intent(SensorList.this.getActivity(), MapActivity.class);
+            Intent intent = new Intent(SensorList.this.getActivity(), SensorDetailsActivity.class);
             this.startActivity(intent);
             SensorList.this.getActivity().overridePendingTransition(R.anim.right_in, R.anim.stay_in);
         } else {

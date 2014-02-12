@@ -32,7 +32,7 @@ public class FriendList extends Fragment {
 
         // after creating fragment we initialize friend list
         // TODO need to fill friend list with backend data
-        getActivity().getActionBar().setTitle("Friends");
+        //getActivity().getActionBar().setTitle("Friends");
         initFriendList();
     }
 

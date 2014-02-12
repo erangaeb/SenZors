@@ -23,4 +23,7 @@
     <color name="blue">#5e7d9a</color>
     <color name="green">#588c73</color>
     <color name="red">#d96459</color>
+    <color name="gray">#333333</color>
+    <color name="light_gray">#515151</color>
+    <color name="transparent">#00000000</color>
 </resources>
