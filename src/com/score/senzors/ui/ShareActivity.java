@@ -30,7 +30,7 @@ public class ShareActivity extends Activity implements Handler.Callback {
 
     private SenzorApplication application;
 
-    private EditText emailEditText;
+    private EditText usernameEditText;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,7 +71,7 @@ public class ShareActivity extends Activity implements Handler.Callback {
         Log.d(TAG, "InitUI: initializing UI components");
         Typeface typefaceThin = Typeface.createFromAsset(this.getAssets(), "fonts/Roboto-Thin.ttf");
 
-        emailEditText = (EditText) findViewById(R.id.share_layout_email_text);
+        usernameEditText = (EditText) findViewById(R.id.share_layout_username_text);
 
         // Set up action bar.
         // Specify that the Home button should show an "Up" caret, indicating that touching the
@@ -87,7 +87,7 @@ public class ShareActivity extends Activity implements Handler.Callback {
         TextView actionBarTitle = (TextView) (this.findViewById(titleId));
         actionBarTitle.setTextColor(getResources().getColor(R.color.white));
         actionBarTitle.setTypeface(typefaceThin, Typeface.BOLD);
-        emailEditText.setTypeface(typefaceThin);
+        usernameEditText.setTypeface(typefaceThin);
     }
 
     /**
@@ -130,12 +130,12 @@ public class ShareActivity extends Activity implements Handler.Callback {
      * Need to send share query to server via web socket
      */
     private void share() {
-        String email = emailEditText.getText().toString().trim();
-        String query = "SHARE" + " " + "#lat #lon" + " " + "@"+emailEditText.getText().toString().trim();
+        String username = usernameEditText.getText().toString().trim();
+        String query = "SHARE" + " " + "#lat #lon" + " " + "@"+usernameEditText.getText().toString().trim();
         Log.d(TAG, "Share: sharing query " + query);
 
         // validate share attribute first
-        if(!email.equalsIgnoreCase("")) {
+        if(!username.equalsIgnoreCase("")) {
             if(NetworkUtil.isAvailableNetwork(ShareActivity.this)) {
                 // construct query and send to server via web socket
                 if(application.getWebSocketConnection().isConnected()) {
@@ -152,8 +152,8 @@ public class ShareActivity extends Activity implements Handler.Callback {
                 Toast.makeText(ShareActivity.this, "Cannot connect to server, Please check your network connection", Toast.LENGTH_LONG).show();
             }
         } else {
-            Log.e(TAG, "Share: empty email");
-            Toast.makeText(ShareActivity.this, "Make sure non empty email address", Toast.LENGTH_LONG).show();
+            Log.e(TAG, "Share: empty username");
+            Toast.makeText(ShareActivity.this, "Make sure non empty username", Toast.LENGTH_LONG).show();
         }
     }
 
