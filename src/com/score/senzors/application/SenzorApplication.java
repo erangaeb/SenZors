@@ -3,15 +3,16 @@ package com.score.senzors.application;
 import android.app.Application;
 import android.os.Handler;
 import android.os.Message;
+import com.score.senzors.db.SenzorsDbSource;
 import com.score.senzors.pojos.LatLon;
 import com.score.senzors.pojos.Query;
 import com.score.senzors.pojos.Sensor;
 import com.score.senzors.pojos.User;
+import com.score.senzors.utils.PreferenceUtils;
 import de.tavendo.autobahn.WebSocket;
 import de.tavendo.autobahn.WebSocketConnection;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 /**
  * Application class to hold shared attributes
@@ -47,7 +48,7 @@ public class SenzorApplication extends Application {
     // keep sensors
     //  1. my sensors(ex: location)
     //  2. friends sensors(sensors shared by friends to me)
-    private ArrayList<Sensor> fiendSensorList;
+    private ArrayList<Sensor> friendSensorList;
     private ArrayList<Sensor> mySensorList;
 
     // to types of sensors requests(query requests) can be perform
@@ -145,11 +146,11 @@ public class SenzorApplication extends Application {
     }
 
     public ArrayList<Sensor> getFiendSensorList() {
-        return fiendSensorList;
+        return friendSensorList;
     }
 
-    public void setFiendSensorList(ArrayList<Sensor> fiendSensorList) {
-        this.fiendSensorList = fiendSensorList;
+    public void setFiendSensorList(ArrayList<Sensor> friendSensorList) {
+        this.friendSensorList = friendSensorList;
     }
 
     public ArrayList<Sensor> getMySensorList() {
@@ -217,13 +218,47 @@ public class SenzorApplication extends Application {
     }
 
     /**
+     * Set up SenZors app, we do
+     *  1. set the app for first time
+     *  2. initialize sensors
+     */
+    public void setUpSenzors() {
+        addMySensorsToDb();
+        initMySensors();
+        initFriendsSensors();
+    }
+
+    /**
+     * First time setup of the app
+     * We add my sensors to database
+     */
+    private void addMySensorsToDb() {
+        if (PreferenceUtils.isFirstTime(this)) {
+            // this is first time app launch
+            // add my sensors and users to database
+            // TODO add more available sensors
+            Sensor sensor = new Sensor("0", getUser().getUsername(), "Location", "LocationValue", true, false);
+            new SenzorsDbSource(this).addSensor(sensor, getUser());
+
+            // reset first time status
+            PreferenceUtils.setFirstTime(this, false);
+        }
+    }
+
+    /**
+     * Initialize friends sensor list
+     * Get saved friend sensors in database and load to friend sensor list
+     */
+    private void initFriendsSensors() {
+        friendSensorList = (ArrayList<Sensor>)new SenzorsDbSource(this).getSensors(false);
+    }
+
+    /**
      * Initialize my sensor list
      * Get all available sensors of me and add to sensor list shared in application
      */
-    public void initMySensors() {
-        // we only support location sensor
-        // TODO add more available sensors
-        mySensorList.add(new Sensor(getUser().getUsername(), "Location", "LocationValue", true, false));
+    private void initMySensors() {
+        mySensorList = (ArrayList<Sensor>)new SenzorsDbSource(this).getSensors(true);
     }
 
     /**
@@ -235,14 +270,4 @@ public class SenzorApplication extends Application {
         }
     }
 
-    public String getRandomLocation() {
-        ArrayList<String> locations = new ArrayList<String>();
-        locations.add("Kirulapona");
-        locations.add("Thimibirigasyaya");
-        locations.add("Nugegoda");
-        locations.add("Maharagam");
-        Random random = new Random(); //Create random class object
-        int randomNumber = random.nextInt(locations.size()); //Generate a random number (index) with the size of the list being the maximum
-        return locations.get(randomNumber);
-    }
 }

@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.score.senzors.R;
 import com.score.senzors.application.SenzorApplication;
+import com.score.senzors.db.SenzorsDbSource;
 import com.score.senzors.pojos.User;
 import com.score.senzors.services.WebSocketService;
 import com.score.senzors.utils.ActivityUtils;
@@ -124,7 +125,7 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
         if(NetworkUtil.isAvailableNetwork(LoginActivity.this)) {
             if(!username.getText().toString().trim().equals("") && !password.getText().toString().trim().equals("")) {
                 // create user and share in application
-                application.setUser(new User(username.getText().toString().trim(), username.getText().toString().trim(),password.getText().toString().trim()));
+                application.setUser(new User("0", username.getText().toString().trim(), username.getText().toString().trim(),password.getText().toString().trim()));
                 Log.d(TAG, "Login: user shared in application");
 
                 // open web socket and send username password fields
@@ -178,8 +179,10 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
             if(payLoad.equalsIgnoreCase("LoginSUCCESS")) {
                 Log.d(TAG, "HandleMessage: login success");
                 Log.d(TAG, "HandleMessage: NOT force to disconnect web socket");
-                PreferenceUtils.saveUser(LoginActivity.this, application.getUser());
-                application.initMySensors();
+                User user = new SenzorsDbSource(LoginActivity.this).getOrCreateUser(application.getUser().getUsername(), application.getUser().getEmail());
+                PreferenceUtils.saveUser(LoginActivity.this, user);
+                application.setUser(user);
+                application.setUpSenzors();
                 application.setForceToDisconnect(false);
                 switchToHome();
                 return true;
