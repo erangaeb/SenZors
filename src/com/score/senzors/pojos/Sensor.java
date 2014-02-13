@@ -5,19 +5,28 @@ package com.score.senzors.pojos;
  * POJO class to hold sensor data attributes
  */
 public class Sensor {
-
+    String id;
     String user;
     String sensorName;
     String sensorValue;
     boolean isMySensor;
     boolean isAvailable;
 
-    public Sensor(String user, String sensorName, String sensorValue, boolean isMySensor, boolean isAvailable) {
+    public Sensor(String id, String user, String sensorName, String sensorValue, boolean isMySensor, boolean isAvailable) {
+        this.id = id;
         this.user = user;
         this.sensorName = sensorName;
         this.sensorValue = sensorValue;
         this.isMySensor = isMySensor;
         this.isAvailable = isAvailable;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getUser() {
