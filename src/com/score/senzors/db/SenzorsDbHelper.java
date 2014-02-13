@@ -3,6 +3,7 @@ package com.score.senzors.db;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 /**
  * Perform creating tables here
@@ -11,11 +12,13 @@ import android.database.sqlite.SQLiteOpenHelper;
  */
 public class SenzorsDbHelper extends SQLiteOpenHelper {
 
+    private static final String TAG = SenzorsDbHelper.class.getName();
+
     // we use singleton database
     private static SenzorsDbHelper senzorsDbHelper;
 
     // If you change the database schema, you must increment the database version
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 3;
     private static final String DATABASE_NAME = "Senzors.db";
 
     // data types, keywords and queries
@@ -42,6 +45,23 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
     private static final String SQL_DELETE_USER =
             "DROP TABLE IF EXISTS " + SenzorsDbContract.User.TABLE_NAME;
 
+    // trigger that use to define foreign key constraint of "user" in "sensor" table
+    // we need to define foreign key constraint because of sqlite older versions not default supporting foreign key constraints
+    private static final String SQL_CREATE_TRIGGER_SENSOR_FOREIGN_KEY =
+            "CREATE TRIGGER " + SenzorsDbContract.Sensor.TRIGGER_FOREIGN_KEY_INSERT + " " +
+            "BEFORE INSERT ON " + SenzorsDbContract.Sensor.TABLE_NAME + " " +
+                    "FOR EACH ROW BEGIN " +
+                            "SELECT CASE WHEN((" +
+                                    "SELECT " + SenzorsDbContract.User._ID + " " +
+                                    "FROM " + SenzorsDbContract.User.TABLE_NAME + " " +
+                                    "WHERE " + SenzorsDbContract.User._ID + "=" + "NEW." + SenzorsDbContract.Sensor.COLUMN_NAME_USER + ") " +
+                            "IS NULL) " +
+                            "THEN RAISE(ABORT, 'Foreign key violation') END; " +
+                            "END;";
+
+    private static final String SQL_DELETE_TRIGGER_SENSOR_FOREIGN_KEY =
+            "DROP TRIGGER IF EXISTS " + SenzorsDbContract.Sensor.TRIGGER_FOREIGN_KEY_INSERT;
+
     /**
      * Init context
      * Init database
@@ -67,8 +87,21 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
      * {@inheritDoc}
      */
     public void onCreate(SQLiteDatabase db) {
+        Log.d(TAG, "OnCreate: creating db helper, db version - " + DATABASE_VERSION);
         db.execSQL(SQL_CREATE_SENSOR);
         db.execSQL(SQL_CREATE_USER);
+        //db.execSQL(SQL_CREATE_TRIGGER_SENSOR_FOREIGN_KEY);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onConfigure(SQLiteDatabase db) {
+        super.onConfigure(db);
+        // enable foreign key constraint here
+        Log.d(TAG, "OnConfigure: Enable foreign key constraint");
+        db.setForeignKeyConstraintsEnabled(true);
     }
 
     /**
@@ -77,8 +110,10 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // This database is only a cache for online data, so its upgrade policy is
         // to simply to discard the data and start over
+        Log.d(TAG, "OnUpgrade: updating db helper, db version - " + DATABASE_VERSION);
         db.execSQL(SQL_DELETE_SENSOR);
         db.execSQL(SQL_DELETE_USER);
+        //db.execSQL(SQL_DELETE_TRIGGER_SENSOR_FOREIGN_KEY);
         onCreate(db);
     }
 
