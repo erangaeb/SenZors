@@ -73,13 +73,14 @@ public class SenzorsDbSource {
             // so get user data
             // we return id as password since we no storing users password in database
             String id = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User._ID));
+            String _username = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_USERNAME));
             String _email = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_EMAIL));
 
             // clear
             cursor.close();
             db.close();
 
-            return new User(username, _email, id);
+            return new User(id, _username, _email, "password");
         } else {
             // no matching user
             // so create user
@@ -98,8 +99,9 @@ public class SenzorsDbSource {
     /**
      * Add sensor to the database
      * @param sensor sensor object
+     * @param user sensor user
      */
-    public void addSensor(Sensor sensor) {
+    public void addSensor(Sensor sensor, User user) {
         Log.d(TAG, "AddSensor: adding sensor - " + sensor.getSensorName());
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
 
@@ -107,7 +109,7 @@ public class SenzorsDbSource {
         ContentValues values = new ContentValues();
         values.put(SenzorsDbContract.Sensor.COLUMN_NAME_NAME, sensor.getSensorName());
         values.put(SenzorsDbContract.Sensor.COLUMN_NAME_IS_MINE, sensor.isMySensor()? 1 : 0);
-        values.put(SenzorsDbContract.Sensor.COLUMN_NAME_USER, 5);
+        values.put(SenzorsDbContract.Sensor.COLUMN_NAME_USER, user.getId());
 
         // Insert the new row, if fails throw an error
         db.insertOrThrow(SenzorsDbContract.Sensor.TABLE_NAME, SenzorsDbContract.Sensor.COLUMN_NAME_VALUE, values);
@@ -135,6 +137,7 @@ public class SenzorsDbSource {
                 null); // join
 
         // sensor attributes
+        String id;
         String sensorName;
         String sensorValue;
         boolean isMySensor;
@@ -142,6 +145,7 @@ public class SenzorsDbSource {
 
         // extract attributes
         while (cursor.moveToNext()) {
+            id = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Sensor._ID));
             sensorName = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Sensor.COLUMN_NAME_NAME));
             sensorValue = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Sensor.COLUMN_NAME_VALUE));
             isMySensor = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Sensor.COLUMN_NAME_IS_MINE)) == 1;
@@ -150,7 +154,7 @@ public class SenzorsDbSource {
             //Log.d(TAG, "GetSensors: sensor value - " + sensorValue);
             Log.d(TAG, "GetSensors: is my sensor - " + isMySensor);
             Log.d(TAG, "GetSensors: user - " + user);
-            sensorList.add(new Sensor(user, sensorName, sensorValue, isMySensor, true));
+            sensorList.add(new Sensor(id, user, sensorName, sensorValue, isMySensor, false));
         }
 
         // clean
