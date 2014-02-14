@@ -4,10 +4,12 @@ import android.content.Intent;
 import android.os.Message;
 import android.util.Log;
 import com.score.senzors.application.SenzorApplication;
+import com.score.senzors.db.SenzorsDbSource;
 import com.score.senzors.exceptions.InvalidQueryException;
 import com.score.senzors.pojos.LatLon;
 import com.score.senzors.pojos.Query;
 import com.score.senzors.pojos.Sensor;
+import com.score.senzors.pojos.User;
 import com.score.senzors.services.GpsReadingService;
 
 import java.util.HashMap;
@@ -108,16 +110,25 @@ public class QueryHandler {
      * @param query parsed query
      */
     private static void handleShareQuery(SenzorApplication application, Query query) {
-        // add new sensor to friend sensor list that shared in application
-        Sensor sensor = new Sensor(query.getUser(), "Location", "Location", false, false);
-        if(!application.getFiendSensorList().contains(sensor))
-            application.getFiendSensorList().add(sensor);
+        // get or create match user
+        // create/save new sensor in db
+        User user = new SenzorsDbSource(application.getApplicationContext()).getOrCreateUser(query.getUser(), "email");
+        Sensor sensor = new Sensor("0", user.getUsername(), "Location", "Location", false, false);
+        try {
+            // save sensor in db and refresh friend sensor list
+            new SenzorsDbSource(application.getApplicationContext()).addSensor(sensor, user);
+            application.initFriendsSensors();
+            Log.d(TAG, "HandleShareQuery: saved sensor from - " + user.getUsername());
 
-        // currently we have to launch friend sensor
-        // update notification to notify user about incoming query/ share request
-        application.setSensorType(SenzorApplication.FRIENDS_SENSORS);
-        Log.d(TAG, "HandleShareQuery: received query with type " + application.getSensorType());
-        NotificationUtils.updateNotification(application.getApplicationContext(), "Location @" + query.getUser());
+            // currently we have to launch friend sensor
+            // update notification to notify user about incoming query/ share request
+            application.setSensorType(SenzorApplication.FRIENDS_SENSORS);
+            Log.d(TAG, "HandleShareQuery: received query with type " + application.getSensorType());
+            NotificationUtils.updateNotification(application.getApplicationContext(), "Location @" + user.getUsername());
+        } catch (Exception e) {
+            // Db exception here
+            Log.e(TAG, "HandleShareQuery: db error " + e.toString());
+        }
     }
 
     /**

@@ -182,6 +182,7 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
                 User user = new SenzorsDbSource(LoginActivity.this).getOrCreateUser(application.getUser().getUsername(), application.getUser().getEmail());
                 PreferenceUtils.saveUser(LoginActivity.this, user);
                 application.setUser(user);
+                Log.d(TAG, "HandleMessage: user saved " + application.getUser().getId());
                 application.setUpSenzors();
                 application.setForceToDisconnect(false);
                 switchToHome();
