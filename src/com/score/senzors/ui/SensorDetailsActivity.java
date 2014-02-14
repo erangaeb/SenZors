@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.score.senzors.R;
+import com.score.senzors.application.SenzorApplication;
 import com.score.senzors.utils.ActivityUtils;
 
 /**
@@ -29,11 +30,13 @@ public class SensorDetailsActivity extends FragmentActivity {
     ActionBar actionBar;
     Typeface typefaceThin;
     TextView actionBarTitle;
+    SenzorApplication application;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sensor_details_layout);
+        application = (SenzorApplication)getApplication();
         typefaceThin = Typeface.createFromAsset(this.getAssets(), "fonts/Roboto-Thin.ttf");
 
         actionBar = getActionBar();
@@ -59,7 +62,7 @@ public class SensorDetailsActivity extends FragmentActivity {
 
         //Enable Tabs on Action Bar
         actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setTitle("#Location @eranga");
+        actionBar.setTitle("#Location @" + application.getCurrentSensor().getUser().getUsername());
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
         setUp();
@@ -143,7 +146,9 @@ public class SensorDetailsActivity extends FragmentActivity {
         t1.setLayoutParams(params);
 
         final TextView t2 = new TextView(this);
-        t2.setText("Sharing");
+        if (application.getCurrentSensor().isMySensor()) t2.setText("Shared with");
+        else t2.setText("Shared by");
+
         t2.setTypeface(typefaceThin, Typeface.BOLD);
         t2.setGravity(Gravity.CENTER);
         t2.setTextColor(getResources().getColor(R.color.white));
