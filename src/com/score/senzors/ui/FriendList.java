@@ -63,11 +63,11 @@ public class FriendList extends Fragment {
     private void initFriendList() {
         // populate sample data to list
         userList = new ArrayList<User>();
-        userList.add(new User("eranga", "erangaeb@gmail.com"));
-        userList.add(new User("pagero", "pagero@gmail.com"));
-        userList.add(new User("test", "test@gmail.com"));
-        userList.add(new User("herath", "herath@gmail.com"));
-        userList.add(new User("vijith", "vijith@gmail.com"));
+        userList.add(new User("0", "eranga", "erangaeb@gmail.com", ""));
+        userList.add(new User("0", "pagero", "pagero@gmail.com", ""));
+        //userList.add(new User("0", "test", "test@gmail.com", ""));
+        //userList.add(new User("0", "herath", "herath@gmail.com", ""));
+        //userList.add(new User("0", "vijith", "vijith@gmail.com", ""));
 
         // construct list adapter
         adapter = new FriendListAdapter(FriendList.this.getActivity(), userList);

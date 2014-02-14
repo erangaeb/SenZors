@@ -105,7 +105,7 @@ public class FriendListAdapter extends BaseAdapter {
 
         // bind text with view holder content view for efficient use
         //holder.name.setText(user.getUsername());
-        holder.email.setText(user.getEmail());
+        holder.email.setText(user.getUsername());
         view.setBackgroundResource(R.drawable.friend_list_selector);
 
         return view;
