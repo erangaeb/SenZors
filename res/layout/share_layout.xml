@@ -61,7 +61,8 @@
                     android:textSize="18sp"
                     android:layout_marginLeft="20dp"
                     android:layout_marginBottom="5dp"
-                    android:textColor="#000"
+                    android:textColor="#4a4a4a"
+                    android:id="@+id/share_layout_username_label"
                     android:text="Username">
                 </TextView>
 

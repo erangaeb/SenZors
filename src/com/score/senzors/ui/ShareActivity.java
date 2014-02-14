@@ -30,6 +30,7 @@ public class ShareActivity extends Activity implements Handler.Callback {
 
     private SenzorApplication application;
 
+    private TextView usernameLabel;
     private EditText usernameEditText;
 
     public void onCreate(Bundle savedInstanceState) {
@@ -71,6 +72,7 @@ public class ShareActivity extends Activity implements Handler.Callback {
         Log.d(TAG, "InitUI: initializing UI components");
         Typeface typefaceThin = Typeface.createFromAsset(this.getAssets(), "fonts/Roboto-Thin.ttf");
 
+        usernameLabel = (TextView) findViewById(R.id.share_layout_username_label);
         usernameEditText = (EditText) findViewById(R.id.share_layout_username_text);
 
         // Set up action bar.
@@ -87,6 +89,7 @@ public class ShareActivity extends Activity implements Handler.Callback {
         TextView actionBarTitle = (TextView) (this.findViewById(titleId));
         actionBarTitle.setTextColor(getResources().getColor(R.color.white));
         actionBarTitle.setTypeface(typefaceThin, Typeface.BOLD);
+        usernameLabel.setTypeface(typefaceThin, Typeface.BOLD);
         usernameEditText.setTypeface(typefaceThin);
     }
 
