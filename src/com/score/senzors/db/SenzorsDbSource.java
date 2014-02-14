@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteQueryBuilder;
 import android.util.Log;
 import com.score.senzors.pojos.Sensor;
 import com.score.senzors.pojos.User;
@@ -57,9 +56,9 @@ public class SenzorsDbSource {
      */
     public User getOrCreateUser(String username, String email) {
         Log.d(TAG, "GetOrCreateUser: " + username);
-        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
 
         // get matching user if exists
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
         Cursor cursor = db.query(SenzorsDbContract.User.TABLE_NAME, // table
                 null, SenzorsDbContract.User.COLUMN_NAME_USERNAME + "=?", // constraint
                 new String[]{username}, // prams
@@ -67,10 +66,8 @@ public class SenzorsDbSource {
                 null, // group by
                 null); // join
 
-        if(cursor.moveToNext()) {
+        if(cursor.moveToFirst()) {
             // have matching user
-            cursor.moveToFirst();
-
             // so get user data
             // we return id as password since we no storing users password in database
             String id = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User._ID));
@@ -81,7 +78,7 @@ public class SenzorsDbSource {
             cursor.close();
             db.close();
 
-            Log.d(TAG, "GetOrCreateUser: no user, so user created:" + _username);
+            Log.d(TAG, "GetOrCreateUser: have user, so return it: " + username);
             return new User(id, _username, _email, "password");
         } else {
             // no matching user
@@ -94,7 +91,7 @@ public class SenzorsDbSource {
             long id = db.insert(SenzorsDbContract.User.TABLE_NAME, SenzorsDbContract.User.COLUMN_NAME_EMAIL, values);
             db.close();
 
-            Log.d(TAG, "GetOrCreateUser: have user, so return it: " + username);
+            Log.d(TAG, "GetOrCreateUser: no user, so user created:" + username);
             return new User(Long.toString(id), username, email, "");
         }
     }
@@ -129,37 +126,15 @@ public class SenzorsDbSource {
         Log.d(TAG, "GetSensors: getting all sensor");
         List<Sensor> sensorList = new ArrayList<Sensor>();
 
-        // select query with args
-        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-
-        /*Cursor cursor = db.query(SenzorsDbContract.Sensor.TABLE_NAME, // table
-                null, SenzorsDbContract.Sensor.COLUMN_NAME_IS_MINE + "=?", // constraint
-                new String[]{mySensors ? "1" : "0"}, // prams
-                null, // order by
-                null, // group by
-                null); // join*/
-
-        // join query via query builder
-        /*SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
-        queryBuilder.setTables(SenzorsDbContract.Sensor.TABLE_NAME+
-                " LEFT OUTER JOIN " + SenzorsDbContract.User.TABLE_NAME + " ON " +
-                SenzorsDbContract.Sensor.COLUMN_NAME_USER + " = " + SenzorsDbContract.User._ID);*/
-        /*Cursor cursor = queryBuilder.query(db, // database
-                null,
-                SenzorsDbContract.Sensor.COLUMN_NAME_IS_MINE + "=?", // constraint
-                new String[]{mySensors ? "1" : "0"}, // prams
-                null, // group by
-                null, // having
-                null); // order by*/
-
         // get matching data via JOIN query
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
         String query = "SELECT * " +
                 "FROM sensor JOIN user " +
                 "ON sensor.user = user._id " +
                 "WHERE sensor.is_mine=?";
         Cursor cursor = db.rawQuery(query, new String[]{mySensors ? "1" : "0"});
 
-        // sensor attributes
+        // sensor/user attributes
         String sensorId;
         String sensorName;
         String sensorValue;
