@@ -113,10 +113,10 @@ public class QueryHandler {
         // get or create match user
         // create/save new sensor in db
         User user = new SenzorsDbSource(application.getApplicationContext()).getOrCreateUser(query.getUser(), "email");
-        Sensor sensor = new Sensor("0", user.getUsername(), "Location", "Location", false, false);
+        Sensor sensor = new Sensor("0", "Location", "Location", false, false, user);
         try {
             // save sensor in db and refresh friend sensor list
-            new SenzorsDbSource(application.getApplicationContext()).addSensor(sensor, user);
+            new SenzorsDbSource(application.getApplicationContext()).addSensor(sensor);
             application.initFriendsSensors();
             Log.d(TAG, "HandleShareQuery: saved sensor from - " + user.getUsername());
 

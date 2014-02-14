@@ -237,8 +237,8 @@ public class SenzorApplication extends Application {
             // this is first time app launch
             // add my sensors and users to database
             // TODO add more available sensors
-            Sensor sensor = new Sensor("0", this.getUser().getUsername(), "Location", "LocationValue", true, false);
-            new SenzorsDbSource(this).addSensor(sensor, this.getUser());
+            Sensor sensor = new Sensor("0", "Location", "LocationValue", true, false, this.getUser());
+            new SenzorsDbSource(this).addSensor(sensor);
 
             // reset first time status
             PreferenceUtils.setFirstTime(this, false);

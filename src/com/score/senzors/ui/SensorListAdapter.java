@@ -138,10 +138,10 @@ public class SensorListAdapter extends BaseAdapter {
         viewHolder.sensorUser.setTextColor(Color.parseColor("#d96459"));
 
         if(sensor.isAvailable()) {
-            viewHolder.sensorUser.setText("@" + sensor.getUser());
+            viewHolder.sensorUser.setText("@" + sensor.getUser().getUsername());
             viewHolder.sensorValue.setText(sensor.getSensorValue());
         } else {
-            viewHolder.sensorUser.setText("@" + sensor.getUser());
+            viewHolder.sensorUser.setText("@" + sensor.getUser().getUsername());
             viewHolder.sensorValue.setText(R.string.tap_here);
         }
     }
@@ -154,10 +154,10 @@ public class SensorListAdapter extends BaseAdapter {
         viewHolder.sensorUser.setTextColor(Color.parseColor("#11b29c"));
 
         if(sensor.isAvailable()) {
-            viewHolder.sensorUser.setText("@" + sensor.getUser());
+            viewHolder.sensorUser.setText("@" + sensor.getUser().getUsername());
             viewHolder.sensorValue.setText(sensor.getSensorValue());
         } else {
-            viewHolder.sensorUser.setText("@" + sensor.getUser());
+            viewHolder.sensorUser.setText("@" + sensor.getUser().getUsername());
             viewHolder.sensorValue.setText(R.string.tap_here);
         }
     }

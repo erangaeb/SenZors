@@ -6,19 +6,19 @@ package com.score.senzors.pojos;
  */
 public class Sensor {
     String id;
-    String user;
     String sensorName;
     String sensorValue;
     boolean isMySensor;
     boolean isAvailable;
+    User user;
 
-    public Sensor(String id, String user, String sensorName, String sensorValue, boolean isMySensor, boolean isAvailable) {
+    public Sensor(String id, String sensorName, String sensorValue, boolean isMySensor, boolean isAvailable, User user) {
         this.id = id;
-        this.user = user;
         this.sensorName = sensorName;
         this.sensorValue = sensorValue;
         this.isMySensor = isMySensor;
         this.isAvailable = isAvailable;
+        this.user = user;
     }
 
     public String getId() {
@@ -27,14 +27,6 @@ public class Sensor {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getUser() {
-        return user;
-    }
-
-    public void setUser(String user) {
-        this.user = user;
     }
 
     public String getSensorName() {
@@ -69,11 +61,19 @@ public class Sensor {
         isAvailable = available;
     }
 
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if(obj instanceof Sensor) {
             Sensor toCompare = (Sensor) obj;
-            return (this.user.equalsIgnoreCase(toCompare.getUser()) && this.sensorName.equalsIgnoreCase(toCompare.getSensorName()));
+            return (this.getUser().getUsername().equalsIgnoreCase(toCompare.getUser().getUsername()) && this.sensorName.equalsIgnoreCase(toCompare.getSensorName()));
         }
 
         return false;
