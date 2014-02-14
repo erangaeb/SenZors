@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.util.Log;
 import com.score.senzors.pojos.Sensor;
 import com.score.senzors.pojos.User;
@@ -66,7 +67,7 @@ public class SenzorsDbSource {
                 null, // group by
                 null); // join
 
-        if(cursor!=null) {
+        if(cursor.moveToNext()) {
             // have matching user
             cursor.moveToFirst();
 
@@ -80,6 +81,7 @@ public class SenzorsDbSource {
             cursor.close();
             db.close();
 
+            Log.d(TAG, "GetOrCreateUser: no user, so user created:" + _username);
             return new User(id, _username, _email, "password");
         } else {
             // no matching user
@@ -89,10 +91,11 @@ public class SenzorsDbSource {
             values.put(SenzorsDbContract.User.COLUMN_NAME_EMAIL, email);
 
             // inset data
-            db.insertOrThrow(SenzorsDbContract.User.TABLE_NAME, SenzorsDbContract.User.COLUMN_NAME_EMAIL, values);
+            long id = db.insert(SenzorsDbContract.User.TABLE_NAME, SenzorsDbContract.User.COLUMN_NAME_EMAIL, values);
             db.close();
 
-            return new User(username, email);
+            Log.d(TAG, "GetOrCreateUser: have user, so return it: " + username);
+            return new User(Long.toString(id), username, email, "");
         }
     }
 
@@ -129,12 +132,33 @@ public class SenzorsDbSource {
 
         // select query with args
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-        Cursor cursor = db.query(SenzorsDbContract.Sensor.TABLE_NAME, // table
+
+        /*Cursor cursor = db.query(SenzorsDbContract.Sensor.TABLE_NAME, // table
                 null, SenzorsDbContract.Sensor.COLUMN_NAME_IS_MINE + "=?", // constraint
                 new String[]{mySensors ? "1" : "0"}, // prams
                 null, // order by
                 null, // group by
-                null); // join
+                null); // join*/
+
+        // join query via query builder
+        /*SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
+        queryBuilder.setTables(SenzorsDbContract.Sensor.TABLE_NAME+
+                " LEFT OUTER JOIN " + SenzorsDbContract.User.TABLE_NAME + " ON " +
+                SenzorsDbContract.Sensor.COLUMN_NAME_USER + " = " + SenzorsDbContract.User._ID);*/
+        /*Cursor cursor = queryBuilder.query(db, // database
+                null,
+                SenzorsDbContract.Sensor.COLUMN_NAME_IS_MINE + "=?", // constraint
+                new String[]{mySensors ? "1" : "0"}, // prams
+                null, // group by
+                null, // having
+                null); // order by*/
+
+        // get matching data via JOIN query
+        String query = "SELECT sensor._id, sensor.name, sensor.value, sensor.is_mine, user.name " +
+                "FROM sensor JOIN user " +
+                "ON sensor.user = user._id " +
+                "WHERE sensor.is_mine=?";
+        Cursor cursor = db.rawQuery(query, new String[]{mySensors ? "1" : "0"});
 
         // sensor attributes
         String id;
@@ -149,7 +173,7 @@ public class SenzorsDbSource {
             sensorName = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Sensor.COLUMN_NAME_NAME));
             sensorValue = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Sensor.COLUMN_NAME_VALUE));
             isMySensor = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Sensor.COLUMN_NAME_IS_MINE)) == 1;
-            user = "user";
+            user = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_USERNAME));
             Log.d(TAG, "GetSensors: sensor name - " + sensorName);
             //Log.d(TAG, "GetSensors: sensor value - " + sensorValue);
             Log.d(TAG, "GetSensors: is my sensor - " + isMySensor);
