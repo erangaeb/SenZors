@@ -1,6 +1,8 @@
 package com.score.senzors.pojos;
 
 
+import java.util.ArrayList;
+
 /**
  * POJO class to hold sensor data attributes
  */
@@ -11,14 +13,16 @@ public class Sensor {
     boolean isMySensor;
     boolean isAvailable;
     User user;
+    ArrayList<User> sharedUsers;
 
-    public Sensor(String id, String sensorName, String sensorValue, boolean isMySensor, boolean isAvailable, User user) {
+    public Sensor(String id, String sensorName, String sensorValue, boolean isMySensor, boolean isAvailable, User user, ArrayList<User> sharedUsers) {
         this.id = id;
         this.sensorName = sensorName;
         this.sensorValue = sensorValue;
         this.isMySensor = isMySensor;
         this.isAvailable = isAvailable;
         this.user = user;
+        this.sharedUsers = sharedUsers;
     }
 
     public String getId() {
@@ -67,6 +71,14 @@ public class Sensor {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public ArrayList<User> getSharedUsers() {
+        return sharedUsers;
+    }
+
+    public void setSharedUsers(ArrayList<User> sharedUsers) {
+        this.sharedUsers = sharedUsers;
     }
 
     @Override

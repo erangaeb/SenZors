@@ -160,7 +160,8 @@ public class SenzorsDbSource {
 
             // save to list
             user = new User(userId, username, email, "password");
-            sensor = new Sensor(sensorId, sensorName, sensorValue, isMySensor, false, user);
+            ArrayList<User> sharedUsers = getSharedUsers(sensorId, db);
+            sensor = new Sensor(sensorId, sensorName, sensorValue, isMySensor, false, user, sharedUsers);
             sensorList.add(sensor);
 
             Log.d(TAG, "GetSensors: sensor name - " + sensor.getSensorName());
@@ -211,9 +212,10 @@ public class SenzorsDbSource {
             Log.d(TAG, "GetSharedUsers: user - " + user.getUsername());
         }
 
-        // clean
+        // clean cursor
         cursor.close();
 
+        Log.d(TAG, "GetSharedUsers: user count - " + userList.size());
         return userList;
     }
 
