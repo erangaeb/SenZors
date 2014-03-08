@@ -27,4 +27,10 @@ public class SenzorsDbContract {
         public static final String COLUMN_NAME_USERNAME = "name";
         public static final String COLUMN_NAME_EMAIL = "email";
     }
+
+    public static abstract class SharedUser implements BaseColumns {
+        public static final String TABLE_NAME = "shared_user";
+        public static final String COLUMN_NAME_USER = "user";
+        public static final String COLUMN_NAME_SENSOR = "invoice";
+    }
 }

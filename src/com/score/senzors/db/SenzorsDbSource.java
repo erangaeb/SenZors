@@ -176,4 +176,64 @@ public class SenzorsDbSource {
         return sensorList;
     }
 
+    /**
+     * Get shared users of given sensor
+     * @param sensorId sensor id
+     * @param db database
+     * @return user list
+     */
+    private ArrayList<User> getSharedUsers(String sensorId, SQLiteDatabase db) {
+        Log.d(TAG, "GetSharedUsers: getting shares users");
+        ArrayList<User> userList = new ArrayList<User>();
+
+        String query = "SELECT * " +
+                "FROM shared_user JOIN user " +
+                "ON shared_user.user = user._id " +
+                "WHERE shared_user.sensor=?";
+        Cursor cursor = db.rawQuery(query, new String[]{sensorId});
+
+        // user attributes
+        String userId;
+        String username;
+        String email;
+        User user;
+
+        // extract attributes
+        while (cursor.moveToNext()) {
+            // get user attributes
+            userId = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User._ID));
+            username = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_USERNAME));
+            email = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_EMAIL));
+
+            // save to list
+            user = new User(userId, username, email, "password");
+            userList.add(user);
+            Log.d(TAG, "GetSharedUsers: user - " + user.getUsername());
+        }
+
+        // clean
+        cursor.close();
+
+        return userList;
+    }
+
+    /**
+     * Add shared user to db when share sensor with user
+     * @param sensor sensor
+     * @param user user
+     */
+    public void addSharedUser(Sensor sensor, User user) {
+        Log.d(TAG, "AddSharedUser: add data - " + sensor.getSensorName() + " " + user.getUsername());
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
+
+        // content values to inset
+        ContentValues values = new ContentValues();
+        values.put(SenzorsDbContract.SharedUser.COLUMN_NAME_USER, user.getId());
+        values.put(SenzorsDbContract.SharedUser.COLUMN_NAME_SENSOR, sensor.getId());
+
+        // Insert the new row, if fails throw an error
+        db.insertOrThrow(SenzorsDbContract.SharedUser.TABLE_NAME, SenzorsDbContract.SharedUser.COLUMN_NAME_USER, values);
+        db.close();
+    }
+
 }

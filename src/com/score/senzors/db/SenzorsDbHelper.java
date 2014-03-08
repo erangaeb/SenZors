@@ -18,7 +18,7 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
     private static SenzorsDbHelper senzorsDbHelper;
 
     // If you change the database schema, you must increment the database version
-    private static final int DATABASE_VERSION = 5;
+    private static final int DATABASE_VERSION = 6;
     private static final String DATABASE_NAME = "Senzors.db";
 
     // data types, keywords and queries
@@ -40,10 +40,23 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
                     SenzorsDbContract.User.COLUMN_NAME_USERNAME + TEXT_TYPE + "UNIQUE NOT NULL" + "," +
                     SenzorsDbContract.User.COLUMN_NAME_EMAIL + TEXT_TYPE +
                     " )";
+    private static final String SQL_CREATE_SHARED_USER =
+            "CREATE TABLE " + SenzorsDbContract.SharedUser.TABLE_NAME + " (" +
+                    SenzorsDbContract.SharedUser._ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + "," +
+                    SenzorsDbContract.SharedUser.COLUMN_NAME_USER + " INTEGER NOT NULL" + "," +
+                    SenzorsDbContract.SharedUser.COLUMN_NAME_SENSOR + " INTEGER NOT NULL" + "," +
+                    "FOREIGN KEY" + "(" + SenzorsDbContract.SharedUser.COLUMN_NAME_USER + ") " +
+                    "REFERENCES "+ SenzorsDbContract.User.TABLE_NAME + "(" + SenzorsDbContract.User._ID + ")" +
+                    "FOREIGN KEY" + "(" + SenzorsDbContract.SharedUser.COLUMN_NAME_SENSOR + ") " +
+                    "REFERENCES "+ SenzorsDbContract.Sensor.TABLE_NAME + "(" + SenzorsDbContract.Sensor._ID + ")" +
+            " )";
+
     private static final String SQL_DELETE_SENSOR =
             "DROP TABLE IF EXISTS " + SenzorsDbContract.Sensor.TABLE_NAME;
     private static final String SQL_DELETE_USER =
             "DROP TABLE IF EXISTS " + SenzorsDbContract.User.TABLE_NAME;
+    private static final String SQL_DELETE_SHARED_USER =
+            "DROP TABLE IF EXISTS " + SenzorsDbContract.SharedUser.TABLE_NAME;
 
     // trigger that use to define foreign key constraint of "user" in "sensor" table
     // we need to define foreign key constraint because of sqlite older versions not default supporting foreign key constraints
@@ -90,6 +103,7 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
         Log.d(TAG, "OnCreate: creating db helper, db version - " + DATABASE_VERSION);
         db.execSQL(SQL_CREATE_SENSOR);
         db.execSQL(SQL_CREATE_USER);
+        db.execSQL(SQL_CREATE_SHARED_USER);
         //db.execSQL(SQL_CREATE_TRIGGER_SENSOR_FOREIGN_KEY);
     }
 
@@ -113,6 +127,7 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
         Log.d(TAG, "OnUpgrade: updating db helper, db version - " + DATABASE_VERSION);
         db.execSQL(SQL_DELETE_SENSOR);
         db.execSQL(SQL_DELETE_USER);
+        db.execSQL(SQL_DELETE_SHARED_USER);
         //db.execSQL(SQL_DELETE_TRIGGER_SENSOR_FOREIGN_KEY);
         onCreate(db);
     }
