@@ -15,6 +15,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.score.senzors.application.SenzorApplication;
 import com.score.senzors.R;
+import com.score.senzors.db.SenzorsDbSource;
+import com.score.senzors.pojos.User;
 import com.score.senzors.utils.ActivityUtils;
 import com.score.senzors.utils.NetworkUtil;
 
@@ -32,6 +34,8 @@ public class ShareActivity extends Activity implements Handler.Callback {
 
     private TextView usernameLabel;
     private EditText usernameEditText;
+
+    private User sharingUser;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -139,20 +143,29 @@ public class ShareActivity extends Activity implements Handler.Callback {
 
         // validate share attribute first
         if(!username.equalsIgnoreCase("")) {
-            if(NetworkUtil.isAvailableNetwork(ShareActivity.this)) {
-                // construct query and send to server via web socket
-                if(application.getWebSocketConnection().isConnected()) {
-                    Log.w(TAG, "Share: sending query to server");
-                    application.getWebSocketConnection().sendTextMessage(query);
-                } else {
-                    Log.w(TAG, "Share: not connected to web socket");
-                    Toast.makeText(ShareActivity.this, "You are disconnected from senZors service", Toast.LENGTH_LONG).show();
-                }
-
-                ActivityUtils.hideSoftKeyboard(this);
+            // check weather sensor already shared with given user
+            sharingUser = new User("id", username, "email : " + username, "password");
+            if(application.getCurrentSensor().getSharedUsers().contains(sharingUser)) {
+                // already shared sensor
+                Log.d(TAG, "Share: already shared sensor with this user " + username);
+                Toast.makeText(ShareActivity.this, "Sensor already shared with " + username, Toast.LENGTH_LONG).show();
             } else {
-                Log.w(TAG, "Share: no network connection");
-                Toast.makeText(ShareActivity.this, "Cannot connect to server, Please check your network connection", Toast.LENGTH_LONG).show();
+                Log.d(TAG, "Share: sensor not shared with this user " + username);
+                if(NetworkUtil.isAvailableNetwork(ShareActivity.this)) {
+                    // construct query and send to server via web socket
+                    if(application.getWebSocketConnection().isConnected()) {
+                        Log.w(TAG, "Share: sending query to server");
+                        application.getWebSocketConnection().sendTextMessage(query);
+                    } else {
+                        Log.w(TAG, "Share: not connected to web socket");
+                        Toast.makeText(ShareActivity.this, "You are disconnected from senZors service", Toast.LENGTH_LONG).show();
+                    }
+
+                    ActivityUtils.hideSoftKeyboard(this);
+                } else {
+                    Log.w(TAG, "Share: no network connection");
+                    Toast.makeText(ShareActivity.this, "Cannot connect to server, Please check your network connection", Toast.LENGTH_LONG).show();
+                }
             }
         } else {
             Log.e(TAG, "Share: empty username");
@@ -184,6 +197,18 @@ public class ShareActivity extends Activity implements Handler.Callback {
             if(payLoad.equalsIgnoreCase("ShareDone")) {
                 Log.d(TAG, "HandleMessage: sharing success");
                 Toast.makeText(ShareActivity.this, "Sensor has been shared successfully", Toast.LENGTH_LONG).show();
+
+                // create sharing user, if user not in the db
+                // create shared connection(sharedUser) in db
+                // refresh sensor list
+                SenzorsDbSource dbSource = new SenzorsDbSource(ShareActivity.this);
+                User user = dbSource.getOrCreateUser(sharingUser.getUsername(), sharingUser.getEmail());
+                dbSource.addSharedUser(application.getCurrentSensor(), user);
+                application.getCurrentSensor().getSharedUsers().add(user);
+
+                Log.d(TAG, "HandleMessage: user get/created " + user.getUsername());
+                Log.d(TAG, "HandleMessage: added shared connection");
+
                 ShareActivity.this.finish();
                 ShareActivity.this.overridePendingTransition(R.anim.stay_in, R.anim.bottom_out);
 

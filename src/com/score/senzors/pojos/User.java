@@ -47,4 +47,19 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof User) {
+            User toCompare = (User) obj;
+            return (this.username.equalsIgnoreCase(toCompare.getUsername()));
+        }
+
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return (this.getUsername()).hashCode();
+    }
 }

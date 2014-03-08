@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.widget.ListView;
+import com.score.senzors.application.SenzorApplication;
 import com.score.senzors.pojos.User;
 import com.score.senzors.R;
 
@@ -19,6 +20,7 @@ import java.util.ArrayList;
  */
 public class FriendList extends Fragment {
     // use to populate list
+    private SenzorApplication application;
     private ListView friendListView;
     private ArrayList<User> userList;
     private FriendListAdapter adapter;
@@ -33,6 +35,7 @@ public class FriendList extends Fragment {
         // after creating fragment we initialize friend list
         // TODO need to fill friend list with backend data
         //getActivity().getActionBar().setTitle("Friends");
+        application = (SenzorApplication) this.getActivity().getApplication();
         initFriendList();
     }
 
@@ -63,11 +66,13 @@ public class FriendList extends Fragment {
     private void initFriendList() {
         // populate sample data to list
         userList = new ArrayList<User>();
-        userList.add(new User("0", "eranga", "erangaeb@gmail.com", ""));
-        userList.add(new User("0", "pagero", "pagero@gmail.com", ""));
+        //userList.add(new User("0", "eranga", "erangaeb@gmail.com", ""));
+        //userList.add(new User("0", "pagero", "pagero@gmail.com", ""));
         //userList.add(new User("0", "test", "test@gmail.com", ""));
         //userList.add(new User("0", "herath", "herath@gmail.com", ""));
         //userList.add(new User("0", "vijith", "vijith@gmail.com", ""));
+        if(application.getCurrentSensor().getSharedUsers() != null)
+            userList = application.getCurrentSensor().getSharedUsers();
 
         // construct list adapter
         adapter = new FriendListAdapter(FriendList.this.getActivity(), userList);
