@@ -179,7 +179,12 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
             if(payLoad.equalsIgnoreCase("LoginSUCCESS")) {
                 Log.d(TAG, "HandleMessage: login success");
                 Log.d(TAG, "HandleMessage: NOT force to disconnect web socket");
+
+                // get user
+                // set password of the user since we not storing password in database
                 User user = new SenzorsDbSource(LoginActivity.this).getOrCreateUser(application.getUser().getUsername(), application.getUser().getEmail());
+                user.setPassword(application.getUser().getPassword());
+
                 PreferenceUtils.saveUser(LoginActivity.this, user);
                 application.setUser(user);
                 Log.d(TAG, "HandleMessage: user saved " + application.getUser().getId());
