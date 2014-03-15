@@ -75,6 +75,14 @@ public class SensorDetailsActivity extends FragmentActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.map_menu, menu);
 
+        // show hide share item according to sensor type
+        MenuItem share = menu.findItem(R.id.action_share);
+        if (application.getCurrentSensor().isMySensor()) {
+            share.setVisible(true);
+        } else {
+            share.setVisible(false);
+        }
+
         return super.onCreateOptionsMenu(menu);
     }
 

@@ -107,8 +107,14 @@ public class FriendList extends Fragment {
         //userList.add(new User("0", "test", "test@gmail.com", ""));
         //userList.add(new User("0", "herath", "herath@gmail.com", ""));
         //userList.add(new User("0", "vijith", "vijith@gmail.com", ""));
-        if(application.getCurrentSensor().getSharedUsers() != null)
-            userList = application.getCurrentSensor().getSharedUsers();
+        if(application.getCurrentSensor().isMySensor()) {
+            // add shared users if available
+            if(application.getCurrentSensor().getSharedUsers() != null)
+                userList = application.getCurrentSensor().getSharedUsers();
+        } else {
+            // add sensor owner
+            userList.add(application.getCurrentSensor().getUser());
+        }
 
         // construct list adapter
         if(userList.size()>0) {
