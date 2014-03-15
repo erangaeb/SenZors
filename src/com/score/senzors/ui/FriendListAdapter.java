@@ -40,6 +40,10 @@ public class FriendListAdapter extends BaseAdapter {
         this.userList = userList;
     }
 
+    public void setUserList(ArrayList<User> userList) {
+        this.userList = userList;
+    }
+
     /**
      * Get size of user list
      * @return userList size

@@ -1,12 +1,15 @@
 package com.score.senzors.ui;
 
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.widget.ListView;
+import android.widget.TextView;
 import com.score.senzors.application.SenzorApplication;
 import com.score.senzors.pojos.User;
 import com.score.senzors.R;
@@ -25,6 +28,8 @@ public class FriendList extends Fragment {
     private ArrayList<User> userList;
     private FriendListAdapter adapter;
 
+    Typeface typeface;
+
     // to handle empty view
     private ViewStub emptyView;
 
@@ -35,7 +40,9 @@ public class FriendList extends Fragment {
         // after creating fragment we initialize friend list
         // TODO need to fill friend list with backend data
         //getActivity().getActionBar().setTitle("Friends");
+        typeface = Typeface.createFromAsset(this.getActivity().getAssets(), "fonts/Roboto-Thin.ttf");
         application = (SenzorApplication) this.getActivity().getApplication();
+        initEmptyView();
         initFriendList();
     }
 
@@ -45,6 +52,22 @@ public class FriendList extends Fragment {
         initUI(root);
 
         return root;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // construct list adapter
+        if(userList.size()>0) {
+            adapter = new FriendListAdapter(FriendList.this.getActivity(), userList);
+            friendListView.setAdapter(adapter);
+        } else {
+            friendListView.setEmptyView(emptyView);
+        }
     }
 
     /**
@@ -58,6 +81,19 @@ public class FriendList extends Fragment {
         View footerView = View.inflate(this.getActivity(), R.layout.list_header, null);
         friendListView.addHeaderView(headerView);
         friendListView.addFooterView(footerView);
+    }
+
+    /**
+     * Initialize empty view for list view
+     * empty view need to be display when no sensors available
+     */
+    private void initEmptyView() {
+        //Log.d(TAG, "InitEmptyView: initializing empty view");
+        emptyView = (ViewStub) getActivity().findViewById(R.id.sensor_list_layout_empty_view);
+        View inflatedEmptyView = emptyView.inflate();
+        TextView emptyText = (TextView) inflatedEmptyView.findViewById(R.id.empty_text);
+        emptyText.setText("Sensor not shared with any user");
+        emptyText.setTypeface(typeface, Typeface.BOLD);
     }
 
     /**
@@ -75,7 +111,11 @@ public class FriendList extends Fragment {
             userList = application.getCurrentSensor().getSharedUsers();
 
         // construct list adapter
-        adapter = new FriendListAdapter(FriendList.this.getActivity(), userList);
-        friendListView.setAdapter(adapter);
+        if(userList.size()>0) {
+            adapter = new FriendListAdapter(FriendList.this.getActivity(), userList);
+            friendListView.setAdapter(adapter);
+        } else {
+            friendListView.setEmptyView(emptyView);
+        }
     }
 }

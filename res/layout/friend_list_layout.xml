@@ -93,4 +93,12 @@
             android:scrollbarStyle="outsideInset">
     </ListView>
 
+    <ViewStub
+            android:id="@+id/sensor_list_layout_empty_view"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_gravity="center"
+            android:layout="@layout/empty">
+    </ViewStub>
+
 </LinearLayout>

@@ -66,7 +66,7 @@ public class SensorList extends Fragment implements Handler.Callback {
 
         Log.d(TAG, "OnActivityCreated: activity created");
         application = (SenzorApplication) getActivity().getApplication();
-        typeface = Typeface.createFromAsset(this.getActivity().getAssets(), "fonts/Roboto-Thin.ttf");
+            typeface = Typeface.createFromAsset(this.getActivity().getAssets(), "fonts/Roboto-Thin.ttf");
 
         Log.d(TAG, "OnActivityCreated: sensor type " + application.getSensorType());
 
