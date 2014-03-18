@@ -166,6 +166,7 @@ public class FriendList extends Fragment implements Handler.Callback {
                 // construct query and send to server via web socket
                 if(application.getWebSocketConnection().isConnected()) {
                     Log.w(TAG, "UnShare: sending query to server");
+                    ActivityUtils.showProgressDialog(this.getActivity(), "Un-sharing sensor...");
                     application.getWebSocketConnection().sendTextMessage(query);
                 } else {
                     Log.w(TAG, "UnShare: not connected to web socket");
@@ -197,6 +198,7 @@ public class FriendList extends Fragment implements Handler.Callback {
             // successful login returns "ShareDone"
             if(payLoad.equalsIgnoreCase(":ShareDone")) {
                 Log.d(TAG, "HandleMessage: un-sharing success");
+                ActivityUtils.cancelProgressDialog();
                 Toast.makeText(this.getActivity(), "Sensor has been unshared successfully", Toast.LENGTH_LONG).show();
 
                 // post un-share action differ according to sensor type(my sensor or friends sensor)
@@ -222,24 +224,13 @@ public class FriendList extends Fragment implements Handler.Callback {
                     this.getActivity().overridePendingTransition(R.anim.stay_in, R.anim.right_out);
                 }
 
-                // remove sharing user from the db
-                // remove shared connection(sharedUser) in db
-                // refresh sensor list
-                /*SenzorsDbSource dbSource = new SenzorsDbSource(ShareActivity.this);
-                User user = dbSource.getOrCreateUser(sharingUser.getUsername(), sharingUser.getEmail());
-                dbSource.addSharedUser(application.getCurrentSensor(), user);
-                application.getCurrentSensor().getSharedUsers().add(user);
-
-                Log.d(TAG, "HandleMessage: user get/created " + user.getUsername());
-                Log.d(TAG, "HandleMessage: added shared connection");
-
-                ShareActivity.this.finish();
-                ShareActivity.this.overridePendingTransition(R.anim.stay_in, R.anim.bottom_out);*/
-
                 return true;
-            } else {
+            } else if (payLoad.equalsIgnoreCase(":ShareFailed")) {
                 Log.d(TAG, "HandleMessage: sharing fail");
+                ActivityUtils.cancelProgressDialog();
                 Toast.makeText(this.getActivity(), "Un-sharing fail", Toast.LENGTH_LONG).show();
+            } else {
+                Log.d(TAG, "HandleMessage: ignore message");
             }
         }
 

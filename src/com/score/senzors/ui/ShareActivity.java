@@ -155,6 +155,7 @@ public class ShareActivity extends Activity implements Handler.Callback {
                     // construct query and send to server via web socket
                     if(application.getWebSocketConnection().isConnected()) {
                         Log.w(TAG, "Share: sending query to server");
+                        ActivityUtils.showProgressDialog(this, "Sharing sensor...");
                         application.getWebSocketConnection().sendTextMessage(query);
                     } else {
                         Log.w(TAG, "Share: not connected to web socket");
@@ -191,6 +192,7 @@ public class ShareActivity extends Activity implements Handler.Callback {
         Log.d(TAG, "HandleMessage: message from server");
         if(message.obj instanceof String) {
             String payLoad = (String)message.obj;
+            ActivityUtils.cancelProgressDialog();
             Log.d(TAG, "HandleMessage: message is a string " + payLoad);
 
             // successful login returns "ShareDone"
