@@ -116,6 +116,23 @@ public class SenzorsDbSource {
     }
 
     /**
+     * Delete sensor from database,
+     * In here we actually delete all the matching sensors of given user
+     * @param sensor sensor
+     */
+    public void deleteSensorOfUser(Sensor sensor) {
+        Log.d(TAG, "deleteSensor: deleting sensor - " + sensor.getSensorName());
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
+
+        // delete sensor matching sensor of given user
+        db.delete(SenzorsDbContract.Sensor.TABLE_NAME,
+                SenzorsDbContract.Sensor.COLUMN_NAME_USER + "=?" + " AND " +
+                SenzorsDbContract.Sensor.COLUMN_NAME_NAME + "=?",
+                new String[]{sensor.getUser().getId(), sensor.getSensorName()});
+        db.close();
+    }
+
+    /**
      * Get all sensors, two types of sensors here
      *  1. my sensors
      *  2. friends sensors
@@ -238,4 +255,20 @@ public class SenzorsDbSource {
         db.close();
     }
 
+    /**
+     * Delete shared users from database,
+     * Sensor sharing details keeps on SharedUser table, so delete that
+     * sharing entries from here
+     * @param user user
+     */
+    public void deleteSharedUser(User user) {
+        Log.d(TAG, "DeleteSharedUser: deleting shared user - " + user.getUsername());
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
+
+        // delete shared user
+        db.delete(SenzorsDbContract.SharedUser.TABLE_NAME,
+                SenzorsDbContract.SharedUser.COLUMN_NAME_USER + "=?",
+                new String[]{user.getId()});
+        db.close();
+    }
 }
