@@ -119,25 +119,20 @@ public class QueryHandler {
         User user = new SenzorsDbSource(application.getApplicationContext()).getOrCreateUser(query.getUser(), "email");
         Sensor sensor = new Sensor("0", "Location", "Location", false, false, user, null);
 
-        // handle share query if it not shared already
-        if(!application.getFiendSensorList().contains(sensor)) {
-            try {
-                // save sensor in db and refresh friend sensor list
-                new SenzorsDbSource(application.getApplicationContext()).addSensor(sensor);
-                application.initFriendsSensors();
-                Log.d(TAG, "HandleShareQuery: saved sensor from - " + user.getUsername());
+        try {
+            // save sensor in db and refresh friend sensor list
+            new SenzorsDbSource(application.getApplicationContext()).addSensor(sensor);
+            application.initFriendsSensors();
+            Log.d(TAG, "HandleShareQuery: saved sensor from - " + user.getUsername());
 
-                // currently we have to launch friend sensor
-                // update notification to notify user about incoming query/ share request
-                application.setSensorType(SenzorApplication.FRIENDS_SENSORS);
-                Log.d(TAG, "HandleShareQuery: received query with type " + application.getSensorType());
-                NotificationUtils.updateNotification(application.getApplicationContext(), "Location @" + user.getUsername());
-            } catch (Exception e) {
-                // Db exception here
-                Log.e(TAG, "HandleShareQuery: db error " + e.toString());
-            }
-        } else {
-            Log.e(TAG, "HandleShareQuery: already shared sensor");
+            // currently we have to launch friend sensor
+            // update notification to notify user about incoming query/ share request
+            application.setSensorType(SenzorApplication.FRIENDS_SENSORS);
+            Log.d(TAG, "HandleShareQuery: received query with type " + application.getSensorType());
+            NotificationUtils.updateNotification(application.getApplicationContext(), "Location @" + user.getUsername());
+        } catch (Exception e) {
+            // Db exception here
+            Log.e(TAG, "HandleShareQuery: db error " + e.toString());
         }
     }
 

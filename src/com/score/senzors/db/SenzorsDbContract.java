@@ -25,7 +25,7 @@ public class SenzorsDbContract {
     /* Inner class that defines the user table contents */
     public static abstract class User implements BaseColumns {
         public static final String TABLE_NAME = "user";
-        public static final String COLUMN_NAME_USERNAME = "name";
+        public static final String COLUMN_NAME_USERNAME = "username";
         public static final String COLUMN_NAME_EMAIL = "email";
     }
 

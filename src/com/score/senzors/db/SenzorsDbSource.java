@@ -122,6 +122,7 @@ public class SenzorsDbSource {
      */
     public void deleteSensorOfUser(Sensor sensor) {
         Log.d(TAG, "deleteSensor: deleting sensor - " + sensor.getSensorName());
+        Log.d(TAG, "deleteSensor: deleting sensor - " + sensor.getUser().getUsername());
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
 
         // delete sensor matching sensor of given user

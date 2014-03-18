@@ -17,8 +17,11 @@ import com.score.senzors.application.SenzorApplication;
 import com.score.senzors.db.SenzorsDbSource;
 import com.score.senzors.pojos.User;
 import com.score.senzors.R;
+import com.score.senzors.utils.ActivityUtils;
+import com.score.senzors.utils.NetworkUtil;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * Display friend list/ Fragment
@@ -36,6 +39,8 @@ public class FriendList extends Fragment implements Handler.Callback {
     private FriendListAdapter adapter;
 
     Typeface typeface;
+
+    private User unSharingUser;
 
     // to handle empty view
     private ViewStub emptyView;
@@ -67,10 +72,11 @@ public class FriendList extends Fragment implements Handler.Callback {
     @Override
     public void onResume() {
         super.onResume();
+        application.setCallback(this);
 
         // construct list adapter
         if(userList.size()>0) {
-            adapter = new FriendListAdapter(FriendList.this.getActivity(), userList);
+            adapter = new FriendListAdapter(FriendList.this, userList);
             friendListView.setAdapter(adapter);
         } else {
             friendListView.setEmptyView(emptyView);
@@ -109,11 +115,7 @@ public class FriendList extends Fragment implements Handler.Callback {
     private void initFriendList() {
         // populate sample data to list
         userList = new ArrayList<User>();
-        //userList.add(new User("0", "eranga", "erangaeb@gmail.com", ""));
-        //userList.add(new User("0", "pagero", "pagero@gmail.com", ""));
-        //userList.add(new User("0", "test", "test@gmail.com", ""));
-        //userList.add(new User("0", "herath", "herath@gmail.com", ""));
-        //userList.add(new User("0", "vijith", "vijith@gmail.com", ""));
+
         if(application.getCurrentSensor().isMySensor()) {
             // add shared users if available
             if(application.getCurrentSensor().getSharedUsers() != null)
@@ -125,10 +127,59 @@ public class FriendList extends Fragment implements Handler.Callback {
 
         // construct list adapter
         if(userList.size()>0) {
-            adapter = new FriendListAdapter(FriendList.this.getActivity(), userList);
+            adapter = new FriendListAdapter(FriendList.this, userList);
             friendListView.setAdapter(adapter);
         } else {
             friendListView.setEmptyView(emptyView);
+        }
+    }
+
+    /**
+     * Remove user from sensor shared user list
+     * Then we can refresh list view
+     * @param removingUser user
+     */
+    private void removeUserFromList(User removingUser) {
+        Iterator<User> it = userList.iterator();
+        while (it.hasNext()) {
+            User user = it.next();
+            if (user.getUsername().equals(removingUser.getUsername())) {
+                it.remove();
+            }
+        }
+    }
+
+    /**
+     * UnShare user from sensor
+     * Need to send un share query to server via web socket
+     *
+     * @param user user
+     */
+    public void unShare(User user) {
+        unSharingUser = user;
+        String query = ":SHARE" + " " + "#lat #lon" + " " + "@" + user.getUsername().trim();
+        Log.d(TAG, "UnShare: un-sharing query " + query);
+
+        // validate share attribute first
+        if(!user.getUsername().equalsIgnoreCase("")) {
+            if(NetworkUtil.isAvailableNetwork(this.getActivity())) {
+                // construct query and send to server via web socket
+                if(application.getWebSocketConnection().isConnected()) {
+                    Log.w(TAG, "UnShare: sending query to server");
+                    application.getWebSocketConnection().sendTextMessage(query);
+                } else {
+                    Log.w(TAG, "UnShare: not connected to web socket");
+                    Toast.makeText(this.getActivity(), "You are disconnected from senZors service", Toast.LENGTH_LONG).show();
+                }
+
+                ActivityUtils.hideSoftKeyboard(this.getActivity());
+            } else {
+                Log.w(TAG, "UnShare: no network connection");
+                Toast.makeText(this.getActivity(), "Cannot connect to server, Please check your network connection", Toast.LENGTH_LONG).show();
+            }
+        } else {
+            Log.e(TAG, "UnShare: empty username");
+            Toast.makeText(this.getActivity(), "Make sure non empty username", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -145,8 +196,31 @@ public class FriendList extends Fragment implements Handler.Callback {
 
             // successful login returns "ShareDone"
             if(payLoad.equalsIgnoreCase(":ShareDone")) {
-                Log.d(TAG, "HandleMessage: unsharing success");
+                Log.d(TAG, "HandleMessage: un-sharing success");
                 Toast.makeText(this.getActivity(), "Sensor has been unshared successfully", Toast.LENGTH_LONG).show();
+
+                // post un-share action differ according to sensor type(my sensor or friends sensor)
+                if(application.getCurrentSensor().isMySensor()) {
+                    // my sensor
+                    // remove shared user from db
+                    if(unSharingUser != null) {
+                        new SenzorsDbSource(application.getApplicationContext()).deleteSharedUser(unSharingUser);
+
+                        // get sensor list again
+                        // refresh list
+                        FriendList.this.removeUserFromList(unSharingUser);
+                        FriendList.this.initFriendList();
+                    }
+                } else {
+                    // friend sensor
+                    // delete sensor from db and go back to sensor list
+                    new SenzorsDbSource(application.getApplicationContext()).deleteSensorOfUser(application.getCurrentSensor());
+                    application.initFriendsSensors();
+
+                    // go back to previous activity
+                    this.getActivity().finish();
+                    this.getActivity().overridePendingTransition(R.anim.stay_in, R.anim.right_out);
+                }
 
                 // remove sharing user from the db
                 // remove shared connection(sharedUser) in db

@@ -257,7 +257,7 @@ public class SenzorApplication extends Application {
      * Initialize my sensor list
      * Get all available sensors of me and add to sensor list shared in application
      */
-    private void initMySensors() {
+    public void initMySensors() {
         mySensorList = (ArrayList<Sensor>)new SenzorsDbSource(this).getSensors(true);
     }
 

@@ -83,6 +83,8 @@ public class SensorList extends Fragment implements Handler.Callback {
         super.onResume();
 
         // TODO refresh sensor list if need
+        initSensorList();
+        displaySensorList();
 
         // register handler from here
         Log.d(TAG, "OnResume: set handler callback SensorList fragment");
@@ -178,9 +180,12 @@ public class SensorList extends Fragment implements Handler.Callback {
         if(sensorList.size()>0) {
             Log.d(TAG, "DisplaySensorList: display sensor list");
             adapter = new SensorListAdapter(SensorList.this.getActivity(), sensorList);
+            adapter.notifyDataSetChanged();
             sensorListView.setAdapter(adapter);
         } else {
             Log.d(TAG, "DisplaySensorList: display empty view");
+            adapter = new SensorListAdapter(SensorList.this.getActivity(), sensorList);
+            sensorListView.setAdapter(adapter);
             sensorListView.setEmptyView(emptyView);
         }
     }

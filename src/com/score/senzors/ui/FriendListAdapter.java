@@ -20,7 +20,7 @@ import java.util.ArrayList;
  */
 public class FriendListAdapter extends BaseAdapter {
 
-    private Context context;
+    private FriendList friendList;
     private ArrayList<User> userList;
     //private Pay2nApplication application;
 
@@ -29,15 +29,15 @@ public class FriendListAdapter extends BaseAdapter {
 
     /**
      * Initialize context variables
-     * @param context activity context
+     * @param friendList activity
      * @param userList user list
      */
-    public FriendListAdapter(Context context, ArrayList<User> userList) {
+    public FriendListAdapter(FriendList friendList, ArrayList<User> userList) {
         //application = (Pay2nApplication) context.getApplicationContext();
 
-        face = Typeface.createFromAsset(context.getAssets(), "fonts/vegur_2.otf");
+        face = Typeface.createFromAsset(friendList.getActivity().getAssets(), "fonts/vegur_2.otf");
 
-        this.context = context;
+        this.friendList = friendList;
         this.userList = userList;
     }
 
@@ -91,7 +91,7 @@ public class FriendListAdapter extends BaseAdapter {
 
         if (view == null) {
             //inflate sharing_list_row_layout
-            LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater layoutInflater = (LayoutInflater) friendList.getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             view = layoutInflater.inflate(R.layout.sharing_list_row_layout, viewGroup, false);
 
             //create view holder to store reference to child views
@@ -120,6 +120,7 @@ public class FriendListAdapter extends BaseAdapter {
             public void onClick(View v) {
                 // click for unshare
                 System.out.println("unshare click");
+                friendList.unShare(user);
             }
         });
 
