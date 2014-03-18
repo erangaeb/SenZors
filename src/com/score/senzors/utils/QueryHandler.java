@@ -66,6 +66,10 @@ public class QueryHandler {
                 // SHARE query
                 // handle SHARE query from handleShare
                 handleShareQuery(application, query);
+            } else if(query.getCommand().equalsIgnoreCase(":SHARE")) {
+                // UN-SHARE query
+                // handle Un-SHARE query from handleUnShare
+                handleUnShareQuery(application, query);
             } else if (query.getCommand().equalsIgnoreCase("GET")) {
                 // GET query
                 // handle via handleGet
@@ -114,20 +118,53 @@ public class QueryHandler {
         // create/save new sensor in db
         User user = new SenzorsDbSource(application.getApplicationContext()).getOrCreateUser(query.getUser(), "email");
         Sensor sensor = new Sensor("0", "Location", "Location", false, false, user, null);
+
+        // handle share query if it not shared already
+        if(!application.getFiendSensorList().contains(sensor)) {
+            try {
+                // save sensor in db and refresh friend sensor list
+                new SenzorsDbSource(application.getApplicationContext()).addSensor(sensor);
+                application.initFriendsSensors();
+                Log.d(TAG, "HandleShareQuery: saved sensor from - " + user.getUsername());
+
+                // currently we have to launch friend sensor
+                // update notification to notify user about incoming query/ share request
+                application.setSensorType(SenzorApplication.FRIENDS_SENSORS);
+                Log.d(TAG, "HandleShareQuery: received query with type " + application.getSensorType());
+                NotificationUtils.updateNotification(application.getApplicationContext(), "Location @" + user.getUsername());
+            } catch (Exception e) {
+                // Db exception here
+                Log.e(TAG, "HandleShareQuery: db error " + e.toString());
+            }
+        } else {
+            Log.e(TAG, "HandleShareQuery: already shared sensor");
+        }
+    }
+
+    /**
+     * Handle UNSHARE query from server
+     * @param application application
+     * @param query parsed query
+     */
+    private static void handleUnShareQuery(SenzorApplication application, Query query) {
+        // get match user and sensor
+        User user = new SenzorsDbSource(application.getApplicationContext()).getOrCreateUser(query.getUser(), "email");
+        Sensor sensor = new Sensor("0", "Location", "Location", false, false, user, null);
         try {
-            // save sensor in db and refresh friend sensor list
-            new SenzorsDbSource(application.getApplicationContext()).addSensor(sensor);
+            // delete sensor  from db
+            // new SenzorsDbSource(application.getApplicationContext()).deleteSharedUser(user);
+            new SenzorsDbSource(application.getApplicationContext()).deleteSensorOfUser(sensor);
             application.initFriendsSensors();
-            Log.d(TAG, "HandleShareQuery: saved sensor from - " + user.getUsername());
+            Log.d(TAG, "HandleUnShareQuery: deleted sensor from - " + user.getUsername());
 
             // currently we have to launch friend sensor
             // update notification to notify user about incoming query/ share request
             application.setSensorType(SenzorApplication.FRIENDS_SENSORS);
-            Log.d(TAG, "HandleShareQuery: received query with type " + application.getSensorType());
-            NotificationUtils.updateNotification(application.getApplicationContext(), "Location @" + user.getUsername());
+            Log.d(TAG, "HandleUnShareQuery: received query with type " + application.getSensorType());
+            NotificationUtils.updateNotification(application.getApplicationContext(), "Unshared Location @" + user.getUsername());
         } catch (Exception e) {
             // Db exception here
-            Log.e(TAG, "HandleShareQuery: db error " + e.toString());
+            Log.e(TAG, "HandleUnShareQuery: db error " + e.toString());
         }
     }
 

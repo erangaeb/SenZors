@@ -20,7 +20,7 @@ public class QueryParser {
 
     // define query commands
     // we support only for 3 commands in mobile
-    private static List<String> commandList = Arrays.asList("GET", "SHARE", "DATA");
+    private static List<String> commandList = Arrays.asList("GET", "SHARE", ":SHARE", "DATA");
 
     /**
      * Parser message and get query object

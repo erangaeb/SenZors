@@ -2,6 +2,8 @@ package com.score.senzors.ui;
 
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,7 +12,9 @@ import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 import com.score.senzors.application.SenzorApplication;
+import com.score.senzors.db.SenzorsDbSource;
 import com.score.senzors.pojos.User;
 import com.score.senzors.R;
 
@@ -21,7 +25,10 @@ import java.util.ArrayList;
  *
  * @author erangaeb@gmail.com (eranga herath)
  */
-public class FriendList extends Fragment {
+public class FriendList extends Fragment implements Handler.Callback {
+
+    private static final String TAG = FriendList.class.getName();
+
     // use to populate list
     private SenzorApplication application;
     private ListView friendListView;
@@ -123,5 +130,45 @@ public class FriendList extends Fragment {
         } else {
             friendListView.setEmptyView(emptyView);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean handleMessage(Message message) {
+        // we handle string messages only from here
+        Log.d(TAG, "HandleMessage: message from server");
+        if(message.obj instanceof String) {
+            String payLoad = (String)message.obj;
+            Log.d(TAG, "HandleMessage: message is a string " + payLoad);
+
+            // successful login returns "ShareDone"
+            if(payLoad.equalsIgnoreCase(":ShareDone")) {
+                Log.d(TAG, "HandleMessage: unsharing success");
+                Toast.makeText(this.getActivity(), "Sensor has been unshared successfully", Toast.LENGTH_LONG).show();
+
+                // remove sharing user from the db
+                // remove shared connection(sharedUser) in db
+                // refresh sensor list
+                /*SenzorsDbSource dbSource = new SenzorsDbSource(ShareActivity.this);
+                User user = dbSource.getOrCreateUser(sharingUser.getUsername(), sharingUser.getEmail());
+                dbSource.addSharedUser(application.getCurrentSensor(), user);
+                application.getCurrentSensor().getSharedUsers().add(user);
+
+                Log.d(TAG, "HandleMessage: user get/created " + user.getUsername());
+                Log.d(TAG, "HandleMessage: added shared connection");
+
+                ShareActivity.this.finish();
+                ShareActivity.this.overridePendingTransition(R.anim.stay_in, R.anim.bottom_out);*/
+
+                return true;
+            } else {
+                Log.d(TAG, "HandleMessage: sharing fail");
+                Toast.makeText(this.getActivity(), "Un-sharing fail", Toast.LENGTH_LONG).show();
+            }
+        }
+
+        return false;
     }
 }

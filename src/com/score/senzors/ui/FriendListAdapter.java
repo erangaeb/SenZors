@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.score.senzors.pojos.User;
 import com.score.senzors.R;
@@ -111,6 +112,16 @@ public class FriendListAdapter extends BaseAdapter {
         //holder.name.setText(user.getUsername());
         holder.email.setText(user.getUsername());
         view.setBackgroundResource(R.drawable.friend_list_selector);
+
+        // set up unshare click action
+        RelativeLayout unshare = (RelativeLayout)view.findViewById(R.id.sharing_list_row_layout_unshare);
+        unshare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // click for unshare
+                System.out.println("unshare click");
+            }
+        });
 
         return view;
     }
