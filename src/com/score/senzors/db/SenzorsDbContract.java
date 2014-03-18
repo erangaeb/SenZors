@@ -19,6 +19,7 @@ public class SenzorsDbContract {
         public static final String COLUMN_NAME_IS_MINE = "is_mine";
         public static final String COLUMN_NAME_USER = "user";
         public static final String TRIGGER_FOREIGN_KEY_INSERT= "fk_insert_sensor";
+        public static final String TRIGGER_UNIQUE_KEY_INSERT= "unique_insert_sensor";
     }
 
     /* Inner class that defines the user table contents */

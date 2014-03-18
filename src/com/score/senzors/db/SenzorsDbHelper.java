@@ -18,7 +18,7 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
     private static SenzorsDbHelper senzorsDbHelper;
 
     // If you change the database schema, you must increment the database version
-    private static final int DATABASE_VERSION = 7;
+    private static final int DATABASE_VERSION = 10;
     private static final String DATABASE_NAME = "Senzors.db";
 
     // data types, keywords and queries
@@ -33,6 +33,7 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
                     SenzorsDbContract.Sensor.COLUMN_NAME_USER + " INTEGER NOT NULL" + "," +
                     "FOREIGN KEY" + "(" + SenzorsDbContract.Sensor.COLUMN_NAME_USER + ") " +
                     "REFERENCES "+ SenzorsDbContract.User.TABLE_NAME + "(" + SenzorsDbContract.User._ID + ")" +
+                    "UNIQUE" + "(" + SenzorsDbContract.Sensor.COLUMN_NAME_NAME + ","  + SenzorsDbContract.Sensor.COLUMN_NAME_USER + ")" +
             " )";
     private static final String SQL_CREATE_USER =
             "CREATE TABLE " + SenzorsDbContract.User.TABLE_NAME + " (" +
@@ -74,6 +75,23 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
 
     private static final String SQL_DELETE_TRIGGER_SENSOR_FOREIGN_KEY =
             "DROP TRIGGER IF EXISTS " + SenzorsDbContract.Sensor.TRIGGER_FOREIGN_KEY_INSERT;
+
+    // trigger that use to define unique constraints in "sensor" table
+    // 'user' and 'sensor_name' should ne unique together
+    private static final String SQL_CREATE_TRIGGER_SENSOR_UNIQUE_KEY =
+            "CREATE TRIGGER " + SenzorsDbContract.Sensor.TRIGGER_UNIQUE_KEY_INSERT + " " +
+            "BEFORE INSERT ON " + SenzorsDbContract.Sensor.TABLE_NAME + " " +
+                    "FOR EACH ROW BEGIN " +
+                            "SELECT CASE WHEN((" +
+                                    "SELECT " + SenzorsDbContract.User._ID + " " +
+                                    "FROM " + SenzorsDbContract.User.TABLE_NAME + " " +
+                                    "WHERE " + SenzorsDbContract.User._ID + "=" + "NEW." + SenzorsDbContract.Sensor.COLUMN_NAME_USER + ") " +
+                            "IS NOT NULL) " +
+                            "THEN RAISE(ABORT, 'Unique key violation') END; " +
+                            "END;";
+
+    private static final String SQL_DELETE_TRIGGER_SENSOR_UNIQUE_KEY =
+            "DROP TRIGGER IF EXISTS " + SenzorsDbContract.Sensor.TRIGGER_UNIQUE_KEY_INSERT;
 
     /**
      * Init context
@@ -125,9 +143,9 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
         // This database is only a cache for online data, so its upgrade policy is
         // to simply to discard the data and start over
         Log.d(TAG, "OnUpgrade: updating db helper, db version - " + DATABASE_VERSION);
+        db.execSQL(SQL_DELETE_SHARED_USER);
         db.execSQL(SQL_DELETE_SENSOR);
         db.execSQL(SQL_DELETE_USER);
-        db.execSQL(SQL_DELETE_SHARED_USER);
         //db.execSQL(SQL_DELETE_TRIGGER_SENSOR_FOREIGN_KEY);
         onCreate(db);
     }
