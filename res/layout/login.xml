@@ -83,7 +83,7 @@
                             android:layout_centerInParent="true"
                             android:textSize="16sp"
                             android:textStyle="bold"
-                            android:textColor="#fff"
+                            android:textColor="#4a4a4a"
                             android:id="@+id/edit_invoice_layout_mark_as_paid_text"
                             android:text="Sign in">
                     </TextView>
