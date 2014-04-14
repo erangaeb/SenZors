@@ -125,11 +125,11 @@ public class HomeActivity extends FragmentActivity {
         // need to determine selected item according to the currently selected sensor type
         drawerItemList = new ArrayList<DrawerItem>();
         if(application.getSensorType().equalsIgnoreCase(SenzorApplication.MY_SENSORS)) {
-            drawerItemList.add(new DrawerItem("My.SenZors", R.drawable.sensors_normal, R.drawable.sensors, true));
-            drawerItemList.add(new DrawerItem("Friends.SenZors", R.drawable.share_normal, R.drawable.share, false));
+            drawerItemList.add(new DrawerItem("My.SenZors", R.drawable.sensors_normal, R.drawable.sensors1, true));
+            drawerItemList.add(new DrawerItem("Friends.SenZors", R.drawable.share_normal, R.drawable.share1, false));
         } else {
-            drawerItemList.add(new DrawerItem("My.SenZors", R.drawable.sensors_normal, R.drawable.sensors, false));
-            drawerItemList.add(new DrawerItem("Friends.SenZors", R.drawable.share_normal, R.drawable.share, true));
+            drawerItemList.add(new DrawerItem("My.SenZors", R.drawable.sensors_normal, R.drawable.sensors1, false));
+            drawerItemList.add(new DrawerItem("Friends.SenZors", R.drawable.share_normal, R.drawable.share1, true));
         }
 
         drawerAdapter = new DrawerAdapter(HomeActivity.this, drawerItemList);

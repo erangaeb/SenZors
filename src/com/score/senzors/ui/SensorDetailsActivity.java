@@ -2,7 +2,9 @@ package com.score.senzors.ui;
 
 import android.app.ActionBar;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
@@ -48,6 +50,9 @@ public class SensorDetailsActivity extends FragmentActivity {
         actionBarTitle = (TextView) (this.findViewById(titleId));
         actionBarTitle.setTextColor(getResources().getColor(R.color.white));
         actionBarTitle.setTypeface(typefaceThin, Typeface.BOLD);
+
+        ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#256788"));
+        //actionBar.setBackgroundDrawable(colorDrawable);
 
         TabAdapter = new TabPagerAdapater(getSupportFragmentManager());
         Tab = (ViewPager)findViewById(R.id.pager);
@@ -148,7 +153,7 @@ public class SensorDetailsActivity extends FragmentActivity {
         final TextView t1 = new TextView(this);
         t1.setText("Location");
         t1.setTypeface(typefaceThin, Typeface.BOLD);
-        t1.setTextColor(getResources().getColor(R.color.white));
+        t1.setTextColor(Color.parseColor("#256788"));
         t1.setGravity(Gravity.CENTER);
         t1.setTextSize(18);
         t1.setLayoutParams(params);
@@ -159,7 +164,7 @@ public class SensorDetailsActivity extends FragmentActivity {
 
         t2.setTypeface(typefaceThin, Typeface.BOLD);
         t2.setGravity(Gravity.CENTER);
-        t2.setTextColor(getResources().getColor(R.color.white));
+        t2.setTextColor(Color.parseColor("#256788"));
         t2.setLayoutParams(params);
         t2.setTextSize(18);
 

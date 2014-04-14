@@ -24,7 +24,8 @@ public class DrawerAdapter extends BaseAdapter {
     private Context context;
     private ArrayList<DrawerItem> itemList;
 
-    Typeface tf;
+    Typeface typefaceThin;
+    Typeface typefaceBlack;
 
     /**
      * Initialize context variables
@@ -34,7 +35,8 @@ public class DrawerAdapter extends BaseAdapter {
     public DrawerAdapter(Context context, ArrayList<DrawerItem> itemList) {
         this.context = context;
         this.itemList = itemList;
-        tf = Typeface.createFromAsset(context.getAssets(), "fonts/Roboto-Thin.ttf");
+        typefaceThin = Typeface.createFromAsset(context.getAssets(), "fonts/Roboto-Thin.ttf");
+        typefaceBlack = Typeface.createFromAsset(context.getAssets(), "fonts/Roboto-Black.ttf");
     }
 
     /**
@@ -99,14 +101,14 @@ public class DrawerAdapter extends BaseAdapter {
 
         if(item.isSelected()) {
             holder.imageView.setImageResource(item.getSelectedResourceId());
-            holder.name.setTextColor(Color.parseColor("#dd4b39"));
+            holder.name.setTextColor(Color.parseColor("#256788"));
         } else {
             holder.imageView.setImageResource(item.getResourceId());
             holder.name.setTextColor(Color.parseColor("#4a4a4a"));
         }
 
         // bind text with view holder content view for efficient use
-        holder.name.setTypeface(tf, Typeface.BOLD);
+        holder.name.setTypeface(typefaceThin, Typeface.BOLD);
         holder.name.setText(item.getName());
 
         return view;
