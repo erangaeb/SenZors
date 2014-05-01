@@ -29,7 +29,7 @@
                 android:textStyle="bold"
                 android:layout_weight="1"
                 android:text="itseranga"
-                android:textColor="#da6c31"
+                android:textColor="#ffc027"
                 android:layout_gravity="center_vertical">
             </TextView>
         </LinearLayout>

@@ -6,7 +6,7 @@
     android:layout_width="fill_parent"
     android:gravity="center"
     android:orientation="vertical"
-    android:background="@drawable/bg_yah">
+    android:background="@drawable/senz">
 
 
         <ScrollView

@@ -56,7 +56,7 @@
             android:screenOrientation="portrait"
             android:configChanges="orientation"
             android:launchMode="singleTask"
-            android:theme="@style/Theme.Blue"
+            android:theme="@style/Theme.Yello"
             android:windowSoftInputMode="stateHidden"
             android:parentActivityName="com.score.senzors.ui.HomeActivity">
         </activity>
@@ -66,7 +66,7 @@
                 android:screenOrientation="portrait"
                 android:configChanges="orientation"
                 android:launchMode="singleTask"
-                android:theme="@style/Theme.Blue"
+                android:theme="@style/Theme.Yello"
                 android:windowSoftInputMode="stateHidden">
         </activity>
 
@@ -75,7 +75,7 @@
                 android:screenOrientation="portrait"
                 android:configChanges="orientation"
                 android:launchMode="singleTask"
-                android:theme="@style/Theme.Blue"
+                android:theme="@style/Theme.Yello"
                 android:parentActivityName="com.score.senzors.ui.HomeActivity"
                 android:windowSoftInputMode="stateHidden">
         </activity>
@@ -84,7 +84,7 @@
                 android:name=".ui.ShareActivity"
                 android:screenOrientation="portrait"
                 android:configChanges="orientation"
-                android:theme="@style/Theme.Blue"
+                android:theme="@style/Theme.Yello"
                 android:windowSoftInputMode="stateHidden"
                 android:launchMode="singleTask"
                 android:parentActivityName="com.score.senzors.ui.SensorDetailsActivity">

@@ -82,7 +82,7 @@ public class DrawerAdapter extends BaseAdapter {
         final ViewHolder holder;
 
         final DrawerItem item = (DrawerItem) getItem(i);
-
+                                                   `
         if (view == null) {
             //inflate sharing_list_row_layout
             LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -101,7 +101,7 @@ public class DrawerAdapter extends BaseAdapter {
 
         if(item.isSelected()) {
             holder.imageView.setImageResource(item.getSelectedResourceId());
-            holder.name.setTextColor(Color.parseColor("#256788"));
+            holder.name.setTextColor(Color.parseColor("#ffc027"));
         } else {
             holder.imageView.setImageResource(item.getResourceId());
             holder.name.setTextColor(Color.parseColor("#4a4a4a"));
