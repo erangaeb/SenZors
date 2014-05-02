@@ -52,7 +52,7 @@ public class FriendList extends Fragment implements Handler.Callback {
         // after creating fragment we initialize friend list
         // TODO need to fill friend list with backend data
         //getActivity().getActionBar().setTitle("Friends");
-        typeface = Typeface.createFromAsset(this.getActivity().getAssets(), "fonts/Roboto-Thin.ttf");
+        typeface = Typeface.createFromAsset(this.getActivity().getAssets(), "fonts/vegur_2.otf");
         application = (SenzorApplication) this.getActivity().getApplication();
         initEmptyView();
         initFriendList();
@@ -106,7 +106,7 @@ public class FriendList extends Fragment implements Handler.Callback {
         View inflatedEmptyView = emptyView.inflate();
         TextView emptyText = (TextView) inflatedEmptyView.findViewById(R.id.empty_text);
         emptyText.setText("Sensor not shared with any user");
-        emptyText.setTypeface(typeface, Typeface.BOLD);
+        emptyText.setTypeface(typeface);
     }
 
     /**

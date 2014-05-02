@@ -40,7 +40,7 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
     // UI fields
     private EditText username;
     private EditText password;
-    //private TextView appName;
+    private TextView appName;
     //private TextView appDescription;
     private TextView loginText;
     private RelativeLayout loginButton;
@@ -94,12 +94,12 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
         username = (EditText) findViewById(R.id.login_layout_username);
         password = (EditText) findViewById(R.id.login_layout_password);
         loginButton = (RelativeLayout) findViewById(R.id.login_button_panel);
-        //appName = (TextView) findViewById(R.id.sensor_text);
+        appName = (TextView) findViewById(R.id.sensor_text);
         //appDescription = (TextView) findViewById(R.id.sensor_text1);
         loginText = (TextView) findViewById(R.id.edit_invoice_layout_mark_as_paid_text);
         loginButton.setOnClickListener(LoginActivity.this);
 
-        //appName.setTypeface(typefaceBlack);
+        appName.setTypeface(typefaceBlack);
         //appDescription.setTypeface(typefaceThin, Typeface.BOLD);
         loginText.setTypeface(typefaceThin, Typeface.BOLD);
         username.setTypeface(typefaceThin);

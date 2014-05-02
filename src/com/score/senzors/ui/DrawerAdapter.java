@@ -24,8 +24,9 @@ public class DrawerAdapter extends BaseAdapter {
     private Context context;
     private ArrayList<DrawerItem> itemList;
 
-    Typeface typefaceThin;
-    Typeface typefaceBlack;
+    //Typeface typefaceThin;
+    //Typeface typefaceBlack;
+    Typeface face;
 
     /**
      * Initialize context variables
@@ -35,8 +36,9 @@ public class DrawerAdapter extends BaseAdapter {
     public DrawerAdapter(Context context, ArrayList<DrawerItem> itemList) {
         this.context = context;
         this.itemList = itemList;
-        typefaceThin = Typeface.createFromAsset(context.getAssets(), "fonts/Roboto-Thin.ttf");
-        typefaceBlack = Typeface.createFromAsset(context.getAssets(), "fonts/Roboto-Black.ttf");
+        //typefaceThin = Typeface.createFromAsset(context.getAssets(), "fonts/Roboto-Thin.ttf");
+        //typefaceBlack = Typeface.createFromAsset(context.getAssets(), "fonts/Roboto-Black.ttf");
+        face = Typeface.createFromAsset(context.getAssets(), "fonts/vegur_2.otf");
     }
 
     /**
@@ -82,7 +84,7 @@ public class DrawerAdapter extends BaseAdapter {
         final ViewHolder holder;
 
         final DrawerItem item = (DrawerItem) getItem(i);
-                                                   `
+
         if (view == null) {
             //inflate sharing_list_row_layout
             LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -102,13 +104,14 @@ public class DrawerAdapter extends BaseAdapter {
         if(item.isSelected()) {
             holder.imageView.setImageResource(item.getSelectedResourceId());
             holder.name.setTextColor(Color.parseColor("#ffc027"));
+            holder.name.setTypeface(face, Typeface.BOLD);
         } else {
             holder.imageView.setImageResource(item.getResourceId());
             holder.name.setTextColor(Color.parseColor("#4a4a4a"));
+            holder.name.setTypeface(face, Typeface.NORMAL);
         }
 
         // bind text with view holder content view for efficient use
-        holder.name.setTypeface(typefaceThin, Typeface.BOLD);
         holder.name.setText(item.getName());
 
         return view;

@@ -39,7 +39,7 @@ public class SensorDetailsActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sensor_details_layout);
         application = (SenzorApplication)getApplication();
-        typefaceThin = Typeface.createFromAsset(this.getAssets(), "fonts/Roboto-Thin.ttf");
+        typefaceThin = Typeface.createFromAsset(this.getAssets(), "fonts/vegur_2.otf");
 
         actionBar = getActionBar();
         //actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#333333")));
@@ -49,7 +49,7 @@ public class SensorDetailsActivity extends FragmentActivity {
         int titleId = getResources().getIdentifier("action_bar_title", "id", "android");
         actionBarTitle = (TextView) (this.findViewById(titleId));
         actionBarTitle.setTextColor(getResources().getColor(R.color.white));
-        actionBarTitle.setTypeface(typefaceThin, Typeface.BOLD);
+        actionBarTitle.setTypeface(typefaceThin);
 
         TabAdapter = new TabPagerAdapater(getSupportFragmentManager());
         Tab = (ViewPager)findViewById(R.id.pager);
@@ -149,7 +149,7 @@ public class SensorDetailsActivity extends FragmentActivity {
 
         final TextView t1 = new TextView(this);
         t1.setText("Location");
-        t1.setTypeface(typefaceThin, Typeface.BOLD);
+        t1.setTypeface(typefaceThin);
         t1.setTextColor(Color.parseColor("#4a4a4a"));
         t1.setGravity(Gravity.CENTER);
         t1.setTextSize(18);
@@ -159,7 +159,7 @@ public class SensorDetailsActivity extends FragmentActivity {
         if (application.getCurrentSensor().isMySensor()) t2.setText("Shared with");
         else t2.setText("Shared by");
 
-        t2.setTypeface(typefaceThin, Typeface.BOLD);
+        t2.setTypeface(typefaceThin);
         t2.setGravity(Gravity.CENTER);
         t2.setTextColor(Color.parseColor("#4a4a4a"));
         t2.setLayoutParams(params);

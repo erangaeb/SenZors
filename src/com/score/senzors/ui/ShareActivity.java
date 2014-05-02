@@ -74,7 +74,7 @@ public class ShareActivity extends Activity implements Handler.Callback {
      */
     private void initUi() {
         Log.d(TAG, "InitUI: initializing UI components");
-        Typeface typefaceThin = Typeface.createFromAsset(this.getAssets(), "fonts/Roboto-Thin.ttf");
+        Typeface typefaceThin = Typeface.createFromAsset(this.getAssets(), "fonts/vegur_2.otf");
 
         usernameLabel = (TextView) findViewById(R.id.share_layout_username_label);
         usernameEditText = (EditText) findViewById(R.id.share_layout_username_text);
@@ -92,8 +92,8 @@ public class ShareActivity extends Activity implements Handler.Callback {
         int titleId = getResources().getIdentifier("action_bar_title", "id", "android");
         TextView actionBarTitle = (TextView) (this.findViewById(titleId));
         actionBarTitle.setTextColor(getResources().getColor(R.color.white));
-        actionBarTitle.setTypeface(typefaceThin, Typeface.BOLD);
-        usernameLabel.setTypeface(typefaceThin, Typeface.BOLD);
+        actionBarTitle.setTypeface(typefaceThin);
+        usernameLabel.setTypeface(typefaceThin);
         usernameEditText.setTypeface(typefaceThin);
     }
 

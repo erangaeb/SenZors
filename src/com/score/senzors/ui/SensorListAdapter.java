@@ -36,7 +36,7 @@ public class SensorListAdapter extends BaseAdapter {
      * @param sensorList sharing user list
      */
     public SensorListAdapter(Context context, ArrayList<Sensor> sensorList) {
-        typefaceThin = Typeface.createFromAsset(context.getAssets(), "fonts/Roboto-Thin.ttf");
+        typefaceThin = Typeface.createFromAsset(context.getAssets(), "fonts/vegur_2.otf");
         typefaceBlack = Typeface.createFromAsset(context.getAssets(), "fonts/Roboto-Black.ttf");
 
         this.context = context;
@@ -100,9 +100,9 @@ public class SensorListAdapter extends BaseAdapter {
             holder.share = (RelativeLayout) view.findViewById(R.id.sensor_list_row_layout_share);
 
             // set custom font
-            holder.sensorName.setTypeface(typefaceThin, Typeface.BOLD);
+            holder.sensorName.setTypeface(typefaceThin);
             holder.sensorUser.setTypeface(typefaceBlack);
-            holder.sensorValue.setTypeface(typefaceThin, Typeface.BOLD);
+            holder.sensorValue.setTypeface(typefaceThin);
 
             view.setTag(holder);
         } else {

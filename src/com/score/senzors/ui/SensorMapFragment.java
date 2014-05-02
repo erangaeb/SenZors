@@ -149,13 +149,13 @@ public class SensorMapFragment extends Fragment implements View.OnClickListener,
             if(latLon!=null) {
                 LatLng currentCoordinates = new LatLng(Double.parseDouble(latLon.getLat()), Double.parseDouble(latLon.getLon()));
                 marker = map.addMarker(new MarkerOptions().position(currentCoordinates).title("My location").icon(BitmapDescriptorFactory.fromResource(R.drawable.bluedot)));
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom(currentCoordinates, 15));
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(currentCoordinates, 10));
 
                 // ... get a map.
                 // Add a circle in Sydney
                 circle = map.addCircle(new CircleOptions()
                         .center(currentCoordinates)
-                        .radius(500)
+                        .radius(14000)
                         .strokeColor(0xFF0000FF)
                         .strokeWidth(0.5f)
                         .fillColor(0x110000FF));
@@ -181,13 +181,13 @@ public class SensorMapFragment extends Fragment implements View.OnClickListener,
         try {
             LatLng currentCoordinates = new LatLng(Double.parseDouble(latLon.getLat()), Double.parseDouble(latLon.getLon()));
             marker = map.addMarker(new MarkerOptions().position(currentCoordinates).title("My new location").icon(BitmapDescriptorFactory.fromResource(R.drawable.bluedot)));
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(currentCoordinates, 15));
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(currentCoordinates, 10));
 
             // ... get a map
             // Add a circle
             circle = map.addCircle(new CircleOptions()
                     .center(currentCoordinates)
-                    .radius(500)
+                    .radius(14000)
                     .strokeColor(0xFF0000FF)
                     .strokeWidth(0.5f)
                     .fillColor(0x110000FF));

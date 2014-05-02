@@ -109,7 +109,7 @@
         android:layout_marginRight="20dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="23sp"
+        android:textSize="22sp"
         android:id="@+id/sensor_list_row_layout_sensor_value"
         android:textColor="#4a4a4a"
         android:gravity="center"

@@ -66,7 +66,7 @@ public class SensorList extends Fragment implements Handler.Callback {
 
         Log.d(TAG, "OnActivityCreated: activity created");
         application = (SenzorApplication) getActivity().getApplication();
-            typeface = Typeface.createFromAsset(this.getActivity().getAssets(), "fonts/Roboto-Thin.ttf");
+        typeface = Typeface.createFromAsset(getActivity().getAssets(), "fonts/vegur_2.otf");
 
         Log.d(TAG, "OnActivityCreated: sensor type " + application.getSensorType());
 
@@ -168,7 +168,7 @@ public class SensorList extends Fragment implements Handler.Callback {
         View inflatedEmptyView = emptyView.inflate();
         TextView emptyText = (TextView) inflatedEmptyView.findViewById(R.id.empty_text);
         emptyText.setText("No Friends.SenZors available");
-        emptyText.setTypeface(typeface, Typeface.BOLD);
+        emptyText.setTypeface(typeface);
     }
 
     /**
@@ -200,7 +200,7 @@ public class SensorList extends Fragment implements Handler.Callback {
         int titleId = getResources().getIdentifier("action_bar_title", "id", "android");
         TextView yourTextView = (TextView) (this.getActivity().findViewById(titleId));
         yourTextView.setTextColor(getResources().getColor(R.color.white));
-        yourTextView.setTypeface(typeface, Typeface.BOLD);
+        yourTextView.setTypeface(typeface);
 
         getActivity().getActionBar().setTitle(title);
     }

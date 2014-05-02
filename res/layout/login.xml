@@ -6,13 +6,55 @@
     android:layout_width="fill_parent"
     android:gravity="center"
     android:orientation="vertical"
-    android:background="@drawable/senz">
+    android:background="#444444">
 
 
-        <ScrollView
+    <LinearLayout
+            android:layout_height="wrap_content"
+            android:layout_width="fill_parent"
+            android:orientation="vertical">
+
+        <ImageView
+                android:id="@+id/oneImgView"
+                android:src="@drawable/logo2"
+                android:layout_width="78dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="0dp"
+                android:layout_height="78dp">
+        </ImageView>
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="34sp"
+                android:id="@+id/sensor_text"
+                android:textColor="#ffc027"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="5dp"
+                android:text="senZors">
+        </TextView>
+        <!--<TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:paddingLeft="25dp"
+                android:paddingRight="25dp"
+                android:gravity="center_horizontal"
+                android:id="@+id/sensor_text1"
+                android:textStyle="bold"
+                android:textColor="#ffc027"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="35dp"
+                android:text="#GET #PUT #SHARE #DATA">
+        </TextView>-->
+
+    </LinearLayout>
+
+
+    <ScrollView
             android:layout_width="fill_parent"
             android:fillViewport="true"
-            android:layout_marginTop="100dp"
+            android:layout_marginTop="30dp"
             android:layout_height="wrap_content">
 
         <LinearLayout

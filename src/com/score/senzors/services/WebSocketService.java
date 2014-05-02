@@ -108,7 +108,7 @@ public class WebSocketService extends Service {
                     Log.d(TAG, "ConnectToWebSocket: open web socket");
                     WebSocketService.RECONNECT_COUNT = 0;
                     QueryHandler.handleLogin(application);
-                    Notification notification = NotificationUtils.getNotification(WebSocketService.this, R.drawable.app_icon121,
+                    Notification notification = NotificationUtils.getNotification(WebSocketService.this, R.drawable.notifica_logo,
                             getString(R.string.app_name), getString(R.string.launch_senzors));
                     notification.flags |= Notification.FLAG_FOREGROUND_SERVICE;
                     startForeground(NotificationUtils.SERVICE_NOTIFICATION_ID, notification);

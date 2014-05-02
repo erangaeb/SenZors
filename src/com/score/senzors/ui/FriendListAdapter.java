@@ -100,7 +100,7 @@ public class FriendListAdapter extends BaseAdapter {
             holder.email = (TextView) view.findViewById(R.id.sharing_list_row_layout_email);
 
             //holder.name.setTypeface(face);
-            holder.email.setTypeface(face);
+            holder.email.setTypeface(face, Typeface.BOLD);
 
             view.setTag(holder);
         } else {
