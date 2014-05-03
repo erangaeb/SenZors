@@ -181,7 +181,6 @@ public class HomeActivity extends FragmentActivity {
     public boolean onPrepareOptionsMenu(Menu menu) {
         // If the nav drawer is open, hide action items related to the content view
         boolean drawerOpen = drawerLayout.isDrawerOpen(drawerListView);
-        menu.findItem(R.id.action_help).setVisible(!drawerOpen);
         menu.findItem(R.id.action_logout).setVisible(!drawerOpen);
 
         return super.onPrepareOptionsMenu(menu);
@@ -199,10 +198,6 @@ public class HomeActivity extends FragmentActivity {
         }
 
         switch (item.getItemId()) {
-            case R.id.action_help:
-                Log.d(TAG, "OnOptionsItemSelected: help action clicked");
-                // TODO display help view
-                break;
             case R.id.action_logout:
                 Log.d(TAG, "OnOptionsItemSelected: logout action clicked");
                 if(application.getWebSocketConnection().isConnected()) {
