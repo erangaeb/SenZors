@@ -50,7 +50,7 @@ public class NotificationUtils {
      * @param message incoming query
      */
     public static void updateNotification(Context context, String message) {
-        Notification notification = getNotification(context, R.drawable.app_icon121, context.getString(R.string.new_senz), message);
+        Notification notification = getNotification(context, R.drawable.logo_green, context.getString(R.string.new_senz), message);
         notification.flags |= Notification.FLAG_AUTO_CANCEL;
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(MESSAGE_NOTIFICATION_ID, notification);

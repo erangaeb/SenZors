@@ -18,6 +18,7 @@ import android.widget.Toast;
 import com.score.senzors.R;
 import com.score.senzors.application.SenzorApplication;
 import com.score.senzors.db.SenzorsDbSource;
+import com.score.senzors.exceptions.NoUserException;
 import com.score.senzors.pojos.User;
 import com.score.senzors.services.WebSocketService;
 import com.score.senzors.utils.ActivityUtils;
@@ -88,7 +89,8 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
      * Initialize UI components
      */
     private void initUi() {
-        Typeface typefaceThin = Typeface.createFromAsset(getAssets(), "fonts/Roboto-Thin.ttf");
+
+        Typeface typefaceThin = Typeface.createFromAsset(getAssets(), "fonts/vegur_2.otf");
         Typeface typefaceBlack = Typeface.createFromAsset(getAssets(), "fonts/Roboto-Black.ttf");
 
         username = (EditText) findViewById(R.id.login_layout_username);
@@ -99,11 +101,20 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
         loginText = (TextView) findViewById(R.id.edit_invoice_layout_mark_as_paid_text);
         loginButton.setOnClickListener(LoginActivity.this);
 
-        appName.setTypeface(typefaceBlack);
+        appName.setTypeface(typefaceThin, Typeface.BOLD);
         //appDescription.setTypeface(typefaceThin, Typeface.BOLD);
         loginText.setTypeface(typefaceThin, Typeface.BOLD);
-        username.setTypeface(typefaceThin);
-        password.setTypeface(typefaceThin);
+        username.setTypeface(typefaceThin, Typeface.BOLD);
+        password.setTypeface(typefaceThin, Typeface.BOLD);
+
+        // get saved used and display credentials
+        try {
+            User user = PreferenceUtils.getUser(LoginActivity.this);
+            username.setText(user.getUsername());
+            password.setText(user.getPassword());
+        } catch (NoUserException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

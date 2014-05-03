@@ -45,7 +45,7 @@ public class PreferenceUtils {
         if(username.isEmpty() || password.isEmpty())
             throw new NoUserException();
 
-        return new User(id, username, password, email);
+        return new User(id, username, email, password);
     }
 
     /**

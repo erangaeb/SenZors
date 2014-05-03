@@ -78,7 +78,7 @@ public class WebSocketService extends Service {
         if(application.isForceToDisconnect()) {
             NotificationUtils.cancelNotification(this);
         } else {
-            Notification notification = NotificationUtils.getNotification(WebSocketService.this, R.drawable.app_icon_disconnect,
+            Notification notification = NotificationUtils.getNotification(WebSocketService.this, R.drawable.logo_gray,
                     getString(R.string.app_name), getString(R.string.disconnected));
             notification.flags |= Notification.FLAG_AUTO_CANCEL;
             NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -108,7 +108,7 @@ public class WebSocketService extends Service {
                     Log.d(TAG, "ConnectToWebSocket: open web socket");
                     WebSocketService.RECONNECT_COUNT = 0;
                     QueryHandler.handleLogin(application);
-                    Notification notification = NotificationUtils.getNotification(WebSocketService.this, R.drawable.notifica_logo,
+                    Notification notification = NotificationUtils.getNotification(WebSocketService.this, R.drawable.logo_green,
                             getString(R.string.app_name), getString(R.string.launch_senzors));
                     notification.flags |= Notification.FLAG_FOREGROUND_SERVICE;
                     startForeground(NotificationUtils.SERVICE_NOTIFICATION_ID, notification);

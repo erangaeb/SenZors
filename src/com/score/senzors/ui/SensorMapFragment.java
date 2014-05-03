@@ -1,6 +1,7 @@
 package com.score.senzors.ui;
 
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -123,6 +124,7 @@ public class SensorMapFragment extends Fragment implements View.OnClickListener,
             //map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
             map = ((SupportMapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
             map.getUiSettings().setZoomControlsEnabled(false);
+            map.getUiSettings().setMyLocationButtonEnabled(true);
             // Check if we were successful in obtaining the map.
             if (map != null) {
                 setUpMap();
@@ -159,10 +161,34 @@ public class SensorMapFragment extends Fragment implements View.OnClickListener,
                         .strokeColor(0xFF0000FF)
                         .strokeWidth(0.5f)
                         .fillColor(0x110000FF));
+
+                showMyLocation(currentCoordinates);
             }
         } catch (NumberFormatException e) {
             Toast.makeText(this.getActivity(), "Invalid location", Toast.LENGTH_LONG).show();
             Log.d(TAG, "setUpMap: invalid lat lon parameters");
+        }
+    }
+
+    /**
+     * Show the my current location in the map current sensor is
+     * friends sensor, need to set up zoom level according to the
+     * distance between my location and friend location
+     */
+    private void showMyLocation(LatLng currentCoordinates) {
+        if(!application.getCurrentSensor().isMySensor()) {
+            // friends sensor
+            // display my location and set zoom level
+            /*Location myLocation = map.getMyLocation();
+            Location friendLocation = new Location("Friend");
+            friendLocation.setLatitude(currentCoordinates.latitude);
+            friendLocation.setLongitude(currentCoordinates.longitude);
+            float distance = myLocation.distanceTo(friendLocation);
+            Log.d(TAG, "Distance: " + distance);*/
+            Log.d(TAG, "Distance: " + "---------------");
+        } else {
+            // set default zoom level
+            // map.moveCamera(CameraUpdateFactory.newLatLngZoom(currentCoordinates, 15));
         }
     }
 
