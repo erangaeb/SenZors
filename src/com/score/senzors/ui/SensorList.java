@@ -147,14 +147,14 @@ public class SensorList extends Fragment implements Handler.Callback {
             //  3. create list view
             Log.d(TAG, "InitSensorList: init my sensors");
             sensorList = application.getMySensorList();
-            setUpActionBarTitle("My.SenZors");
+            setUpActionBarTitle("My.senZors");
         } else {
             // display friends sensors
             //  1. initialize friends sensor list
             //  2. create list view
             Log.d(TAG, "InitSensorList: init friends sensors");
             sensorList = application.getFiendSensorList();
-            setUpActionBarTitle("Friends.SenZors");
+            setUpActionBarTitle("Friends.senZors");
         }
     }
 
