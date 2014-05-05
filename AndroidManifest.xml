@@ -2,11 +2,11 @@
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.score.senzors"
-    android:versionCode="1"
-    android:versionName="1.0">
+    android:versionCode="3"
+    android:versionName="1.2">
 
     <uses-sdk
-        android:minSdkVersion="9"
+        android:minSdkVersion="14"
         android:targetSdkVersion="17"/>
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
@@ -32,7 +32,7 @@
 
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyAzW1LOJz7zGeKTohFwzmRPDtb1yqt0bC8"/>
+            android:value="AIzaSyDQBL4MsO4B5qpA3VvX3HtRCQG2I09p7t0"/>
 
         <meta-data
             android:name="com.google.android.gms.version"
