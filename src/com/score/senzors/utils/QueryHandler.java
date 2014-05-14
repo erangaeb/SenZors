@@ -191,7 +191,8 @@ public class QueryHandler {
             // @mysensors DATA #msg LoginSuccess
             // just send status to available handler
             String status = query.getParams().get("msg");
-            sendMessage(application, status);
+            if (status != null && !status.equalsIgnoreCase("UnsupportedQueryType"))
+                sendMessage(application, status);
         } else {
             // from a specific user
             // create LatLon object from query params

@@ -112,6 +112,10 @@ public class WebSocketService extends Service {
                             getString(R.string.app_name), getString(R.string.launch_senzors));
                     notification.flags |= Notification.FLAG_FOREGROUND_SERVICE;
                     startForeground(NotificationUtils.SERVICE_NOTIFICATION_ID, notification);
+
+                    // start another service to send ping messages
+                    Intent serviceIntent = new Intent(WebSocketService.this, PingService.class);
+                    startService(serviceIntent);
                 }
 
                 @Override
@@ -129,6 +133,7 @@ public class WebSocketService extends Service {
                     if(application.isForceToDisconnect()) {
                         Log.d(TAG, "ConnectToWebSocket: forced to disconnect, so stop the service");
                         stopService(new Intent(getApplicationContext(), WebSocketService.class));
+                        stopService(new Intent(getApplicationContext(), PingService.class));
                     } else {
                         Log.d(TAG, "ConnectToWebSocket: NOT forced to disconnect, so reconnect again");
                         if(code<4000) new WebSocketReConnector().execute();
