@@ -4,6 +4,6 @@
         android:id="@+id/action_share_done"
         android:orderInCategory="100"
         android:showAsAction="ifRoom"
-        android:icon="@drawable/done"
+        android:icon="@drawable/accept"
         android:title="Share"/>
 </menu>
