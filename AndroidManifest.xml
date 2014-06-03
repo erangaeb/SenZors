@@ -51,6 +51,15 @@
             android:launchMode="singleTask"
             android:theme="@android:style/Theme.NoTitleBar"
             android:windowSoftInputMode="stateHidden">
+        </activity>
+
+        <activity
+                android:name=".ui.LaunchActivity"
+                android:screenOrientation="portrait"
+                android:configChanges="orientation"
+                android:launchMode="singleTask"
+                android:theme="@android:style/Theme.NoDisplay"
+                android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
