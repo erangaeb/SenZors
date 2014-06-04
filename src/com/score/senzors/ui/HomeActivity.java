@@ -223,7 +223,7 @@ public class HomeActivity extends FragmentActivity {
     private class HomeActionBarDrawerToggle extends ActionBarDrawerToggle {
 
         public HomeActionBarDrawerToggle(Activity mActivity, DrawerLayout mDrawerLayout){
-            super(mActivity, mDrawerLayout, R.drawable.ic_drawer, R.string.ns_menu_open, R.string.ns_menu_close);
+            super(mActivity, mDrawerLayout, R.drawable.ic_navigation_drawer, R.string.ns_menu_open, R.string.ns_menu_close);
         }
 
         /**
