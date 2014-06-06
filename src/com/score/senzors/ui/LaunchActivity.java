@@ -28,7 +28,7 @@ public class LaunchActivity extends Activity {
             finish();
             startActivity(intent);
         } else {
-            Intent intent = new Intent(this, LoginActivity.class);
+            Intent intent = new Intent(this, SplashActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             finish();
             startActivity(intent);
