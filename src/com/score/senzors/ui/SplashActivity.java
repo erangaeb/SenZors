@@ -5,18 +5,16 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.Menu;
-import android.widget.EditText;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.score.senzors.R;
 import com.score.senzors.application.SenzorApplication;
+import com.score.senzors.utils.PreferenceUtils;
 
 /**
  * Created by eranga on 6/6/14.
  */
 public class SplashActivity extends Activity {
-    private final int SPLASH_DISPLAY_LENGHT = 3000;
+    private final int SPLASH_DISPLAY_LENGTH = 3000;
 
     /** Called when the activity is first created. */
     @Override
@@ -37,6 +35,7 @@ public class SplashActivity extends Activity {
             public void run() {
                 SenzorApplication application = (SenzorApplication) SplashActivity.this.getApplication();
 
+                // PreferenceUtils.setRsaKeySavedStatus(SplashActivity.this, false);
                 // determine where to go
                 // check user registration status
                 if(!true) {
@@ -51,6 +50,6 @@ public class SplashActivity extends Activity {
                     SplashActivity.this.finish();
                 }
             }
-        }, SPLASH_DISPLAY_LENGHT);
+        }, SPLASH_DISPLAY_LENGTH);
     }
 }

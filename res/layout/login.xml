@@ -27,7 +27,7 @@
                 <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:id="@+id/sensor_text"
+                        android:id="@+id/header_text"
                         android:textColor="#ffffff"
                         android:textSize="42sp"
                         android:layout_centerHorizontal="true"
@@ -46,17 +46,16 @@
                         android:textStyle="bold"
                         android:textColor="#ffffff"
                         android:textColorHint="#ffffff"
-                        android:layout_below="@+id/sensor_text"
-                        android:inputType="textEmailAddress"
+                        android:layout_below="@+id/header_text"
+                        android:inputType="phone"
                         android:background="@drawable/username_field_shape"
-                        android:id="@+id/login_layout_phone_no">
+                        android:id="@+id/phone_no">
                 </EditText>
 
                 <EditText
                         android:layout_width="fill_parent"
                         android:layout_height="40dp"
                         android:layout_marginTop="25dp"
-
                         android:paddingLeft="15dp"
                         android:hint="Username"
                         android:textSize="16sp"
@@ -64,10 +63,10 @@
                         android:textStyle="bold"
                         android:textColor="#ffffff"
                         android:textColorHint="#ffffff"
-                        android:inputType="textEmailAddress"
-                        android:layout_below="@+id/login_layout_phone_no"
+                        android:inputType="text"
+                        android:layout_below="@+id/phone_no"
                         android:background="@drawable/username_field_shape"
-                        android:id="@+id/login_layout_username">
+                        android:id="@+id/username">
 
                 </EditText>
 
@@ -84,8 +83,8 @@
                         android:singleLine="true"
                         android:password="true"
                         android:background="@drawable/username_field_shape"
-                        android:layout_below="@+id/login_layout_username"
-                        android:id="@+id/login_layout_password">
+                        android:layout_below="@+id/username"
+                        android:id="@+id/password">
                 </EditText>
 
                 <EditText
@@ -101,8 +100,8 @@
                         android:singleLine="true"
                         android:password="true"
                         android:background="@drawable/username_field_shape"
-                        android:layout_below="@+id/login_layout_password"
-                        android:id="@+id/login_layout_confirm_password">
+                        android:layout_below="@+id/password"
+                        android:id="@+id/confirm_password">
                 </EditText>
 
             </RelativeLayout>
@@ -122,7 +121,7 @@
                         android:layout_width="fill_parent"
                         android:layout_height="fill_parent"
                         android:background="@drawable/login_button_selector"
-                        android:id="@+id/login_button_panel">
+                        android:id="@+id/sign_up_button_panel">
                     <TextView
                             android:layout_height="wrap_content"
                             android:layout_width="wrap_content"
@@ -130,7 +129,7 @@
                             android:textSize="16sp"
                             android:textStyle="bold"
                             android:textColor="#FFF"
-                            android:id="@+id/edit_invoice_layout_mark_as_paid_text"
+                            android:id="@+id/sign_up_text"
                             android:text="Sign up">
                     </TextView>
                 </RelativeLayout>

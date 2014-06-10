@@ -26,6 +26,7 @@ import com.score.senzors.R;
 import com.score.senzors.services.WebSocketService;
 import com.score.senzors.utils.ActivityUtils;
 import com.score.senzors.utils.CryptoUtils;
+import com.score.senzors.utils.PreferenceUtils;
 
 import java.util.ArrayList;
 
@@ -211,10 +212,16 @@ public class HomeActivity extends FragmentActivity {
 //                    Log.d(TAG, "OnOptionsItemSelected: web socket not connected");
 //                }
 
-                CryptoUtils cryptoUtils = new CryptoUtils();
-                cryptoUtils.initKeys();
-                cryptoUtils.encryptMessage();
-                cryptoUtils.decryptMessage();
+//                CryptoUtils cryptoUtils = new CryptoUtils();
+//
+//                if (!PreferenceUtils.isRasKeysSaved(this)) {
+//                    cryptoUtils.initKeys(HomeActivity.this);
+//                } else {
+//                    Log.d(TAG, "Already saved RSA keys");
+//                }
+
+                //cryptoUtils.encryptMessage(HomeActivity.this);
+                //cryptoUtils.decryptMessage(HomeActivity.this);
 
                 break;
         }

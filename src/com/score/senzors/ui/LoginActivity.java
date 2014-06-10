@@ -9,6 +9,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -18,13 +19,24 @@ import android.widget.Toast;
 import com.score.senzors.R;
 import com.score.senzors.application.SenzorApplication;
 import com.score.senzors.db.SenzorsDbSource;
+import com.score.senzors.exceptions.InvalidQueryException;
 import com.score.senzors.exceptions.NoUserException;
+import com.score.senzors.exceptions.RsaKeyException;
+import com.score.senzors.pojos.Query;
 import com.score.senzors.pojos.User;
 import com.score.senzors.services.WebSocketService;
-import com.score.senzors.utils.ActivityUtils;
-import com.score.senzors.utils.NetworkUtil;
-import com.score.senzors.utils.PreferenceUtils;
-import com.score.senzors.utils.QueryHandler;
+import com.score.senzors.utils.*;
+import de.tavendo.autobahn.WebSocketConnection;
+import de.tavendo.autobahn.WebSocketConnectionHandler;
+import de.tavendo.autobahn.WebSocketException;
+
+import java.io.UnsupportedEncodingException;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.HashMap;
 
 /**
  * Activity class for login
@@ -35,16 +47,19 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
 
     private static final String TAG = LoginActivity.class.getName();
 
+    private final WebSocketConnection mConnection = new WebSocketConnection();
+
     private SenzorApplication application;
     private DataUpdateReceiver dataUpdateReceiver;
 
     // UI fields
+    private EditText phoneNo;
     private EditText username;
     private EditText password;
-    private TextView appName;
-    //private TextView appDescription;
-    private TextView loginText;
-    private RelativeLayout loginButton;
+    private EditText confirmPassword;
+    private TextView headerText;
+    private TextView signUpText;
+    private RelativeLayout signUpButton;
 
     /**
      * {@inheritDoc}
@@ -93,19 +108,21 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
         Typeface typefaceThin = Typeface.createFromAsset(getAssets(), "fonts/vegur_2.otf");
         Typeface typefaceBlack = Typeface.createFromAsset(getAssets(), "fonts/Roboto-Black.ttf");
 
-        username = (EditText) findViewById(R.id.login_layout_username);
-        password = (EditText) findViewById(R.id.login_layout_password);
-        loginButton = (RelativeLayout) findViewById(R.id.login_button_panel);
-        appName = (TextView) findViewById(R.id.sensor_text);
-        //appDescription = (TextView) findViewById(R.id.sensor_text1);
-        loginText = (TextView) findViewById(R.id.edit_invoice_layout_mark_as_paid_text);
-        loginButton.setOnClickListener(LoginActivity.this);
+        phoneNo = (EditText) findViewById(R.id.phone_no);
+        username = (EditText) findViewById(R.id.username);
+        password = (EditText) findViewById(R.id.password);
+        confirmPassword = (EditText) findViewById(R.id.confirm_password);
+        signUpButton = (RelativeLayout) findViewById(R.id.sign_up_button_panel);
+        headerText = (TextView) findViewById(R.id.header_text);
+        signUpText = (TextView) findViewById(R.id.sign_up_text);
+        signUpButton.setOnClickListener(LoginActivity.this);
 
-        appName.setTypeface(typefaceThin, Typeface.BOLD);
-        //appDescription.setTypeface(typefaceThin, Typeface.BOLD);
-        loginText.setTypeface(typefaceThin, Typeface.BOLD);
-        username.setTypeface(typefaceThin, Typeface.BOLD);
-        password.setTypeface(typefaceThin, Typeface.BOLD);
+        headerText.setTypeface(typefaceThin, Typeface.BOLD);
+        signUpText.setTypeface(typefaceThin, Typeface.BOLD);
+        phoneNo.setTypeface(typefaceThin, Typeface.NORMAL);
+        username.setTypeface(typefaceThin, Typeface.NORMAL);
+        password.setTypeface(typefaceThin, Typeface.NORMAL);
+        confirmPassword.setTypeface(typefaceThin, Typeface.NORMAL);
 
         // get saved used and display credentials
         try {
@@ -122,9 +139,9 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
      */
     @Override
     public void onClick(View v) {
-        if (v==loginButton) {
+        if (v==signUpButton) {
             Log.d(TAG, "OnClick: click login");
-            login();
+            signUp();
         }
     }
 
@@ -158,6 +175,92 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
         } else {
             Log.w(TAG, "Login: no network connection");
             Toast.makeText(LoginActivity.this, "Cannot connect to server, Please check your network connection", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    /**
+     * Sign up action
+     * Connect to web socket and send PUT request
+     */
+    private void signUp() {
+        if(!phoneNo.getText().toString().trim().equals("") && !password.getText().toString().trim().equals("") && !confirmPassword.getText().toString().trim().equals("")) {
+            if(NetworkUtil.isAvailableNetwork(LoginActivity.this)) {
+                if (!PreferenceUtils.isRasKeysSaved(this)) {
+                    CryptoUtils.initKeys(LoginActivity.this);
+                } else {
+                    Log.d(TAG, "Already saved RSA keys");
+                }
+
+                registerUser();
+            }
+        }
+    }
+
+    /**
+     * Register user in server,
+     * basically upload public key and phone no to server
+     * Send PUT query hear
+     */
+    private void registerUser() {
+        try {
+            // construct put message
+            final HashMap<String, String> params = new HashMap<String, String>();
+            String command = "PUT";
+            String name = phoneNo.getText().toString().trim();
+            String pubKey = PreferenceUtils. getEncodedRsaKey(application, "public_key");
+            String signature = CryptoUtils.getEncryptedMessage(application, name);
+            params.put("name", name);
+            params.put("pubkey", pubKey);
+            params.put("signature", signature);
+            final String message = QueryParser.getMessage(new Query(command, "mysensors", params));
+
+            mConnection.connect(SenzorApplication.WEB_SOCKET_URI, new WebSocketConnectionHandler() {
+                @Override
+                public void onOpen() {
+                    // send put query
+                    Log.d(TAG, "sending message " + message);
+                }
+
+                @Override
+                public void onTextMessage(String payload) {
+                    Log.d(TAG, "Got message: " + payload);
+                    if (payload.contains("pubkey")) {
+                        // receive server public key
+                        try {
+                            Query query = QueryParser.parse(payload);
+                            byte[] serverKey = Base64.decode(query.getParams().get("pubkey"), Base64.DEFAULT);
+                            String sKey = new String(serverKey, "UTF-8");
+
+                            // remove BEGIN and END from key
+                            String publicPEM = sKey.replace("-----BEGIN PUBLIC KEY-----\n", "");
+                            publicPEM = publicPEM.replace("-----END PUBLIC KEY-----", "");
+                            System.out.println(publicPEM);
+
+                            X509EncodedKeySpec spec = new X509EncodedKeySpec(Base64.decode(publicPEM, Base64.DEFAULT));
+                            KeyFactory kf = KeyFactory.getInstance("RSA");
+                            PublicKey key = kf.generatePublic(spec);
+                        } catch (NoSuchAlgorithmException e) {
+                            e.printStackTrace();
+                        } catch (InvalidKeySpecException e) {
+                            e.printStackTrace();
+                        } catch (InvalidQueryException e) {
+                            e.printStackTrace();
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    //mConnection.sendTextMessage("LOGIN #name eranga #skey 1234");
+                }
+
+                @Override
+                public void onClose(int code, String reason) {
+                    Log.d(TAG, "Connection lost");
+                }
+            });
+        } catch (WebSocketException e) {
+            Log.d(TAG, e.toString());
+        } catch (RsaKeyException e) {
+            Log.d(TAG, e.toString());
         }
     }
 

@@ -20,6 +20,9 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
+    <!-- Use to get the phone no -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+
     <!-- Maps API needs OpenGL ES 2.0. -->
     <uses-feature
         android:glEsVersion="0x00020000"
