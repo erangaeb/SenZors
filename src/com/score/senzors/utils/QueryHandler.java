@@ -6,12 +6,14 @@ import android.util.Log;
 import com.score.senzors.application.SenzorApplication;
 import com.score.senzors.db.SenzorsDbSource;
 import com.score.senzors.exceptions.InvalidQueryException;
+import com.score.senzors.exceptions.RsaKeyException;
 import com.score.senzors.pojos.LatLon;
 import com.score.senzors.pojos.Query;
 import com.score.senzors.pojos.Sensor;
 import com.score.senzors.pojos.User;
 import com.score.senzors.services.GpsReadingService;
 
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 
 /**
@@ -38,12 +40,36 @@ public class QueryHandler {
         // sample query - LOGIN #name era #skey 123 @mysensors
         String command = "LOGIN";
         HashMap<String, String> params = new HashMap<String, String>();
-        params.put("name", application.getUser().getUsername());
-        params.put("skey", application.getUser().getPassword());
-        String message = QueryParser.getMessage(new Query(command, "mysensors", params));
+        params.put("name", "eranga");
+        try {
+            params.put("enckey", CryptoUtils.encryptMessage(application, "1234"));
+            String message = QueryParser.getMessage(new Query(command, "mysensors", params));
 
-        System.out.println("login message " + message);
-        application.getWebSocketConnection().sendTextMessage(message);
+            application.getWebSocketConnection().sendTextMessage(message);
+        } catch (RsaKeyException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Generate PUT query to send to server,
+     * server use PUT queries when creating users, need to encrypt phone no with server public key
+     * and send it as "enckey"
+     *
+     * @param application application object
+     * @param phoneNo user phone no
+     * @param username username
+     * @param password password
+     */
+    public static String getRegistrationQuery(SenzorApplication application, String phoneNo, String username, String password) throws RsaKeyException {
+        // construct PUT message
+        final HashMap<String, String> params = new HashMap<String, String>();
+        String command = "PUT";
+        params.put("name", username);
+        params.put("phone", phoneNo);
+        params.put("enckey", CryptoUtils.encryptMessage(application, password));
+
+        return QueryParser.getMessage(new Query(command, "mysensors", params));
     }
 
     /**
@@ -53,7 +79,6 @@ public class QueryHandler {
      * @param payload payload from server
      */
     public static void handleQuery(SenzorApplication application, String payload) {
-        System.out.println(payload);
         try {
             // need to parse query in order to further processing
             Query query = QueryParser.parse(payload);
@@ -80,10 +105,10 @@ public class QueryHandler {
                 handleDataQuery(application, query);
             } else {
                 // invalid query or not supporting query
-                System.out.println("INVALID/UN-SUPPORTING query");
+                Log.e(TAG, "INVALID/UN-SUPPORTING query");
             }
         } catch (InvalidQueryException e) {
-            System.out.println(e);
+            Log.e(TAG, "HandleQuery: " + e.getMessage());
         }
     }
 
@@ -187,12 +212,15 @@ public class QueryHandler {
      */
     private static void handleDataQuery(SenzorApplication application, Query query) {
         if(query.getUser().equalsIgnoreCase("mysensors")) {
-            // this is a status query
-            // @mysensors DATA #msg LoginSuccess
-            // just send status to available handler
-            String status = query.getParams().get("msg");
-            if (status != null && !status.equalsIgnoreCase("UnsupportedQueryType"))
-                sendMessage(application, status);
+            if (query.getParams().containsKey("pubkey")) {
+                handleServerPublicKeyQuery(application, query);
+            } else {
+                // this is a status query, just send status to available handler
+                // @mysensors DATA #msg LoginSuccess
+                String status = query.getParams().get("msg");
+                if (status != null && !status.equalsIgnoreCase("UnsupportedQueryType"))
+                    sendMessage(application, status);
+            }
         } else {
             // from a specific user
             // create LatLon object from query params
@@ -202,6 +230,24 @@ public class QueryHandler {
 
             // send message to available handler to notify incoming sensor value
             sendMessage(application, latLon);
+        }
+    }
+
+    /**
+     * Handle server public key query, this query comes as DATA query
+     * @param query parsed query
+     */
+    private static void handleServerPublicKeyQuery(SenzorApplication application, Query query) {
+        // receives server public key
+        // @mysensors DATA #pubkey <public key>
+        try {
+            CryptoUtils.saveServerPublicKey(application, query.getParams().get("pubkey"));
+
+            sendMessage(application, "SERVER_KEY_EXTRACTION_SUCCESS");
+        } catch (UnsupportedEncodingException e) {
+            Log.e(TAG, e.getMessage());
+
+            sendMessage(application, "SERVER_KEY_EXTRACTION_FAIL");
         }
     }
 

@@ -21,7 +21,6 @@ import com.score.senzors.application.SenzorApplication;
 import com.score.senzors.db.SenzorsDbSource;
 import com.score.senzors.exceptions.InvalidQueryException;
 import com.score.senzors.exceptions.NoUserException;
-import com.score.senzors.exceptions.RsaKeyException;
 import com.score.senzors.pojos.Query;
 import com.score.senzors.pojos.User;
 import com.score.senzors.services.WebSocketService;
@@ -36,7 +35,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.HashMap;
 
 /**
  * Activity class for login
@@ -185,12 +183,6 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
     private void signUp() {
         if(!phoneNo.getText().toString().trim().equals("") && !password.getText().toString().trim().equals("") && !confirmPassword.getText().toString().trim().equals("")) {
             if(NetworkUtil.isAvailableNetwork(LoginActivity.this)) {
-                if (!PreferenceUtils.isRasKeysSaved(this)) {
-                    CryptoUtils.initKeys(LoginActivity.this);
-                } else {
-                    Log.d(TAG, "Already saved RSA keys");
-                }
-
                 registerUser();
             }
         }
@@ -204,21 +196,21 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
     private void registerUser() {
         try {
             // construct put message
-            final HashMap<String, String> params = new HashMap<String, String>();
-            String command = "PUT";
-            String name = phoneNo.getText().toString().trim();
-            String pubKey = PreferenceUtils. getEncodedRsaKey(application, "public_key");
-            String signature = CryptoUtils.getEncryptedMessage(application, name);
-            params.put("name", name);
-            params.put("pubkey", pubKey);
-            params.put("signature", signature);
-            final String message = QueryParser.getMessage(new Query(command, "mysensors", params));
+//            final HashMap<String, String> params = new HashMap<String, String>();
+//            String command = "PUT";
+//            String name = phoneNo.getText().toString().trim();
+//            //String pubKey = PreferenceUtils.getEncodedRsaKey(application, "public_key");
+//            String signature = CryptoUtils.getEncryptedMessage(application, name);
+//            params.put("name", name);
+//            params.put("pubkey", "pubKey");
+//            params.put("signature", signature);
+//            final String message = QueryParser.getMessage(new Query(command, "mysensors", params));
 
             mConnection.connect(SenzorApplication.WEB_SOCKET_URI, new WebSocketConnectionHandler() {
                 @Override
                 public void onOpen() {
                     // send put query
-                    Log.d(TAG, "sending message " + message);
+                    Log.d(TAG, "sending message");
                 }
 
                 @Override
@@ -258,8 +250,6 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
                 }
             });
         } catch (WebSocketException e) {
-            Log.d(TAG, e.toString());
-        } catch (RsaKeyException e) {
             Log.d(TAG, e.toString());
         }
     }

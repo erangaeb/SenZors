@@ -8,7 +8,6 @@ import android.os.Handler;
 import android.widget.TextView;
 import com.score.senzors.R;
 import com.score.senzors.application.SenzorApplication;
-import com.score.senzors.utils.PreferenceUtils;
 
 /**
  * Created by eranga on 6/6/14.
@@ -16,7 +15,7 @@ import com.score.senzors.utils.PreferenceUtils;
 public class SplashActivity extends Activity {
     private final int SPLASH_DISPLAY_LENGTH = 3000;
 
-    /** Called when the activity is first created. */
+    /** Called when the activity is first created */
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
@@ -44,7 +43,7 @@ public class SplashActivity extends Activity {
                     SplashActivity.this.startActivity(intent);
                     SplashActivity.this.finish();
                 } else {
-                    Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
+                    Intent intent = new Intent(SplashActivity.this, RegistrationActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     SplashActivity.this.startActivity(intent);
                     SplashActivity.this.finish();

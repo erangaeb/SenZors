@@ -9,6 +9,8 @@ import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import com.score.senzors.R;
+import com.score.senzors.exceptions.InvalidInputFieldsException;
+import com.score.senzors.exceptions.MismatchPasswordException;
 
 /**
  * Utility class to handle activity related common functions
@@ -78,6 +80,28 @@ public class ActivityUtils {
      */
     public static Typeface getThinTypeFace(Context context) {
         return null;
+    }
+
+    /**
+     * Validate input fields of registration form,
+     * Need to have
+     *      1. non empty valid phone no
+     *      2. non empty username
+     *      3. non empty passwords
+     *      4. two passwords should be match
+     *
+     * @return valid or not
+     */
+    public static boolean isValidRegistrationFields(String phoneNo, String username, String password, String confirmPassword) throws InvalidInputFieldsException, MismatchPasswordException {
+        if (phoneNo.isEmpty() || username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+            throw new InvalidInputFieldsException();
+        }
+
+        if (!password.equals(confirmPassword)) {
+            throw new MismatchPasswordException();
+        }
+
+        return true;
     }
 
 }
