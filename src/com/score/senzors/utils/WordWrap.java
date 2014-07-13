@@ -41,11 +41,6 @@ public class WordWrap {
             }
         }
 
-        // print slack for debug
-        for (int[] arr : slack) {
-            System.out.println(Arrays.toString(arr));
-        }
-
         return slack;
     }
 
@@ -67,7 +62,6 @@ public class WordWrap {
     private static int[] findBestLineBreaks(int wordCount, int [][]slack) {
         int []bestValues = new int[wordCount + 1];
         int []lineBreaks = new int[wordCount + 1];
-
         bestValues[0] = 0;
 
         for(int i=1; i<=wordCount; i++) {
@@ -86,7 +80,7 @@ public class WordWrap {
                     // last line cost is 0
                     tmp = 0;
                 } else {
-                    // rest of the line cost is "min{best(j) + S(j, i-1)}"
+                    // rest of the line cost is "min{best(j) + S(j+1, i)}"
                     tmp = bestValues[j] + ((slack[j + 1][i]) * (slack[j + 1][i]) * (slack[j + 1][i]));
                 }
 
@@ -101,10 +95,63 @@ public class WordWrap {
             lineBreaks[i] = choice;
         }
 
-        System.out.println(Arrays.toString(bestValues));
-        System.out.println(Arrays.toString(lineBreaks));
-
         return lineBreaks;
+    }
+
+    /**
+     * Break words into lines according to the line breaks
+     * @param lineBreaks best line breaks
+     * @param words input words
+     *
+     * @return best lines
+     */
+    private static ArrayList<String> findBestLines(int []lineBreaks, String []words) {
+        ArrayList<String> lines = new ArrayList<String>();
+
+        int j = words.length;
+        while (j>0) {
+            int i = lineBreaks[j];
+
+            // find best lines
+            String line = "";
+            for (String s: Arrays.copyOfRange(words, i, j)) {
+                line = line + " " + s;
+            }
+            lines.add(line.trim());
+
+            j = i;
+        }
+
+        Collections.reverse(lines);
+
+        // print best lines
+        for(String line : lines) {
+            System.out.println(line);
+        }
+
+        return lines;
+    }
+
+    /**
+     * Calculate penalty of a line
+     * @param lines best lines
+     * @param margin maximum line width
+     *
+     * @return total cost
+     */
+    private static int calculateCost(ArrayList<String> lines, int margin) {
+        int totalCost = 0;
+        for (int i = 0; i<lines.size(); i++) {
+            // we ignore penalty of the last line
+            if (i!=(lines.size() -1)) {
+                int lineCost = margin - lines.get(i).length();
+                totalCost += (lineCost * lineCost * lineCost);
+            }
+        }
+
+        System.out.println("Cost: " + totalCost);
+
+        return totalCost;
     }
 
     /**
@@ -125,11 +172,9 @@ public class WordWrap {
             }
             lines.add(line.trim());
 
-            //System.out.println(line);
             j = i;
         }
 
-        // reverse content in lines
         Collections.reverse(lines);
         int penalty = 0;
         for (int i = 0; i<lines.size(); i++) {
@@ -137,32 +182,41 @@ public class WordWrap {
                 penalty += getCost(lines.get(i), 15);
             }
 
-            //System.out.println(lines.get(i));
+            System.out.println(lines.get(i));
         }
 
         System.out.println("penalty " + penalty);
     }
 
+
     private static int getCost(String s, int maxLength) {
 
         int penalty = maxLength - s.length();
 
-        System.out.println(s);
-        System.out.println(penalty);
         return penalty*penalty*penalty;
     }
 
 
     public static void main(String []args) {
-        //String word = "One could imagine some of these features being contextual";
-        String word = "She is happy but is a blue gal. I am all gone.";
-        //String word = "Compilable (and afterwards runnable) source file(s) of your implementation and the report you prepared.";
-        //String word = "aaa bb cc ddddd";
-        String []words = word.split(" ");
-        int margin = 30;
-        //int margin = 4;
-        int [][]slack = initSlack(words, 15);
-        int [] lineBreaks = findBestLineBreaks(words.length, slack);
-        print(lineBreaks, words);
+//        //String word = "One could imagine some of these features being contextual";
+//        String word = "She is happy but is a blue gal. I am all gone.";
+//        //String word = "The university is a state university, with most of its funding coming from the central government via the University Grants Commission(UGC). Therefore, as with all other state universities in Sri Lanka, the UGC recommends its vice-chancellor for appointment by thePresident of Sri Lanka and makes appointments of its administrative staff";
+//        //String word = "Compilable (and afterwards runnable) source file(s) of your implementation and the report you prepared.";
+//        //String word = "aaa bb cc ddddd";
+//        String []words = word.split(" ");
+//        int margin = 15;
+//        //int margin = 4;
+//        int [][]slack = initSlack(words, 15);
+//        int [] lineBreaks = findBestLineBreaks(words.length, slack);
+//        print(lineBreaks, words);
+
+        String input = "She is happy but is a blue gal. I am all gone.";
+        int margin = 15;
+        String []words = input.split(" ");
+
+        int [][]slack = initSlack(words, margin);
+        int []lineBreaks = findBestLineBreaks(words.length, slack);
+        ArrayList<String> bestLines = findBestLines(lineBreaks, words);
+        calculateCost(bestLines, margin);
     }
 }
