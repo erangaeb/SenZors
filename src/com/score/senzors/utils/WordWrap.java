@@ -30,14 +30,14 @@ public class WordWrap {
      */
     private static int[][] initSlack(String []words, int margin) {
         // slack table is two dimensional Array
-        int [][]slack = new int[words.length][words.length];
+        int [][]slack = new int[words.length + 1][words.length + 1];
 
         // initialize slack
-        for (int i=0; i<words.length; i++) {
-            slack[i][i] = margin - words[i].length();
+        for (int i=1; i<=words.length; i++) {
+            slack[i][i] = margin - words[i - 1].length();
 
-            for (int j=i+1; j<words.length; j++) {
-                slack[i][j] = slack[i][j-1] - words[j].length() - 1;
+            for (int j=i+1; j<=words.length; j++) {
+                slack[i][j] = slack[i][j-1] - words[j - 1].length() - 1;
             }
         }
 
@@ -57,7 +57,7 @@ public class WordWrap {
      *            0                              if i = 0
      * best(i) =
      *            j = 0 -> i
-     *                min{best(j) + S(j, i-1)}   otherwise
+     *                min{best(j) + S(j + 1, i)}   otherwise
      *
      * @param wordCount length of the words(this can identifies as n)
      * @param slack slack table
@@ -66,7 +66,7 @@ public class WordWrap {
      */
     private static int[] findBestLineBreaks(int wordCount, int [][]slack) {
         int []bestValues = new int[wordCount + 1];
-        int []lineBreaks = new int[wordCount];
+        int []lineBreaks = new int[wordCount + 1];
 
         bestValues[0] = 0;
 
@@ -79,7 +79,7 @@ public class WordWrap {
             for (int j=0; j<i; j++) {
                 // we not allow negative costs,
                 // negative costs considers as infinity
-                if (slack[j][i-1] < 0) {
+                if (slack[j + 1][i] < 0) {
                     // ignore here
                     tmp = INFINITY;
                 } else if(j == wordCount - 1) {
@@ -87,7 +87,7 @@ public class WordWrap {
                     tmp = 0;
                 } else {
                     // rest of the line cost is "min{best(j) + S(j, i-1)}"
-                    tmp = bestValues[j] + ((slack[j][i - 1]) * (slack[j][i - 1]) * (slack[j][i - 1]));
+                    tmp = bestValues[j] + ((slack[j + 1][i]) * (slack[j + 1][i]) * (slack[j + 1][i]));
                 }
 
                 // refine min value
@@ -98,8 +98,11 @@ public class WordWrap {
             }
 
             bestValues[i] = min;
-            lineBreaks[i-1] = choice;
+            lineBreaks[i] = choice;
         }
+
+        System.out.println(Arrays.toString(bestValues));
+        System.out.println(Arrays.toString(lineBreaks));
 
         return lineBreaks;
     }
@@ -113,32 +116,52 @@ public class WordWrap {
         int j = words.length;
         ArrayList<String> lines = new ArrayList<String>();
         while (j>0) {
-            int i = lineBreaks[j - 1];
+            int i = lineBreaks[j];
 
             // concatenate lines and store in a another array
             String line = "";
             for (String s: Arrays.copyOfRange(words, i, j)) {
                 line = line + " " + s;
             }
-            lines.add(line);
+            lines.add(line.trim());
 
-            System.out.println(line);
+            //System.out.println(line);
             j = i;
         }
 
         // reverse content in lines
         Collections.reverse(lines);
+        int penalty = 0;
+        for (int i = 0; i<lines.size(); i++) {
+            if (i!=(lines.size() -1)) {
+                penalty += getCost(lines.get(i), 15);
+            }
+
+            //System.out.println(lines.get(i));
+        }
+
+        System.out.println("penalty " + penalty);
     }
+
+    private static int getCost(String s, int maxLength) {
+
+        int penalty = maxLength - s.length();
+
+        System.out.println(s);
+        System.out.println(penalty);
+        return penalty*penalty*penalty;
+    }
+
 
     public static void main(String []args) {
         //String word = "One could imagine some of these features being contextual";
-        //String word = "She is happy but is a blue gal. I am all gone.";
-        String word = "Compilable (and afterwards runnable) source file(s) of your implementation and the report you prepared.";
-        //String word = "aaa bb";
+        String word = "She is happy but is a blue gal. I am all gone.";
+        //String word = "Compilable (and afterwards runnable) source file(s) of your implementation and the report you prepared.";
+        //String word = "aaa bb cc ddddd";
         String []words = word.split(" ");
         int margin = 30;
         //int margin = 4;
-        int [][]slack = initSlack(words, 30);
+        int [][]slack = initSlack(words, 15);
         int [] lineBreaks = findBestLineBreaks(words.length, slack);
         print(lineBreaks, words);
     }
