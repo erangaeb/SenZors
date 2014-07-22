@@ -136,4 +136,36 @@ public class CryptoUtils {
             throw new RsaKeyException();
         }
     }
+
+    /**
+     * Encode string with SHA1
+     * @param message message to encode
+     * @return base64 encoded message
+     */
+    public static String encodeMessage(String message) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+        MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
+        messageDigest.update(message.getBytes("iso-8859-1"), 0, message.length());
+        byte[] sha1hash = messageDigest.digest();
+
+        // return convertToHex(sha1hash);
+        return Base64.encodeToString(sha1hash, Base64.DEFAULT);
+    }
+
+    /**
+     * Convert byte array to hex
+     * @param data byte array
+     * @return hex string
+     */
+    private static String convertToHex(byte[] data) {
+        StringBuilder buf = new StringBuilder();
+        for (byte b : data) {
+            int halfbyte = (b >>> 4) & 0x0F;
+            int two_halfs = 0;
+            do {
+                buf.append((0 <= halfbyte) && (halfbyte <= 9) ? (char) ('0' + halfbyte) : (char) ('a' + (halfbyte - 10)));
+                halfbyte = b & 0x0F;
+            } while (two_halfs++ < 1);
+        }
+        return buf.toString();
+    }
 }

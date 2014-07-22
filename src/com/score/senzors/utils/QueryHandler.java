@@ -14,6 +14,7 @@ import com.score.senzors.pojos.User;
 import com.score.senzors.services.GpsReadingService;
 
 import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 
 /**
@@ -61,15 +62,15 @@ public class QueryHandler {
      * @param username username
      * @param password password
      */
-    public static String getRegistrationQuery(SenzorApplication application, String phoneNo, String username, String password) throws RsaKeyException {
+    public static String getRegistrationQuery(SenzorApplication application, String phoneNo, String username, String password) throws UnsupportedEncodingException, NoSuchAlgorithmException {
         // construct PUT message
         final HashMap<String, String> params = new HashMap<String, String>();
         String command = "PUT";
         params.put("name", username);
         params.put("phone", phoneNo);
 
-        // encode password/pin with SHA1
-        //params.put("enckey", CryptoUtils.encryptMessage(application, password));
+        // encode password/pin with SHA1 and encode with Base64
+        params.put("hkey", CryptoUtils.encodeMessage(password));
 
         return QueryParser.getMessage(new Query(command, "mysensors", params));
     }

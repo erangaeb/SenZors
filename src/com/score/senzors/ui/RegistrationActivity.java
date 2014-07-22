@@ -22,6 +22,9 @@ import de.tavendo.autobahn.WebSocketConnection;
 import de.tavendo.autobahn.WebSocketConnectionHandler;
 import de.tavendo.autobahn.WebSocketException;
 
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
+
 /**
  * Activity class that handles user registrations
  *
@@ -176,13 +179,16 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
                     if(application.getWebSocketConnection().isConnected()) {
                         application.getWebSocketConnection().sendTextMessage(putQuery);
                     }
-                } catch (RsaKeyException e) {
+                } catch (UnsupportedEncodingException e) {
+                    Log.e(TAG, e.getMessage());
+                } catch (NoSuchAlgorithmException e) {
                     Log.e(TAG, e.getMessage());
                 }
             } else if(payLoad.equalsIgnoreCase("SERVER_KEY_EXTRACTION_FAIL")) {
                 Toast.makeText(RegistrationActivity.this, "Registration fail", Toast.LENGTH_LONG).show();
             } else if(payLoad.equalsIgnoreCase("USER_CREATED")) {
                 // stop service
+                Toast.makeText(RegistrationActivity.this, "User created", Toast.LENGTH_LONG).show();
             }
         }
 
