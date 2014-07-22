@@ -67,7 +67,9 @@ public class QueryHandler {
         String command = "PUT";
         params.put("name", username);
         params.put("phone", phoneNo);
-        params.put("enckey", CryptoUtils.encryptMessage(application, password));
+
+        // encode password/pin with SHA1
+        //params.put("enckey", CryptoUtils.encryptMessage(application, password));
 
         return QueryParser.getMessage(new Query(command, "mysensors", params));
     }

@@ -126,12 +126,10 @@ public class CryptoUtils {
             cipher.init(Cipher.ENCRYPT_MODE, publicKey);
             byte []encodedBytes = cipher.doFinal(message.getBytes("UTF-8"));
             String encryptedMessage = Base64.encodeToString(encodedBytes, Base64.DEFAULT);
-            System.out.println("lenghthhhhhhhhhh " + encodedBytes.length);
-
+            //String encryptedMessage = new String(Base64.encode(encodedBytes, Base64.DEFAULT), "UTF-8");
             Log.d(TAG, "Encrypted message : " + encryptedMessage);
 
-            //return encryptedMessage;
-            return new String(Base64.encode(encodedBytes, Base64.DEFAULT), "UTF-8");
+            return encryptedMessage;
         } catch (Exception e) {
             Log.e(TAG, "RSA encryption error " + e.getMessage());
 
