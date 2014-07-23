@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.widget.TextView;
 import com.score.senzors.R;
-import com.score.senzors.utils.PreferenceUtils;
 
 /**
  * Created by eranga on 6/6/14.

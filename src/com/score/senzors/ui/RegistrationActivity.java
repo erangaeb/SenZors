@@ -15,8 +15,10 @@ import android.widget.Toast;
 import com.score.senzors.R;
 import com.score.senzors.application.SenzorApplication;
 import com.score.senzors.exceptions.*;
+import com.score.senzors.pojos.User;
 import com.score.senzors.services.WebSocketService;
 import com.score.senzors.utils.ActivityUtils;
+import com.score.senzors.utils.PreferenceUtils;
 import com.score.senzors.utils.QueryHandler;
 import de.tavendo.autobahn.WebSocketConnection;
 import de.tavendo.autobahn.WebSocketConnectionHandler;
@@ -111,13 +113,17 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
             // so send PUT query to server in order to create an user
             application.setRegistering(true);
             application.setForceToDisconnect(true);
+            ActivityUtils.hideSoftKeyboard(this);
+            ActivityUtils.showProgressDialog(this, "Registering...");
             Intent serviceIntent = new Intent(RegistrationActivity.this, WebSocketService.class);
             startService(serviceIntent);
-            //registerUser();
+            application.setForceToDisconnect(true);
         } catch (InvalidInputFieldsException e) {
             Log.e(TAG, e.toString());
+            Toast.makeText(this, "Invalid input fields", Toast.LENGTH_LONG).show();
         } catch (MismatchPasswordException e) {
             Log.e(TAG, e.toString());
+            Toast.makeText(this, "Mismatching passwords", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -185,10 +191,25 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
                     Log.e(TAG, e.getMessage());
                 }
             } else if(payLoad.equalsIgnoreCase("SERVER_KEY_EXTRACTION_FAIL")) {
+                ActivityUtils.cancelProgressDialog();
                 Toast.makeText(RegistrationActivity.this, "Registration fail", Toast.LENGTH_LONG).show();
-            } else if(payLoad.equalsIgnoreCase("USER_CREATED")) {
+            } else if(payLoad.equalsIgnoreCase("UserCreated")) {
                 // stop service
-                Toast.makeText(RegistrationActivity.this, "User created", Toast.LENGTH_LONG).show();
+                // save user in shared preference
+                // move to login
+                ActivityUtils.cancelProgressDialog();
+                Toast.makeText(RegistrationActivity.this, "Successfully registered", Toast.LENGTH_LONG).show();
+
+                String username = editTextUsername.getText().toString().trim();
+                String password = editTextPassword.getText().toString().trim();
+                PreferenceUtils.saveUser(this, new User("0", username, username, password));
+                application.getWebSocketConnection().disconnect();
+                this.finish();
+                this.overridePendingTransition(R.anim.stay_in, R.anim.bottom_out);
+            } else if (payLoad.equalsIgnoreCase("UserCreationFailed")) {
+                ActivityUtils.cancelProgressDialog();
+                Toast.makeText(RegistrationActivity.this, "Registration failed", Toast.LENGTH_LONG).show();
+                application.getWebSocketConnection().disconnect();
             }
         }
 

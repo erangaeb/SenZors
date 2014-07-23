@@ -64,6 +64,7 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
      */
     protected void onResume() {
         super.onResume();
+        displayUserCredentials();
 
         // register broadcast receiver from here
         Log.d(TAG, "OnResume: registering broadcast receiver");
@@ -105,7 +106,15 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
         password.setTypeface(typefaceThin, Typeface.NORMAL);
         link.setTypeface(typefaceThin, Typeface.BOLD);
 
-        // get saved used and display credentials
+        displayUserCredentials();
+    }
+
+
+    /**
+     * Set user fields in UI
+     * actually display username and password in UI
+     */
+    private void displayUserCredentials() {
         try {
             User user = PreferenceUtils.getUser(LoginActivity.this);
             phoneNo.setText(user.getUsername());
@@ -146,6 +155,8 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
                     Log.d(TAG, "Login: not connected to web socket");
                     Log.d(TAG, "Login: connecting to web socket via service");
                     Log.d(TAG, "Login: force to disconnect web socket");
+                    application.setRegistering(false);
+                    ActivityUtils.hideSoftKeyboard(this);
                     ActivityUtils.showProgressDialog(LoginActivity.this, "Connecting to senZors...");
                     Intent serviceIntent = new Intent(LoginActivity.this, WebSocketService.class);
                     startService(serviceIntent);
@@ -155,6 +166,7 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
                 }
             } else {
                 Log.d(TAG, "Login: empty username/password");
+                Toast.makeText(LoginActivity.this, "Invalid input fields", Toast.LENGTH_LONG).show();
             }
         } else {
             Log.w(TAG, "Login: no network connection");
