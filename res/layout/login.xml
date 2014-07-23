@@ -4,8 +4,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="fill_parent"
     android:layout_width="fill_parent"
-    android:gravity="center"
     android:orientation="vertical"
+    android:gravity="center"
     android:background="@drawable/freee">
 
     <ScrollView
@@ -33,7 +33,7 @@
                         android:layout_centerHorizontal="true"
                         android:layout_marginLeft="0dp"
                         android:layout_marginBottom="52dp"
-                        android:text="#SignUp">
+                        android:text="#SignIn">
                 </TextView>
 
                 <EditText
@@ -46,8 +46,8 @@
                         android:textStyle="bold"
                         android:textColor="#ffffff"
                         android:textColorHint="#ffffff"
-                        android:layout_below="@+id/header_text"
                         android:inputType="phone"
+                        android:layout_below="@+id/header_text"
                         android:background="@drawable/username_field_shape"
                         android:id="@+id/phone_no">
                 </EditText>
@@ -57,7 +57,7 @@
                         android:layout_height="40dp"
                         android:layout_marginTop="25dp"
                         android:paddingLeft="15dp"
-                        android:hint="Username"
+                        android:hint="Password"
                         android:textSize="16sp"
                         android:singleLine="true"
                         android:textStyle="bold"
@@ -66,44 +66,8 @@
                         android:inputType="text"
                         android:layout_below="@+id/phone_no"
                         android:background="@drawable/username_field_shape"
-                        android:id="@+id/username">
-
-                </EditText>
-
-                <EditText
-                        android:layout_width="fill_parent"
-                        android:paddingLeft="15dp"
-                        android:hint="Password"
-                        android:layout_marginTop="25dp"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColorHint="#ffffff"
-                        android:layout_height="40dp"
-                        android:textColor="#ffffff"
-                        android:singleLine="true"
-                        android:password="true"
-                        android:background="@drawable/username_field_shape"
-                        android:layout_below="@+id/username"
                         android:id="@+id/password">
                 </EditText>
-
-                <EditText
-                        android:layout_width="fill_parent"
-                        android:paddingLeft="15dp"
-                        android:hint="Confirm Password"
-                        android:layout_marginTop="25dp"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColorHint="#ffffff"
-                        android:layout_height="40dp"
-                        android:textColor="#ffffff"
-                        android:singleLine="true"
-                        android:password="true"
-                        android:background="@drawable/username_field_shape"
-                        android:layout_below="@+id/password"
-                        android:id="@+id/confirm_password">
-                </EditText>
-
             </RelativeLayout>
 
             <RelativeLayout
@@ -121,7 +85,7 @@
                         android:layout_width="fill_parent"
                         android:layout_height="fill_parent"
                         android:background="@drawable/login_button_selector"
-                        android:id="@+id/sign_up_button_panel">
+                        android:id="@+id/sign_in_button_panel">
                     <TextView
                             android:layout_height="wrap_content"
                             android:layout_width="wrap_content"
@@ -130,10 +94,35 @@
                             android:textStyle="bold"
                             android:textColor="#FFF"
                             android:id="@+id/sign_up_text"
-                            android:text="Sign up">
+                            android:text="Sign in">
                     </TextView>
                 </RelativeLayout>
 
+            </RelativeLayout>
+
+            <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:layout_gravity="center_horizontal"
+                    android:id="@+id/not_registered"
+                    android:layout_height="wrap_content">
+                <TextView
+                        android:id="@+id/link"
+                        android:layout_marginTop="25dp"
+                        android:textColor="#ffc027"
+                        android:textSize="16sp"
+                        android:layout_centerHorizontal="true"
+                        android:layout_width="wrap_content"
+                        android:layout_height="fill_parent"
+                        android:text="Not registered yet?">
+                </TextView>
+                <TextView
+                    android:layout_width="120dp"
+                    android:layout_height="1dp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_alignParentBottom="true"
+                    android:background="#ffc027">
+                </TextView>
             </RelativeLayout>
 
         </LinearLayout>

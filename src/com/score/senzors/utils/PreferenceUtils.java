@@ -31,6 +31,25 @@ public class PreferenceUtils {
     }
 
     /**
+     * Already have a registered user,
+     * when having registered user, user should saved in shared preference
+     * @param context application context
+     * @return saved user having or not
+     */
+    public static boolean haveRegisteredUser(Context context) {
+        // get saved used and display credentials
+        try {
+            getUser(context);
+
+            return true;
+        } catch (NoUserException e) {
+            e.printStackTrace();
+
+            return false;
+        }
+    }
+
+    /**
      * Get user details from shared preference
      * @param context application context
      * @return user object

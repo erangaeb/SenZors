@@ -194,4 +194,15 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
 
         return false;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        Log.d("TAG", "OnBackPressed: go back");
+        this.overridePendingTransition(R.anim.stay_in, R.anim.bottom_out);
+    }
 }
