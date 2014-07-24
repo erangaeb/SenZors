@@ -27,6 +27,7 @@ public class SenzorApplication extends Application {
     //  2. friends sensors
     public final static String MY_SENSORS = "MY_SENSORS";
     public final static String FRIENDS_SENSORS = "FRIENDS_SENSORS";
+    public static String SENSOR_TYPE = MY_SENSORS;
 
     // web socket server up and running in this API
     // need to connect this server when starting the app
@@ -37,11 +38,6 @@ public class SenzorApplication extends Application {
     // web socket connection share in application
     // we are using one instance of web socket in all over the application
     public final WebSocket webSocketConnection = new WebSocketConnection();
-
-    // determine
-    //  1. My sensor
-    //  2. Friends sensor
-    private String sensorType;
 
     // keep sensors
     //  1. my sensors(ex: location)
@@ -69,20 +65,10 @@ public class SenzorApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-        // initialize sensor type
         // initialize sensor lists
         // initially add my location to my sensor list
-        setSensorType(MY_SENSORS);
         setFiendSensorList(new ArrayList<Sensor>());
         setMySensorList(new ArrayList<Sensor>());
-    }
-
-    public String getSensorType() {
-        return sensorType;
-    }
-
-    public void setSensorType(String sensorType) {
-        this.sensorType = sensorType;
     }
 
     public WebSocket getWebSocketConnection() {

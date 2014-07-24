@@ -136,7 +136,7 @@ public class HomeActivity extends FragmentActivity {
         // initialize drawer content
         // need to determine selected item according to the currently selected sensor type
         drawerItemList = new ArrayList<DrawerItem>();
-        if(application.getSensorType().equalsIgnoreCase(SenzorApplication.MY_SENSORS)) {
+        if(SenzorApplication.SENSOR_TYPE.equalsIgnoreCase(SenzorApplication.MY_SENSORS)) {
             drawerItemList.add(new DrawerItem("My.senZors", R.drawable.my_sensz_normal, R.drawable.my_sensz_selected, true));
             drawerItemList.add(new DrawerItem("Friends.senZors", R.drawable.friends_normal, R.drawable.friends_selected, false));
         } else {
@@ -217,13 +217,13 @@ public class HomeActivity extends FragmentActivity {
             if(position == 0) {
                 // set
                 //  1. sensor type
-                application.setSensorType(SenzorApplication.MY_SENSORS);
+                SenzorApplication.SENSOR_TYPE = SenzorApplication.MY_SENSORS;
                 loadSensors();
                 drawerItemList.get(0).setSelected(true);
             } else if(position==1) {
                 // set
                 //  1. sensor type
-                application.setSensorType(SenzorApplication.FRIENDS_SENSORS);
+                SenzorApplication.SENSOR_TYPE = SenzorApplication.FRIENDS_SENSORS;
                 loadSensors();
                 drawerItemList.get(1).setSelected(true);
             }

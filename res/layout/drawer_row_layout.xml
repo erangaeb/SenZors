@@ -17,7 +17,7 @@
                 android:layout_height="35dp"
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="8dp"
+                android:layout_marginLeft="6dp"
                 android:layout_marginRight="12dp"
                 android:src="@drawable/new_icon" >
         </ImageView>

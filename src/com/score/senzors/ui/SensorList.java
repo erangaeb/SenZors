@@ -127,7 +127,7 @@ public class SensorList extends Fragment implements Handler.Callback {
         // two sensor types to display
         //  1. My senzors
         //  2. Friends senzors
-        if(application.getSensorType().equalsIgnoreCase(SenzorApplication.MY_SENSORS)) {
+        if(SenzorApplication.SENSOR_TYPE.equalsIgnoreCase(SenzorApplication.MY_SENSORS)) {
             // display my sensors
             //  1. initialize my sensors
             //  2. initialize location listener

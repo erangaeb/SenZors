@@ -158,8 +158,7 @@ public class QueryHandler {
 
             // currently we have to launch friend sensor
             // update notification to notify user about incoming query/ share request
-            application.setSensorType(SenzorApplication.FRIENDS_SENSORS);
-            Log.d(TAG, "HandleShareQuery: received query with type " + application.getSensorType());
+            SenzorApplication.SENSOR_TYPE = SenzorApplication.FRIENDS_SENSORS;
             NotificationUtils.updateNotification(application.getApplicationContext(), "Location @" + user.getUsername());
         } catch (Exception e) {
             // Db exception here
@@ -185,8 +184,7 @@ public class QueryHandler {
 
             // currently we have to launch friend sensor
             // update notification to notify user about incoming query/ share request
-            application.setSensorType(SenzorApplication.FRIENDS_SENSORS);
-            Log.d(TAG, "HandleUnShareQuery: received query with type " + application.getSensorType());
+            SenzorApplication.SENSOR_TYPE = SenzorApplication.FRIENDS_SENSORS;
             NotificationUtils.updateNotification(application.getApplicationContext(), "Unshared Location @" + user.getUsername());
         } catch (Exception e) {
             // Db exception here
