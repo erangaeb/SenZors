@@ -109,7 +109,7 @@ public class WebSocketService extends Service {
                     if (!application.isRegistering()) {
                         // only display notification when user login
                         WebSocketService.RECONNECT_COUNT = 0;
-                        QueryHandler.handleLogin(application);
+                        // QueryHandler.handleLogin(application);
                         Notification notification = NotificationUtils.getNotification(WebSocketService.this, R.drawable.logo_green,
                                 getString(R.string.app_name), getString(R.string.launch_senzors));
                         notification.flags |= Notification.FLAG_FOREGROUND_SERVICE;

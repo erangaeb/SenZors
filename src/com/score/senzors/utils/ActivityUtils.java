@@ -104,4 +104,18 @@ public class ActivityUtils {
         return true;
     }
 
+    /**
+     * validate input fields of login form
+     * @param username username text
+     * @param password password text
+     * @return valid of not
+     */
+    public static boolean isValidLoginFields(String username, String password) {
+        if (username.isEmpty() || username.isEmpty() || password.isEmpty()) {
+            return false;
+        }
+
+        return true;
+    }
+
 }

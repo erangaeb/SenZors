@@ -34,22 +34,20 @@ public class QueryHandler {
 
     /**
      * Generate login query and send to server
-     * @param application application object instance
+     * @param username username
+     * @param password password
      */
-    public static void handleLogin(SenzorApplication application) {
+    public static String getLoginQuery(String username, String password) throws UnsupportedEncodingException, NoSuchAlgorithmException {
         // generate login query with user credentials
         // sample query - LOGIN #name era #skey 123 @mysensors
         String command = "LOGIN";
         HashMap<String, String> params = new HashMap<String, String>();
-        params.put("name", "eranga");
-        try {
-            params.put("enckey", CryptoUtils.encryptMessage(application, "1234"));
-            String message = QueryParser.getMessage(new Query(command, "mysensors", params));
+        params.put("name", username);
 
-            application.getWebSocketConnection().sendTextMessage(message);
-        } catch (RsaKeyException e) {
-            e.printStackTrace();
-        }
+        // encode password with SHA1 and encode with Base64
+        params.put("signature", CryptoUtils.encodeMessage(password));
+
+        return QueryParser.getMessage(new Query(command, "mysensors", params));
     }
 
     /**

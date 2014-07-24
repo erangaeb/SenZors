@@ -204,6 +204,7 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
                 String password = editTextPassword.getText().toString().trim();
                 PreferenceUtils.saveUser(this, new User("0", username, username, password));
                 application.getWebSocketConnection().disconnect();
+                application.setCallback(null);
                 this.finish();
                 this.overridePendingTransition(R.anim.stay_in, R.anim.bottom_out);
             } else if (payLoad.equalsIgnoreCase("UserCreationFailed")) {

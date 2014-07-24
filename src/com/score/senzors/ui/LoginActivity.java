@@ -23,6 +23,9 @@ import com.score.senzors.pojos.User;
 import com.score.senzors.services.WebSocketService;
 import com.score.senzors.utils.*;
 
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
+
 /**
  * Activity class for login
  *
@@ -36,8 +39,8 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
     private DataUpdateReceiver dataUpdateReceiver;
 
     // UI fields
-    private EditText phoneNo;
-    private EditText password;
+    private EditText editTextUsername;
+    private EditText editTextPassword;
     private TextView headerText;
     private TextView signUpText;
     private TextView link;
@@ -52,7 +55,6 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
         setContentView(R.layout.login);
 
         application = (SenzorApplication) this.getApplication();
-        application.setCallback(this);
         Log.d(TAG, "OnCreate: set handler callback LoginActivity");
 
         initUi();
@@ -64,6 +66,7 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
      */
     protected void onResume() {
         super.onResume();
+        application.setCallback(this);
         displayUserCredentials();
 
         // register broadcast receiver from here
@@ -90,8 +93,8 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
     private void initUi() {
         Typeface typefaceThin = Typeface.createFromAsset(getAssets(), "fonts/vegur_2.otf");
 
-        phoneNo = (EditText) findViewById(R.id.phone_no);
-        password = (EditText) findViewById(R.id.password);
+        editTextUsername = (EditText) findViewById(R.id.phone_no);
+        editTextPassword = (EditText) findViewById(R.id.password);
         signInButton = (RelativeLayout) findViewById(R.id.sign_in_button_panel);
         signUpButton = (RelativeLayout) findViewById(R.id.not_registered);
         headerText = (TextView) findViewById(R.id.header_text);
@@ -102,13 +105,12 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
 
         headerText.setTypeface(typefaceThin, Typeface.BOLD);
         signUpText.setTypeface(typefaceThin, Typeface.BOLD);
-        phoneNo.setTypeface(typefaceThin, Typeface.NORMAL);
-        password.setTypeface(typefaceThin, Typeface.NORMAL);
+        editTextUsername.setTypeface(typefaceThin, Typeface.NORMAL);
+        editTextPassword.setTypeface(typefaceThin, Typeface.NORMAL);
         link.setTypeface(typefaceThin, Typeface.BOLD);
 
         displayUserCredentials();
     }
-
 
     /**
      * Set user fields in UI
@@ -117,8 +119,8 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
     private void displayUserCredentials() {
         try {
             User user = PreferenceUtils.getUser(LoginActivity.this);
-            phoneNo.setText(user.getUsername());
-            password.setText(user.getPassword());
+            editTextUsername.setText(user.getUsername());
+            editTextPassword.setText(user.getPassword());
         } catch (NoUserException e) {
             e.printStackTrace();
         }
@@ -144,10 +146,11 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
      */
     private void login() {
         if(NetworkUtil.isAvailableNetwork(LoginActivity.this)) {
-            if(!phoneNo.getText().toString().trim().equals("") && !password.getText().toString().trim().equals("")) {
+            String username = editTextUsername.getText().toString().trim();
+            String password = editTextPassword.getText().toString().trim();
+            if(ActivityUtils.isValidLoginFields(username, password)) {
                 // create user and share in application
-                application.setUser(new User("0", phoneNo.getText().toString().trim(), phoneNo.getText().toString().trim(),password.getText().toString().trim()));
-                Log.d(TAG, "Login: user shared in application");
+                application.setUser(new User("0", username, username, password));
 
                 // open web socket and send username password fields
                 // we are authenticate with web sockets
@@ -209,8 +212,25 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
             String payLoad = (String)message.obj;
             Log.d(TAG, "HandleMessage: message is a string - " + payLoad);
 
-            // successful login returns "LoginSUCCESS"
-            if(payLoad.equalsIgnoreCase("LoginSUCCESS")) {
+            if (payLoad.equalsIgnoreCase("SERVER_KEY_EXTRACTION_SUCCESS")) {
+                // server key extraction success
+                // so send PUT query to create user
+                String username = editTextUsername.getText().toString().trim();
+                String password = editTextPassword.getText().toString().trim();
+
+                try {
+                    String loginQuery = QueryHandler.getLoginQuery(username, password);
+                    System.out.println(loginQuery);
+
+                    if(application.getWebSocketConnection().isConnected()) {
+                        application.getWebSocketConnection().sendTextMessage(loginQuery);
+                    }
+                } catch (UnsupportedEncodingException e) {
+                    Log.e(TAG, e.getMessage());
+                } catch (NoSuchAlgorithmException e) {
+                    Log.e(TAG, e.getMessage());
+                }
+            } else if(payLoad.equalsIgnoreCase("LoginSUCCESS")) {
                 Log.d(TAG, "HandleMessage: login success");
                 Log.d(TAG, "HandleMessage: NOT force to disconnect web socket");
 
@@ -257,7 +277,7 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
             if (intent.getAction().equals(WebSocketService.WEB_SOCKET_CONNECTED)) {
                 // send login request to server
                 Log.d(TAG, "OnReceive: received broadcast message " + WebSocketService.WEB_SOCKET_CONNECTED);
-                QueryHandler.handleLogin(application);
+                //QueryHandler.handleLogin(application);
             }
         }
     }
