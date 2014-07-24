@@ -109,14 +109,15 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
         try {
             ActivityUtils.isValidRegistrationFields(phoneNo, username, password, confirmPassword);
 
-            // valid input fields
-            // so send PUT query to server in order to create an user
-            application.setRegistering(true);
-            application.setForceToDisconnect(true);
             ActivityUtils.hideSoftKeyboard(this);
             ActivityUtils.showProgressDialog(this, "Registering...");
+
             Intent serviceIntent = new Intent(RegistrationActivity.this, WebSocketService.class);
+            Bundle bundle = new Bundle();
+            bundle.putBoolean("isRegistering", true);
+            serviceIntent.putExtras(bundle);
             startService(serviceIntent);
+
             application.setForceToDisconnect(true);
         } catch (InvalidInputFieldsException e) {
             Log.e(TAG, e.toString());

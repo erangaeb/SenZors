@@ -70,16 +70,6 @@
         </activity>
 
         <activity
-            android:name=".ui.MapActivity"
-            android:screenOrientation="portrait"
-            android:configChanges="orientation"
-            android:launchMode="singleTask"
-            android:theme="@style/Theme.Yello"
-            android:windowSoftInputMode="stateHidden"
-            android:parentActivityName="com.score.senzors.ui.HomeActivity">
-        </activity>
-
-        <activity
                 android:name=".ui.HomeActivity"
                 android:screenOrientation="portrait"
                 android:configChanges="orientation"

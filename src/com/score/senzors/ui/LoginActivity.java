@@ -155,10 +155,13 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
                 // open web socket and send username password fields
                 // we are authenticate with web sockets
                 if(!application.getWebSocketConnection().isConnected()) {
-                    application.setRegistering(false);
                     ActivityUtils.hideSoftKeyboard(this);
                     ActivityUtils.showProgressDialog(LoginActivity.this, "Connecting to senZors...");
+
                     Intent serviceIntent = new Intent(LoginActivity.this, WebSocketService.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putBoolean("isRegistering", false);
+                    serviceIntent.putExtras(bundle);
                     startService(serviceIntent);
                     application.setForceToDisconnect(true);
                 } else {

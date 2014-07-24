@@ -34,6 +34,11 @@ public class WebSocketService extends Service {
     private static int RECONNECT_COUNT = 0;
     private static int MAX_RECONNECT_COUNT = 14;
 
+    // two ways to start service
+    //      1. registering
+    //      2. login
+    boolean isRegistering = false;
+
     /**
      * {@inheritDoc}
      */
@@ -47,10 +52,8 @@ public class WebSocketService extends Service {
      */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        // connect to web socket from here
-        Log.d(TAG, "OnStartCommand: starting service");
+        isRegistering = intent.getExtras().getBoolean("isRegistering");
         connectToWebSocket(application);
-        application.setServiceRunning(true);
 
         // If we get killed, after returning from here, restart
         return START_NOT_STICKY;
@@ -85,7 +88,6 @@ public class WebSocketService extends Service {
             notificationManager.notify(NotificationUtils.SERVICE_NOTIFICATION_ID, notification);
         }
 
-        application.setServiceRunning(false);
         application.emptyMySensors();
         Intent disconnectMessage = new Intent(WebSocketService.WEB_SOCKET_DISCONNECTED);
         sendBroadcast(disconnectMessage);
@@ -106,7 +108,7 @@ public class WebSocketService extends Service {
                 public void onOpen() {
                     // connected to web socket so notify it to activity
                     Log.d(TAG, "ConnectToWebSocket: open web socket");
-                    if (!application.isRegistering()) {
+                    if (!isRegistering) {
                         // only display notification when user login
                         WebSocketService.RECONNECT_COUNT = 0;
                         Notification notification = NotificationUtils.getNotification(WebSocketService.this, R.drawable.logo_green,

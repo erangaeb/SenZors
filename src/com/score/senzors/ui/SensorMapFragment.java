@@ -1,7 +1,6 @@
 package com.score.senzors.ui;
 
 import android.content.Intent;
-import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -12,7 +11,6 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.*;
 import com.score.senzors.R;
@@ -30,7 +28,7 @@ import com.score.senzors.utils.ActivityUtils;
  */
 public class SensorMapFragment extends Fragment implements View.OnClickListener, Handler.Callback, GoogleMap.OnMarkerClickListener {
 
-    private static final String TAG = MapActivity.class.getName();
+    private static final String TAG = SensorMapFragment.class.getName();
     private SenzorApplication application;
 
     private GoogleMap map;
