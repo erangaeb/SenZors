@@ -179,7 +179,7 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
                 String password = editTextPassword.getText().toString().trim();
 
                 try {
-                    String putQuery = QueryHandler.getRegistrationQuery(application, phoneNo, username, password);
+                    String putQuery = QueryHandler.getRegistrationQuery(phoneNo, username, password);
                     System.out.println(putQuery);
 
                     if(application.getWebSocketConnection().isConnected()) {

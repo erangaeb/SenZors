@@ -44,19 +44,13 @@ public class QueryHandler {
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("name", username);
 
-        // need to append session key to password --> hkey = base64(sha1(password)) + sessionkey
-        // then get SHA1 of hkey and encode with base64
-        String encodedPassword = CryptoUtils.encodeMessage(password);
+        // need to append session key to password --> key = base64(sha1(password)) + session_key
+        // then get SHA1 of key and encode with base64
         StringBuilder builder = new StringBuilder();
-        builder.append(encodedPassword);
+        builder.append(CryptoUtils.encodeMessage(password));
         builder.append(sessionKey);
-        String hkey = builder.toString().replace("\n", "").replace("\r", "");
-
-        System.out.println("--------- session key " + sessionKey);
-        System.out.println("--------- encoded password " + encodedPassword);
-        System.out.println("--------- hkey " + hkey);
-
-        params.put("hkey", CryptoUtils.encodeMessage(hkey));
+        String key = builder.toString().replace("\n", "").replace("\r", "");
+        params.put("hkey", CryptoUtils.encodeMessage(key));
 
         return QueryParser.getMessage(new Query(command, "mysensors", params));
     }
@@ -66,12 +60,11 @@ public class QueryHandler {
      * server use PUT queries when creating users, need to encrypt phone no with server public key
      * and send it as "enckey"
      *
-     * @param application application object
      * @param phoneNo user phone no
      * @param username username
      * @param password password
      */
-    public static String getRegistrationQuery(SenzorApplication application, String phoneNo, String username, String password) throws UnsupportedEncodingException, NoSuchAlgorithmException {
+    public static String getRegistrationQuery(String phoneNo, String username, String password) throws UnsupportedEncodingException, NoSuchAlgorithmException {
         // construct PUT message
         final HashMap<String, String> params = new HashMap<String, String>();
         String command = "PUT";
