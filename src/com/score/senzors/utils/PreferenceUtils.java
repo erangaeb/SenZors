@@ -113,4 +113,26 @@ public class PreferenceUtils {
         return preferences.getString(keyType, "");
     }
 
+    /**
+     * Save session key in shared preference
+     * @param context application context
+     * @param sessionKey session key
+     */
+    public static void saveSessionKey(Context context, String sessionKey) {
+        SharedPreferences preferences = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor =  preferences.edit();
+        editor.putString("session_key", sessionKey);
+        editor.commit();
+    }
+
+    /**
+     * Read session key form shared preference
+     * @param context application context
+     * @return session key
+     */
+    public static String getSessionKey(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        return preferences.getString("session_key", "");
+    }
+
 }

@@ -6,7 +6,6 @@ import android.util.Log;
 import com.score.senzors.application.SenzorApplication;
 import com.score.senzors.db.SenzorsDbSource;
 import com.score.senzors.exceptions.InvalidQueryException;
-import com.score.senzors.exceptions.RsaKeyException;
 import com.score.senzors.pojos.LatLon;
 import com.score.senzors.pojos.Query;
 import com.score.senzors.pojos.Sensor;
@@ -36,16 +35,28 @@ public class QueryHandler {
      * Generate login query and send to server
      * @param username username
      * @param password password
+     * @param sessionKey session key
      */
-    public static String getLoginQuery(String username, String password) throws UnsupportedEncodingException, NoSuchAlgorithmException {
+    public static String getLoginQuery(String username, String password, String sessionKey) throws UnsupportedEncodingException, NoSuchAlgorithmException {
         // generate login query with user credentials
         // sample query - LOGIN #name era #skey 123 @mysensors
         String command = "LOGIN";
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("name", username);
 
-        // encode password with SHA1 and encode with Base64
-        params.put("signature", CryptoUtils.encodeMessage(password));
+        // need to append session key to password --> hkey = base64(sha1(password)) + sessionkey
+        // then get SHA1 of hkey and encode with base64
+        String encodedPassword = CryptoUtils.encodeMessage(password);
+        StringBuilder builder = new StringBuilder();
+        builder.append(encodedPassword);
+        builder.append(sessionKey);
+        String hkey = builder.toString().replace("\n", "").replace("\r", "");
+
+        System.out.println("--------- session key " + sessionKey);
+        System.out.println("--------- encoded password " + encodedPassword);
+        System.out.println("--------- hkey " + hkey);
+
+        params.put("hkey", CryptoUtils.encodeMessage(hkey));
 
         return QueryParser.getMessage(new Query(command, "mysensors", params));
     }
@@ -214,7 +225,7 @@ public class QueryHandler {
     private static void handleDataQuery(SenzorApplication application, Query query) {
         if(query.getUser().equalsIgnoreCase("mysensors")) {
             if (query.getParams().containsKey("pubkey")) {
-                handleServerPublicKeyQuery(application, query);
+                ExtractServerKeys(application, query);
             } else {
                 // this is a status query, just send status to available handler
                 // @mysensors DATA #msg LoginSuccess
@@ -235,15 +246,17 @@ public class QueryHandler {
     }
 
     /**
-     * Handle server public key query, this query comes as DATA query
+     * Extract server keys from query, two types of keys
+     *      1. server public key
+     *      2. session key
      * @param query parsed query
      */
-    private static void handleServerPublicKeyQuery(SenzorApplication application, Query query) {
-        // receives server public key
-        // @mysensors DATA #pubkey <public key>
+    private static void ExtractServerKeys(SenzorApplication application, Query query) {
+        // receives server public key and session key
+        // @mysensors DATA #pubkey <public key> #websocketkey <session key>
         try {
             CryptoUtils.saveServerPublicKey(application, query.getParams().get("pubkey"));
-
+            PreferenceUtils.saveSessionKey(application, query.getParams().get("websocketkey"));
             sendMessage(application, "SERVER_KEY_EXTRACTION_SUCCESS");
         } catch (UnsupportedEncodingException e) {
             Log.e(TAG, e.getMessage());

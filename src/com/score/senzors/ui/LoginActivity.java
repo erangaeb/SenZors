@@ -217,9 +217,10 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
                 // so send PUT query to create user
                 String username = editTextUsername.getText().toString().trim();
                 String password = editTextPassword.getText().toString().trim();
+                String sessionKey = PreferenceUtils.getSessionKey(this);
 
                 try {
-                    String loginQuery = QueryHandler.getLoginQuery(username, password);
+                    String loginQuery = QueryHandler.getLoginQuery(username, password, sessionKey);
                     System.out.println(loginQuery);
 
                     if(application.getWebSocketConnection().isConnected()) {
