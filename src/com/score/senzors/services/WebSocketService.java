@@ -78,15 +78,12 @@ public class WebSocketService extends Service {
         //  2. delete all sensors in my sensor list
         //  3. send broadcast message about service disconnecting
         stopForeground(true);
-        if(application.isForceToDisconnect()) {
-            NotificationUtils.cancelNotification(this);
-        } else {
-            Notification notification = NotificationUtils.getNotification(WebSocketService.this, R.drawable.logo_gray,
-                    getString(R.string.app_name), getString(R.string.disconnected));
-            notification.flags |= Notification.FLAG_AUTO_CANCEL;
-            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            notificationManager.notify(NotificationUtils.SERVICE_NOTIFICATION_ID, notification);
-        }
+
+        Notification notification = NotificationUtils.getNotification(WebSocketService.this, R.drawable.logo_gray,
+                getString(R.string.app_name), getString(R.string.disconnected));
+        notification.flags |= Notification.FLAG_AUTO_CANCEL;
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(NotificationUtils.SERVICE_NOTIFICATION_ID, notification);
 
         application.emptyMySensors();
         Intent disconnectMessage = new Intent(WebSocketService.WEB_SOCKET_DISCONNECTED);
@@ -130,13 +127,8 @@ public class WebSocketService extends Service {
                     Log.d(TAG, "ConnectToWebSocket: web socket closed");
                     Log.d(TAG, "ConnectToWebSocket: code - " + code);
                     Log.d(TAG, "ConnectToWebSocket: reason - " + reason);
-                    if(application.isForceToDisconnect()) {
-                        Log.d(TAG, "ConnectToWebSocket: forced to disconnect, so stop the service");
-                        stopService(new Intent(getApplicationContext(), WebSocketService.class));
-                    } else {
-                        Log.d(TAG, "ConnectToWebSocket: NOT forced to disconnect, so reconnect again");
-                        if(code<4000) new WebSocketReConnector().execute();
-                    }
+
+                    if(code<4000) new WebSocketReConnector().execute();
                 }
             });
         } catch (WebSocketException e) {
@@ -154,8 +146,6 @@ public class WebSocketService extends Service {
                 Log.e(TAG, "ReconnectToWebSocket: web socket already connected");
             } else {
                 Log.e(TAG, "ReconnectToWebSocket: trying to re-connect " + (WebSocketService.RECONNECT_COUNT+1) + " times");
-                Log.d(TAG, "ReconnectToWebSocket: NOT force to close web socket");
-                application.setForceToDisconnect(false);
                 connectToWebSocket(application);
                 WebSocketService.RECONNECT_COUNT++;
             }

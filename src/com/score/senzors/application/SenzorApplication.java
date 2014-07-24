@@ -62,11 +62,6 @@ public class SenzorApplication extends Application {
     // we mainly focus on type of current sensor, all the logic depends on the sensor type
     Sensor currentSensor;
 
-    // We disconnect from web socket two ways
-    //  1. when log out - in here we don't need to reconnect to web socket
-    //  2. automatic disconnect(because of network drop of server error) - in her we need to re connect to web socket
-    boolean forceToDisconnect;
-
     /**
      * {@inheritDoc}
      */
@@ -80,9 +75,6 @@ public class SenzorApplication extends Application {
         setSensorType(MY_SENSORS);
         setFiendSensorList(new ArrayList<Sensor>());
         setMySensorList(new ArrayList<Sensor>());
-
-        // we don't want to force to disconnect from web socket
-        setForceToDisconnect(true);
     }
 
     public String getSensorType() {
@@ -161,14 +153,6 @@ public class SenzorApplication extends Application {
 
     public void setCurrentSensor(Sensor currentSensor) {
         this.currentSensor = currentSensor;
-    }
-
-    public boolean isForceToDisconnect() {
-        return forceToDisconnect;
-    }
-
-    public void setForceToDisconnect(boolean forceToDisconnect) {
-        this.forceToDisconnect = forceToDisconnect;
     }
 
     /**

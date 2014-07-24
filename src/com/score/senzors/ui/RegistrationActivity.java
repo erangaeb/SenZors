@@ -117,8 +117,6 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
             bundle.putBoolean("isRegistering", true);
             serviceIntent.putExtras(bundle);
             startService(serviceIntent);
-
-            application.setForceToDisconnect(true);
         } catch (InvalidInputFieldsException e) {
             Log.e(TAG, e.toString());
             Toast.makeText(this, "Invalid input fields", Toast.LENGTH_LONG).show();

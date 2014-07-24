@@ -163,7 +163,6 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
                     bundle.putBoolean("isRegistering", false);
                     serviceIntent.putExtras(bundle);
                     startService(serviceIntent);
-                    application.setForceToDisconnect(true);
                 } else {
                     Log.d(TAG, "Login: already connected to web socket");
                 }
@@ -233,12 +232,10 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
                 PreferenceUtils.saveUser(LoginActivity.this, user);
 
                 application.setUpSenzors();
-                application.setForceToDisconnect(false);
                 switchToHome();
             } else {
                 Log.d(TAG, "HandleMessage: login fail");
                 if(application.getWebSocketConnection().isConnected()) {
-                    application.setForceToDisconnect(true);
                     application.getWebSocketConnection().disconnect();
                 }
 
