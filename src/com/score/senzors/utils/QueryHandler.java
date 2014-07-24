@@ -231,9 +231,6 @@ public class QueryHandler {
             // create LatLon object from query params
             // we assume incoming query contains lat lon values
             LatLon latLon = new LatLon(query.getParams().get("lat"), query.getParams().get("lon"));
-            application.setDataQuery(query);
-
-            // send message to available handler to notify incoming sensor value
             sendMessage(application, latLon);
         }
     }

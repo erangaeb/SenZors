@@ -58,7 +58,6 @@ public class SenzorApplication extends Application {
     //  1. GET query from friend
     //  2. DATA query
     private Query requestQuery;
-    private Query dataQuery;
 
     // keep current location
     // this location display on google map
@@ -168,14 +167,6 @@ public class SenzorApplication extends Application {
 
     public void setRequestQuery(Query requestQuery) {
         this.requestQuery = requestQuery;
-    }
-
-    public Query getDataQuery() {
-        return dataQuery;
-    }
-
-    public void setDataQuery(Query dataQuery) {
-        this.dataQuery = dataQuery;
     }
 
     public LatLon getLatLon() {
