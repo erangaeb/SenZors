@@ -38,7 +38,6 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
     private SenzorApplication application;
     private DataUpdateReceiver dataUpdateReceiver;
 
-    // UI fields
     private EditText editTextUsername;
     private EditText editTextPassword;
     private TextView headerText;
@@ -46,6 +45,9 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
     private TextView link;
     private RelativeLayout signInButton;
     private RelativeLayout signUpButton;
+
+    // keep user object to use in this activity
+    User thiUser;
 
     /**
      * {@inheritDoc}
@@ -55,10 +57,7 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
         setContentView(R.layout.login);
 
         application = (SenzorApplication) this.getApplication();
-        Log.d(TAG, "OnCreate: set handler callback LoginActivity");
-
         initUi();
-        Log.d(TAG, "OnCreate: activity created");
     }
 
     /**
@@ -70,7 +69,6 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
         displayUserCredentials();
 
         // register broadcast receiver from here
-        Log.d(TAG, "OnResume: registering broadcast receiver");
         if (dataUpdateReceiver == null) dataUpdateReceiver = new DataUpdateReceiver();
         IntentFilter intentFilter = new IntentFilter(WebSocketService.WEB_SOCKET_CONNECTED);
         registerReceiver(dataUpdateReceiver, intentFilter);
@@ -83,7 +81,6 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
         super.onPause();
 
         // un-register broadcast receiver from here
-        Log.d(TAG, "OnPause: un-registering broadcast receiver");
         if (dataUpdateReceiver != null) unregisterReceiver(dataUpdateReceiver);
     }
 
@@ -127,15 +124,23 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
     }
 
     /**
+     * Initialize this user object
+     */
+    private void initThisUser() {
+        String username = editTextUsername.getText().toString().trim();
+        String password = editTextPassword.getText().toString().trim();
+        thiUser = new User("0", username, username, password);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
     public void onClick(View v) {
         if (v==signInButton) {
-            Log.d(TAG, "OnClick: click login");
+            initThisUser();
             login();
         } else if(v==signUpButton) {
-            Log.d(TAG, "OnClick: click register link");
             switchToRegister();
         }
     }
@@ -146,18 +151,10 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
      */
     private void login() {
         if(NetworkUtil.isAvailableNetwork(LoginActivity.this)) {
-            String username = editTextUsername.getText().toString().trim();
-            String password = editTextPassword.getText().toString().trim();
-            if(ActivityUtils.isValidLoginFields(username, password)) {
-                // create user and share in application
-                application.setUser(new User("0", username, username, password));
-
+            if(ActivityUtils.isValidLoginFields(thiUser.getUsername(), thiUser.getPassword())) {
                 // open web socket and send username password fields
                 // we are authenticate with web sockets
                 if(!application.getWebSocketConnection().isConnected()) {
-                    Log.d(TAG, "Login: not connected to web socket");
-                    Log.d(TAG, "Login: connecting to web socket via service");
-                    Log.d(TAG, "Login: force to disconnect web socket");
                     application.setRegistering(false);
                     ActivityUtils.hideSoftKeyboard(this);
                     ActivityUtils.showProgressDialog(LoginActivity.this, "Connecting to senZors...");
@@ -204,26 +201,19 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
      */
     @Override
     public boolean handleMessage(Message message) {
-        Log.d(TAG, "HandleMessage: message from server");
         ActivityUtils.cancelProgressDialog();
 
         // we handle string messages only from here
         if(message.obj instanceof String) {
             String payLoad = (String)message.obj;
-            Log.d(TAG, "HandleMessage: message is a string - " + payLoad);
-
             if (payLoad.equalsIgnoreCase("SERVER_KEY_EXTRACTION_SUCCESS")) {
+                Log.d(TAG, "HandleMessage: server key extracted");
+
                 // server key extraction success
                 // so send PUT query to create user
-                String username = editTextUsername.getText().toString().trim();
-                String password = editTextPassword.getText().toString().trim();
-                String sessionKey = PreferenceUtils.getSessionKey(this);
-
                 try {
-                    String loginQuery = QueryHandler.getLoginQuery(username, password, sessionKey);
-                    System.out.println(loginQuery);
-
                     if(application.getWebSocketConnection().isConnected()) {
+                        String loginQuery = QueryHandler.getLoginQuery(thiUser.getUsername(), thiUser.getPassword(), PreferenceUtils.getSessionKey(this));
                         application.getWebSocketConnection().sendTextMessage(loginQuery);
                     }
                 } catch (UnsupportedEncodingException e) {
@@ -233,25 +223,18 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
                 }
             } else if(payLoad.equalsIgnoreCase("LoginSUCCESS")) {
                 Log.d(TAG, "HandleMessage: login success");
-                Log.d(TAG, "HandleMessage: NOT force to disconnect web socket");
 
-                // get user
                 // set password of the user since we not storing password in database
-                User user = new SenzorsDbSource(LoginActivity.this).getOrCreateUser(application.getUser().getUsername(), application.getUser().getEmail());
-                user.setPassword(application.getUser().getPassword());
-
+                User user = new SenzorsDbSource(LoginActivity.this).getOrCreateUser(thiUser.getUsername(), thiUser.getEmail());
+                user.setPassword(thiUser.getPassword());
                 PreferenceUtils.saveUser(LoginActivity.this, user);
-                application.setUser(user);
-                Log.d(TAG, "HandleMessage: user saved " + application.getUser().getId());
+
                 application.setUpSenzors();
                 application.setForceToDisconnect(false);
                 switchToHome();
-                return true;
             } else {
                 Log.d(TAG, "HandleMessage: login fail");
                 if(application.getWebSocketConnection().isConnected()) {
-                    Log.d(TAG, "HandleMessage: disconnect from web socket");
-                    Log.d(TAG, "HandleMessage: force to disconnect web socket");
                     application.setForceToDisconnect(true);
                     application.getWebSocketConnection().disconnect();
                 }
@@ -274,7 +257,6 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
     private class DataUpdateReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "OnReceive: received broadcast message");
             if (intent.getAction().equals(WebSocketService.WEB_SOCKET_CONNECTED)) {
                 // send login request to server
                 Log.d(TAG, "OnReceive: received broadcast message " + WebSocketService.WEB_SOCKET_CONNECTED);
