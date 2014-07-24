@@ -1,6 +1,7 @@
 package com.score.senzors.utils;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Message;
 import android.util.Log;
 import com.score.senzors.application.SenzorApplication;
@@ -203,9 +204,11 @@ public class QueryHandler {
         if(application.getWebSocketConnection().isConnected()) {
             // current location request is from web socket service
             // start location service
-            application.setRequestFromFriend(true);
             application.setRequestQuery(query);
             Intent serviceIntent = new Intent(application.getApplicationContext(), GpsReadingService.class);
+            Bundle bundle = new Bundle();
+            bundle.putBoolean("isMyLocation", false);
+            serviceIntent.putExtras(bundle);
             application.getApplicationContext().startService(serviceIntent);
         }
     }

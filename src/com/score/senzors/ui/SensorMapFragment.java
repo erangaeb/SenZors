@@ -232,9 +232,11 @@ public class SensorMapFragment extends Fragment implements View.OnClickListener,
             // TODO if this sensor is from friend get friends location , we currently displaying our location
             Log.d(TAG, "OnClick: click on location, get current location");
             ActivityUtils.showProgressDialog(this.getActivity(), "Accessing location...");
-            application.setRequestFromFriend(false);
-            application.setRequestQuery(null);
+
             Intent serviceIntent = new Intent(this.getActivity(), GpsReadingService.class);
+            Bundle bundle = new Bundle();
+            bundle.putBoolean("isMyLocation", true);
+            serviceIntent.putExtras(bundle);
             this.getActivity().startService(serviceIntent);
         } else if(v==mapActivity) {
             Log.d(TAG, "OnClick: click on activity, get user activity");

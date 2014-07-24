@@ -128,7 +128,6 @@
 
         <service android:enabled="true" android:name=".services.WebSocketService" />
         <service android:enabled="true" android:name=".services.GpsReadingService" />
-        <service android:enabled="true" android:name=".services.LocationService" />
         <service android:enabled="true" android:name=".services.PingService" />
 
     </application>

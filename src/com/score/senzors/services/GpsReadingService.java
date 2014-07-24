@@ -41,12 +41,16 @@ public class GpsReadingService extends Service implements GooglePlayServicesClie
     private LocationClient locationClient;
     private LocationRequest locationRequest;
 
+    // two types of location request
+    //      1. request from this phone
+    //      2. request from friend
+    boolean isMyLocation = true;
+
     /**
      * {@inheritDoc}
      */
     @Override
     public void onCreate() {
-        Log.d(TAG, "OnCreate: creating service");
         application = (SenzorApplication) getApplication();
         locationClient = new LocationClient(getApplicationContext(), this,this);
 
@@ -65,7 +69,7 @@ public class GpsReadingService extends Service implements GooglePlayServicesClie
      */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(TAG, "OnStartCommand: starting service");
+        isMyLocation = intent.getExtras().getBoolean("isMyLocation");
         if (isServicesConnected()) locationClient.connect();
 
         // If we get killed, after returning from here, restart
@@ -144,12 +148,12 @@ public class GpsReadingService extends Service implements GooglePlayServicesClie
         // get location and send to appropriate handle
         // the close location updates
         // stop service
-        if(application.isRequestFromFriend()) {
-            // send location to server via web socket
-            handleLocationRequestFromSever(location);
-        } else {
+        if(isMyLocation) {
             // send location result to sensor list via message
             handleLocationRequestFromSensorList(location);
+        } else {
+            // send location to server via web socket
+            handleLocationRequestFromSever(location);
         }
 
         // If the client is connected
@@ -177,8 +181,6 @@ public class GpsReadingService extends Service implements GooglePlayServicesClie
      * @param location current location
      */
     private void handleLocationRequestFromSever(Location location) {
-        Log.d(TAG, "HandleLocationRequestFromSever: location request from server");
-
         String command = "DATA";
         String user = application.getRequestQuery().getUser();
         HashMap<String, String> params = new HashMap<String, String>();
@@ -201,7 +203,6 @@ public class GpsReadingService extends Service implements GooglePlayServicesClie
      * @param location current location
      */
     private void handleLocationRequestFromSensorList(Location location) {
-        Log.d(TAG, "HandleLocationRequestFromSensorList: location request from app");
         LatLon latLon = new LatLon(Double.toString(location.getLatitude()), Double.toString(location.getLongitude()));
 
         // send message to available handler

@@ -49,11 +49,6 @@ public class SenzorApplication extends Application {
     private ArrayList<Sensor> friendSensorList;
     private ArrayList<Sensor> mySensorList;
 
-    // to types of sensors requests(query requests) can be perform
-    //  1. request from friend
-    //  2. request from own app(get my sensor value to display on app)
-    private boolean isRequestFromFriend;
-
     // to types of queries need to be shared in application
     //  1. GET query from friend
     //  2. DATA query
@@ -92,9 +87,7 @@ public class SenzorApplication extends Application {
         setFiendSensorList(new ArrayList<Sensor>());
         setMySensorList(new ArrayList<Sensor>());
 
-        // initially we ready to response request from friend
         // we don't want to force to disconnect from web socket
-        setRequestFromFriend(true);
         setForceToDisconnect(true);
         setServiceRunning(false);
     }
@@ -151,14 +144,6 @@ public class SenzorApplication extends Application {
 
     public void setMySensorList(ArrayList<Sensor> mySensorList) {
         this.mySensorList = mySensorList;
-    }
-
-    public boolean isRequestFromFriend() {
-        return isRequestFromFriend;
-    }
-
-    public void setRequestFromFriend(boolean requestFromFriend) {
-        isRequestFromFriend = requestFromFriend;
     }
 
     public Query getRequestQuery() {

@@ -51,7 +51,6 @@ public class SensorList extends Fragment implements Handler.Callback {
      */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.d(TAG, "OnCreateView: creating view");
         ViewGroup root = (ViewGroup) inflater.inflate(R.layout.sensor_list_layout, container, false);
 
         return root;
@@ -64,11 +63,8 @@ public class SensorList extends Fragment implements Handler.Callback {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        Log.d(TAG, "OnActivityCreated: activity created");
         application = (SenzorApplication) getActivity().getApplication();
         typeface = Typeface.createFromAsset(getActivity().getAssets(), "fonts/vegur_2.otf");
-
-        Log.d(TAG, "OnActivityCreated: sensor type " + application.getSensorType());
 
         initEmptyView();
         initSensorListView();
@@ -85,9 +81,6 @@ public class SensorList extends Fragment implements Handler.Callback {
         // TODO refresh sensor list if need
         initSensorList();
         displaySensorList();
-
-        // register handler from here
-        Log.d(TAG, "OnResume: set handler callback SensorList fragment");
         application.setCallback(this);
     }
 
@@ -96,9 +89,6 @@ public class SensorList extends Fragment implements Handler.Callback {
      */
     public void onPause() {
         super.onPause();
-
-        // un-register handler from here
-        Log.d(TAG, "OnPause: reset handler callback SensorList fragment");
         application.setCallback(null);
     }
 
@@ -106,7 +96,6 @@ public class SensorList extends Fragment implements Handler.Callback {
      * Initialize UI components
      */
     private void initSensorListView() {
-        Log.d(TAG, "initSensorListView: initializing list view components");
         sensorListView = (ListView)getActivity().findViewById(R.id.sensor_list_layout_sensor_list);
 
         // add header and footer for list
@@ -135,24 +124,20 @@ public class SensorList extends Fragment implements Handler.Callback {
      *  2. Display Friends.SenZors
      */
     private void initSensorList() {
-        Log.d(TAG, "InitSensorList: initializing sensor list");
         // two sensor types to display
         //  1. My senzors
         //  2. Friends senzors
-        Log.d(TAG, "InitSensorList: sensor type " + application.getSensorType());
         if(application.getSensorType().equalsIgnoreCase(SenzorApplication.MY_SENSORS)) {
             // display my sensors
             //  1. initialize my sensors
             //  2. initialize location listener
             //  3. create list view
-            Log.d(TAG, "InitSensorList: init my sensors");
             sensorList = application.getMySensorList();
             setUpActionBarTitle("My.senZors");
         } else {
             // display friends sensors
             //  1. initialize friends sensor list
             //  2. create list view
-            Log.d(TAG, "InitSensorList: init friends sensors");
             sensorList = application.getFiendSensorList();
             setUpActionBarTitle("Friends.senZors");
         }
@@ -163,7 +148,6 @@ public class SensorList extends Fragment implements Handler.Callback {
      * empty view need to be display when no sensors available
      */
     private void initEmptyView() {
-        Log.d(TAG, "InitEmptyView: initializing empty view");
         emptyView = (ViewStub) getActivity().findViewById(R.id.sensor_list_layout_empty_view);
         View inflatedEmptyView = emptyView.inflate();
         TextView emptyText = (TextView) inflatedEmptyView.findViewById(R.id.empty_text);
@@ -178,12 +162,10 @@ public class SensorList extends Fragment implements Handler.Callback {
     private void displaySensorList() {
         // construct list adapter
         if(sensorList.size()>0) {
-            Log.d(TAG, "DisplaySensorList: display sensor list");
             adapter = new SensorListAdapter(SensorList.this.getActivity(), sensorList);
             adapter.notifyDataSetChanged();
             sensorListView.setAdapter(adapter);
         } else {
-            Log.d(TAG, "DisplaySensorList: display empty view");
             adapter = new SensorListAdapter(SensorList.this.getActivity(), sensorList);
             sensorListView.setAdapter(adapter);
             sensorListView.setEmptyView(emptyView);
@@ -196,7 +178,6 @@ public class SensorList extends Fragment implements Handler.Callback {
      * @param title action bar title
      */
     private void setUpActionBarTitle(String title) {
-        Log.d(TAG, "SetUpActionBarTitle: set action bar title and custom font");
         int titleId = getResources().getIdentifier("action_bar_title", "id", "android");
         TextView yourTextView = (TextView) (this.getActivity().findViewById(titleId));
         yourTextView.setTextColor(getResources().getColor(R.color.white));
@@ -215,13 +196,13 @@ public class SensorList extends Fragment implements Handler.Callback {
         if(sensor != null) {
             if(sensor.isMySensor()) {
                 // start location service to get my location
-                Log.d(TAG, "handleSensorListItemClick: click on my sensor item(this is location)");
                 if(NetworkUtil.isAvailableNetwork(SensorList.this.getActivity())) {
-                    Log.d(TAG, "handleSensorListItemClick: starting service to get my location");
                     ActivityUtils.showProgressDialog(SensorList.this.getActivity(), "Accessing location...");
-                    application.setRequestFromFriend(false);
-                    application.setRequestQuery(null);
+
                     Intent serviceIntent = new Intent(getActivity(), GpsReadingService.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putBoolean("isMyLocation", true);
+                    serviceIntent.putExtras(bundle);
                     getActivity().startService(serviceIntent);
                 } else {
                     Log.w(TAG, "handleSensorListItemClick: not network connection available");
@@ -231,11 +212,8 @@ public class SensorList extends Fragment implements Handler.Callback {
                 // friend sensor
                 // so need to get request to server
                 // send query to get data
-                Log.d(TAG, "handleSensorListItemClick: click on friend sensor item");
                 if(NetworkUtil.isAvailableNetwork(SensorList.this.getActivity())) {
-                    Log.d(TAG, "handleSensorListItemClick: starting service to get my location");
                     if(application.getWebSocketConnection().isConnected()) {
-                        Log.d(TAG, "handleSensorListItemClick: starting service to get my location");
                         ActivityUtils.showProgressDialog(SensorList.this.getActivity(), "Accessing location ...");
                         application.getWebSocketConnection().sendTextMessage("GET #lat #lon " + "@" + sensor.getUser().getUsername());
                     } else {
@@ -258,7 +236,6 @@ public class SensorList extends Fragment implements Handler.Callback {
      */
     @Override
     public boolean handleMessage(Message message) {
-        Log.d(TAG, "HandleMessage: message from server");
         if(message.obj instanceof LatLon) {
             // we handle LatLon messages only, from here
             // get address from location
