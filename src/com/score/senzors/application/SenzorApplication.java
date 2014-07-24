@@ -4,6 +4,7 @@ import android.app.Application;
 import android.os.Handler;
 import android.os.Message;
 import com.score.senzors.db.SenzorsDbSource;
+import com.score.senzors.exceptions.NoUserException;
 import com.score.senzors.pojos.LatLon;
 import com.score.senzors.pojos.Query;
 import com.score.senzors.pojos.Sensor;
@@ -36,9 +37,6 @@ public class SenzorApplication extends Application {
     // web socket connection share in application
     // we are using one instance of web socket in all over the application
     public final WebSocket webSocketConnection = new WebSocketConnection();
-
-    // currently logged in user
-    private User user;
 
     // determine
     //  1. My sensor
@@ -100,14 +98,6 @@ public class SenzorApplication extends Application {
         setRequestFromFriend(true);
         setForceToDisconnect(true);
         setServiceRunning(false);
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 
     public String getSensorType() {
@@ -248,11 +238,16 @@ public class SenzorApplication extends Application {
             // this is first time app launch
             // add my sensors and users to database
             // TODO add more available sensors
-            Sensor sensor = new Sensor("0", "Location", "LocationValue", true, false, this.getUser(), null);
-            new SenzorsDbSource(this).addSensor(sensor);
+            try {
+                User user = PreferenceUtils.getUser(this);
+                Sensor sensor = new Sensor("0", "Location", "LocationValue", true, false, user, null);
+                new SenzorsDbSource(this).addSensor(sensor);
 
-            // reset first time status
-            PreferenceUtils.setFirstTime(this, false);
+                // reset first time status
+                PreferenceUtils.setFirstTime(this, false);
+            } catch (NoUserException e) {
+                e.printStackTrace();
+            }
         }
     }
 
