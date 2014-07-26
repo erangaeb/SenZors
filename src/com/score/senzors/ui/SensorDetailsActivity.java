@@ -4,7 +4,6 @@ import android.app.ActionBar;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
@@ -17,7 +16,7 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.score.senzors.R;
-import com.score.senzors.application.SenzorApplication;
+import com.score.senzors.pojos.Sensor;
 import com.score.senzors.utils.ActivityUtils;
 
 /**
@@ -32,20 +31,21 @@ public class SensorDetailsActivity extends FragmentActivity {
     ActionBar actionBar;
     Typeface typefaceThin;
     TextView actionBarTitle;
-    SenzorApplication application;
+
+    // Activity deal with this Sensor
+    Sensor thisSensor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sensor_details_layout);
-        application = (SenzorApplication)getApplication();
-        typefaceThin = Typeface.createFromAsset(this.getAssets(), "fonts/vegur_2.otf");
+        initThisInvoice();
 
-        actionBar = getActionBar();
-        //actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#333333")));
         // set custom font for
         //  1. action bar title
         //  2. other ui texts
+        actionBar = getActionBar();
+        typefaceThin = Typeface.createFromAsset(this.getAssets(), "fonts/vegur_2.otf");
         int titleId = getResources().getIdentifier("action_bar_title", "id", "android");
         actionBarTitle = (TextView) (this.findViewById(titleId));
         actionBarTitle.setTextColor(getResources().getColor(R.color.white));
@@ -58,16 +58,26 @@ public class SensorDetailsActivity extends FragmentActivity {
                     @Override
                     public void onPageSelected(int position) {
                         actionBar = getActionBar();
-                        actionBar.setSelectedNavigationItem(position);                    }
+                        actionBar.setSelectedNavigationItem(position);
+                    }
                 });
         Tab.setAdapter(TabAdapter);
 
         //Enable Tabs on Action Bar
         actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setTitle("#Location @" + application.getCurrentSensor().getUser().getUsername());
+        actionBar.setTitle("#Location @" + thisSensor.getUser().getUsername());
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
         setUp();
+    }
+
+    /**
+     * Sensor coming through bundle,
+     * extract it and initialize the thisInvoice
+     */
+    private void initThisInvoice() {
+        Bundle bundle = getIntent().getExtras();
+        thisSensor = bundle.getParcelable("com.score.senzors.pojos.Sensor");
     }
 
     /**
@@ -79,7 +89,7 @@ public class SensorDetailsActivity extends FragmentActivity {
 
         // show hide share item according to sensor type
         MenuItem share = menu.findItem(R.id.action_share);
-        if (application.getCurrentSensor().isMySensor()) {
+        if (thisSensor.isMySensor()) {
             share.setVisible(true);
         } else {
             share.setVisible(false);
@@ -156,7 +166,7 @@ public class SensorDetailsActivity extends FragmentActivity {
         t1.setLayoutParams(params);
 
         final TextView t2 = new TextView(this);
-        if (application.getCurrentSensor().isMySensor()) t2.setText("Shared with");
+        if (thisSensor.isMySensor()) t2.setText("Shared with");
         else t2.setText("Shared by");
 
         t2.setTypeface(typefaceThin);
