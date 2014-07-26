@@ -148,7 +148,7 @@ public class CryptoUtils {
         byte[] sha1hash = messageDigest.digest();
 
         // return convertToHex(sha1hash);
-        return Base64.encodeToString(sha1hash, Base64.DEFAULT);
+        return Base64.encodeToString(sha1hash, Base64.DEFAULT).replace("\n", "").replace("\r", "");
     }
 
     /**

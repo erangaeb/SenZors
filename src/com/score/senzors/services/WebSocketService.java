@@ -79,11 +79,11 @@ public class WebSocketService extends Service {
         //  3. send broadcast message about service disconnecting
         stopForeground(true);
 
-        Notification notification = NotificationUtils.getNotification(WebSocketService.this, R.drawable.logo_gray,
-                getString(R.string.app_name), getString(R.string.disconnected));
-        notification.flags |= Notification.FLAG_AUTO_CANCEL;
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(NotificationUtils.SERVICE_NOTIFICATION_ID, notification);
+//        Notification notification = NotificationUtils.getNotification(WebSocketService.this, R.drawable.logo_gray,
+//                getString(R.string.app_name), getString(R.string.disconnected));
+//        notification.flags |= Notification.FLAG_AUTO_CANCEL;
+//        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+//        notificationManager.notify(NotificationUtils.SERVICE_NOTIFICATION_ID, notification);
 
         application.emptyMySensors();
         Intent disconnectMessage = new Intent(WebSocketService.WEB_SOCKET_DISCONNECTED);

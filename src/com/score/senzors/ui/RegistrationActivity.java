@@ -1,7 +1,6 @@
 package com.score.senzors.ui;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
@@ -17,7 +16,6 @@ import com.score.senzors.application.SenzorApplication;
 import com.score.senzors.db.SenzorsDbSource;
 import com.score.senzors.exceptions.*;
 import com.score.senzors.pojos.User;
-import com.score.senzors.services.WebSocketService;
 import com.score.senzors.utils.ActivityUtils;
 import com.score.senzors.utils.PreferenceUtils;
 import com.score.senzors.utils.QueryHandler;
@@ -113,11 +111,12 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
             ActivityUtils.hideSoftKeyboard(this);
             ActivityUtils.showProgressDialog(this, "Registering...");
 
-            Intent serviceIntent = new Intent(RegistrationActivity.this, WebSocketService.class);
-            Bundle bundle = new Bundle();
-            bundle.putBoolean("isRegistering", true);
-            serviceIntent.putExtras(bundle);
-            startService(serviceIntent);
+            //Intent serviceIntent = new Intent(RegistrationActivity.this, WebSocketService.class);
+            //Bundle bundle = new Bundle();
+            //bundle.putBoolean("isRegistering", true);
+            //serviceIntent.putExtras(bundle);
+            //startService(serviceIntent);
+            registerUser();
         } catch (InvalidInputFieldsException e) {
             Log.e(TAG, e.toString());
             Toast.makeText(this, "Invalid input fields", Toast.LENGTH_LONG).show();
@@ -180,10 +179,11 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
 
                 try {
                     String putQuery = QueryHandler.getRegistrationQuery(phoneNo, username, password);
+                    System.out.println("------put query------");
                     System.out.println(putQuery);
 
-                    if(application.getWebSocketConnection().isConnected()) {
-                        application.getWebSocketConnection().sendTextMessage(putQuery);
+                    if(webSocketConnection.isConnected()) {
+                        webSocketConnection.sendTextMessage(putQuery);
                     }
                 } catch (UnsupportedEncodingException e) {
                     Log.e(TAG, e.getMessage());
@@ -201,21 +201,25 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
                 Toast.makeText(RegistrationActivity.this, "Successfully registered", Toast.LENGTH_LONG).show();
 
                 // create user from here
+                // we don't store passwords in DB, so when save user in shared preference need to set password
                 String username = editTextUsername.getText().toString().trim();
                 String email = editTextUsername.getText().toString().trim();
                 String password = editTextPassword.getText().toString().trim();
-                User user = new User("id", username, email, password);
-                new SenzorsDbSource(this).createUser(user);
+                User user = new SenzorsDbSource(this).getOrCreateUser(username, email);
+                user.setPassword(password);
                 PreferenceUtils.saveUser(this, user);
 
-                application.getWebSocketConnection().disconnect();
+                // stop web socket service
+                //stopService(new Intent(getApplicationContext(), WebSocketService.class));
+                webSocketConnection.disconnect();
                 application.setCallback(null);
                 this.finish();
                 this.overridePendingTransition(R.anim.stay_in, R.anim.bottom_out);
             } else if (payLoad.equalsIgnoreCase("UserCreationFailed")) {
                 ActivityUtils.cancelProgressDialog();
                 Toast.makeText(RegistrationActivity.this, "Registration failed", Toast.LENGTH_LONG).show();
-                application.getWebSocketConnection().disconnect();
+                webSocketConnection.disconnect();
+                //stopService(new Intent(getApplicationContext(), WebSocketService.class));
             }
         }
 

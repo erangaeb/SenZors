@@ -43,15 +43,15 @@ public class QueryHandler {
         // sample query - LOGIN #name era #skey 123 @mysensors
         String command = "LOGIN";
         HashMap<String, String> params = new HashMap<String, String>();
-        params.put("name", username);
 
         // need to append session key to password --> key = base64(sha1(password)) + session_key
         // then get SHA1 of key and encode with base64
         StringBuilder builder = new StringBuilder();
         builder.append(CryptoUtils.encodeMessage(password));
         builder.append(sessionKey);
-        String key = builder.toString().replace("\n", "").replace("\r", "");
+        String key = builder.toString();
         params.put("hkey", CryptoUtils.encodeMessage(key));
+        params.put("name", username);
 
         return QueryParser.getMessage(new Query(command, "mysensors", params));
     }
@@ -59,7 +59,7 @@ public class QueryHandler {
     /**
      * Generate PUT query to send to server,
      * server use PUT queries when creating users, need to encrypt phone no with server public key
-     * and send it as "enckey"
+     * and send it as "hkey"
      *
      * @param phoneNo user phone no
      * @param username username
@@ -67,13 +67,13 @@ public class QueryHandler {
      */
     public static String getRegistrationQuery(String phoneNo, String username, String password) throws UnsupportedEncodingException, NoSuchAlgorithmException {
         // construct PUT message
-        final HashMap<String, String> params = new HashMap<String, String>();
         String command = "PUT";
-        params.put("name", username);
-        params.put("phone", phoneNo);
+        final HashMap<String, String> params = new HashMap<String, String>();
 
         // encode password/pin with SHA1 and encode with Base64
         params.put("hkey", CryptoUtils.encodeMessage(password));
+        params.put("name", username);
+        params.put("phone", phoneNo);
 
         return QueryParser.getMessage(new Query(command, "mysensors", params));
     }

@@ -215,6 +215,8 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
                 try {
                     if(application.getWebSocketConnection().isConnected()) {
                         String loginQuery = QueryHandler.getLoginQuery(thiUser.getUsername(), thiUser.getPassword(), PreferenceUtils.getSessionKey(this));
+                        System.out.println("------login query------");
+                        System.out.println(loginQuery);
                         application.getWebSocketConnection().sendTextMessage(loginQuery);
                     }
                 } catch (UnsupportedEncodingException e) {
@@ -224,7 +226,6 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
                 }
             } else if(payLoad.equalsIgnoreCase("LoginSUCCESS")) {
                 Log.d(TAG, "HandleMessage: login success");
-
                 application.setUpSenzors();
                 switchToHome();
             } else {
