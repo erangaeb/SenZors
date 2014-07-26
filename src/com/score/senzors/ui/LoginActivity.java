@@ -17,7 +17,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.score.senzors.R;
 import com.score.senzors.application.SenzorApplication;
-import com.score.senzors.db.SenzorsDbSource;
 import com.score.senzors.exceptions.NoUserException;
 import com.score.senzors.pojos.User;
 import com.score.senzors.services.WebSocketService;
@@ -225,11 +224,6 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
                 }
             } else if(payLoad.equalsIgnoreCase("LoginSUCCESS")) {
                 Log.d(TAG, "HandleMessage: login success");
-
-                // set password of the user since we not storing password in database
-                User user = new SenzorsDbSource(LoginActivity.this).getOrCreateUser(thiUser.getUsername(), thiUser.getEmail());
-                user.setPassword(thiUser.getPassword());
-                PreferenceUtils.saveUser(LoginActivity.this, user);
 
                 application.setUpSenzors();
                 switchToHome();

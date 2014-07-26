@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.score.senzors.R;
 import com.score.senzors.application.SenzorApplication;
+import com.score.senzors.db.SenzorsDbSource;
 import com.score.senzors.exceptions.*;
 import com.score.senzors.pojos.User;
 import com.score.senzors.services.WebSocketService;
@@ -199,9 +200,14 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
                 ActivityUtils.cancelProgressDialog();
                 Toast.makeText(RegistrationActivity.this, "Successfully registered", Toast.LENGTH_LONG).show();
 
+                // create user from here
                 String username = editTextUsername.getText().toString().trim();
+                String email = editTextUsername.getText().toString().trim();
                 String password = editTextPassword.getText().toString().trim();
-                PreferenceUtils.saveUser(this, new User("0", username, username, password));
+                User user = new User("id", username, email, password);
+                new SenzorsDbSource(this).createUser(user);
+                PreferenceUtils.saveUser(this, user);
+
                 application.getWebSocketConnection().disconnect();
                 application.setCallback(null);
                 this.finish();

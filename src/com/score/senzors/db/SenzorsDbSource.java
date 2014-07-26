@@ -34,7 +34,7 @@ public class SenzorsDbSource {
      * Insert user to database
      * @param user user
      */
-    public void addUser(User user) {
+    public void createUser(User user) {
         Log.d(TAG, "AddUser: adding user - " + user.getUsername());
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
 
