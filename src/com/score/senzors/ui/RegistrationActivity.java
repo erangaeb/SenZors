@@ -110,12 +110,6 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
 
             ActivityUtils.hideSoftKeyboard(this);
             ActivityUtils.showProgressDialog(this, "Registering...");
-
-            //Intent serviceIntent = new Intent(RegistrationActivity.this, WebSocketService.class);
-            //Bundle bundle = new Bundle();
-            //bundle.putBoolean("isRegistering", true);
-            //serviceIntent.putExtras(bundle);
-            //startService(serviceIntent);
             registerUser();
         } catch (InvalidInputFieldsException e) {
             Log.e(TAG, e.toString());
@@ -209,8 +203,7 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
                 user.setPassword(password);
                 PreferenceUtils.saveUser(this, user);
 
-                // stop web socket service
-                //stopService(new Intent(getApplicationContext(), WebSocketService.class));
+                // disconnect at the end
                 webSocketConnection.disconnect();
                 application.setCallback(null);
                 this.finish();
@@ -219,7 +212,6 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
                 ActivityUtils.cancelProgressDialog();
                 Toast.makeText(RegistrationActivity.this, "Registration failed", Toast.LENGTH_LONG).show();
                 webSocketConnection.disconnect();
-                //stopService(new Intent(getApplicationContext(), WebSocketService.class));
             }
         }
 

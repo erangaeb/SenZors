@@ -158,9 +158,6 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
                     ActivityUtils.showProgressDialog(LoginActivity.this, "Connecting to senZors...");
 
                     Intent serviceIntent = new Intent(LoginActivity.this, WebSocketService.class);
-                    Bundle bundle = new Bundle();
-                    bundle.putBoolean("isRegistering", false);
-                    serviceIntent.putExtras(bundle);
                     startService(serviceIntent);
                 } else {
                     Log.d(TAG, "Login: already connected to web socket");

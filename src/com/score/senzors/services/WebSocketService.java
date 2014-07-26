@@ -34,11 +34,6 @@ public class WebSocketService extends Service {
     private static int RECONNECT_COUNT = 0;
     private static int MAX_RECONNECT_COUNT = 14;
 
-    // two ways to start service
-    //      1. registering
-    //      2. login
-    boolean isRegistering = false;
-
     /**
      * {@inheritDoc}
      */
@@ -52,7 +47,6 @@ public class WebSocketService extends Service {
      */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        isRegistering = intent.getExtras().getBoolean("isRegistering");
         connectToWebSocket(application);
 
         // If we get killed, after returning from here, restart
@@ -79,11 +73,11 @@ public class WebSocketService extends Service {
         //  3. send broadcast message about service disconnecting
         stopForeground(true);
 
-//        Notification notification = NotificationUtils.getNotification(WebSocketService.this, R.drawable.logo_gray,
-//                getString(R.string.app_name), getString(R.string.disconnected));
-//        notification.flags |= Notification.FLAG_AUTO_CANCEL;
-//        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-//        notificationManager.notify(NotificationUtils.SERVICE_NOTIFICATION_ID, notification);
+        Notification notification = NotificationUtils.getNotification(WebSocketService.this, R.drawable.logo_gray,
+                getString(R.string.app_name), getString(R.string.disconnected));
+        notification.flags |= Notification.FLAG_AUTO_CANCEL;
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(NotificationUtils.SERVICE_NOTIFICATION_ID, notification);
 
         application.emptyMySensors();
         Intent disconnectMessage = new Intent(WebSocketService.WEB_SOCKET_DISCONNECTED);
@@ -105,14 +99,12 @@ public class WebSocketService extends Service {
                 public void onOpen() {
                     // connected to web socket so notify it to activity
                     Log.d(TAG, "ConnectToWebSocket: open web socket");
-                    if (!isRegistering) {
-                        // only display notification when user login
-                        WebSocketService.RECONNECT_COUNT = 0;
-                        Notification notification = NotificationUtils.getNotification(WebSocketService.this, R.drawable.logo_green,
-                                getString(R.string.app_name), getString(R.string.launch_senzors));
-                        notification.flags |= Notification.FLAG_FOREGROUND_SERVICE;
-                        startForeground(NotificationUtils.SERVICE_NOTIFICATION_ID, notification);
-                    }
+                    // only display notification when user login
+                    WebSocketService.RECONNECT_COUNT = 0;
+                    Notification notification = NotificationUtils.getNotification(WebSocketService.this, R.drawable.logo_green,
+                            getString(R.string.app_name), getString(R.string.launch_senzors));
+                    notification.flags |= Notification.FLAG_FOREGROUND_SERVICE;
+                    startForeground(NotificationUtils.SERVICE_NOTIFICATION_ID, notification);
                 }
 
                 @Override
