@@ -148,7 +148,7 @@ public class QueryHandler {
         // get or create match user
         // create/save new sensor in db
         User user = new SenzorsDbSource(application.getApplicationContext()).getOrCreateUser(query.getUser(), "email");
-        Sensor sensor = new Sensor("0", "Location", "Location", false, false, user, null);
+        Sensor sensor = new Sensor("0", "Location", "Location", false, user, null);
 
         try {
             // save sensor in db and refresh friend sensor list
@@ -174,7 +174,7 @@ public class QueryHandler {
     private static void handleUnShareQuery(SenzorApplication application, Query query) {
         // get match user and sensor
         User user = new SenzorsDbSource(application.getApplicationContext()).getOrCreateUser(query.getUser(), "email");
-        Sensor sensor = new Sensor("0", "Location", "Location", false, false, user, null);
+        Sensor sensor = new Sensor("0", "Location", "Location", false, user, null);
         try {
             // delete sensor  from db
             // new SenzorsDbSource(application.getApplicationContext()).deleteSharedUser(user);

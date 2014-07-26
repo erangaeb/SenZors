@@ -35,7 +35,6 @@ public class HomeActivity extends FragmentActivity {
 
     private static final String TAG = HomeActivity.class.getName();
 
-    private SenzorApplication application;
     private DataUpdateReceiver dataUpdateReceiver;
 
     // Ui components
@@ -55,7 +54,6 @@ public class HomeActivity extends FragmentActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home_layout);
-        application = (SenzorApplication)this.getApplication();
 
         initDrawer();
         initDrawerList();

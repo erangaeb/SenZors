@@ -11,16 +11,14 @@ public class Sensor {
     String sensorName;
     String sensorValue;
     boolean isMySensor;
-    boolean isAvailable;
     User user;
     ArrayList<User> sharedUsers;
 
-    public Sensor(String id, String sensorName, String sensorValue, boolean isMySensor, boolean isAvailable, User user, ArrayList<User> sharedUsers) {
+    public Sensor(String id, String sensorName, String sensorValue, boolean isMySensor, User user, ArrayList<User> sharedUsers) {
         this.id = id;
         this.sensorName = sensorName;
         this.sensorValue = sensorValue;
         this.isMySensor = isMySensor;
-        this.isAvailable = isAvailable;
         this.user = user;
         this.sharedUsers = sharedUsers;
     }
@@ -55,14 +53,6 @@ public class Sensor {
 
     public void setMySensor(boolean mySensor) {
         isMySensor = mySensor;
-    }
-
-    public boolean isAvailable() {
-        return isAvailable;
-    }
-
-    public void setAvailable(boolean available) {
-        isAvailable = available;
     }
 
     public User getUser() {

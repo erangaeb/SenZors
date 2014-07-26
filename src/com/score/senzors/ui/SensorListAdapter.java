@@ -136,14 +136,8 @@ public class SensorListAdapter extends BaseAdapter {
         viewHolder.share.setVisibility(View.GONE);
         viewHolder.sensorName.setBackgroundResource(R.drawable.circle_shape_red);
         viewHolder.sensorUser.setTextColor(Color.parseColor("#d96459"));
-
-        if(sensor.isAvailable()) {
-            viewHolder.sensorUser.setText("@" + sensor.getUser().getUsername());
-            viewHolder.sensorValue.setText(sensor.getSensorValue());
-        } else {
-            viewHolder.sensorUser.setText("@" + sensor.getUser().getUsername());
-            viewHolder.sensorValue.setText(R.string.tap_here);
-        }
+        viewHolder.sensorUser.setText("@" + sensor.getUser().getUsername());
+        viewHolder.sensorValue.setText(R.string.tap_here);
     }
 
     private void setUpFriendSensor(Sensor sensor, View view, ViewHolder viewHolder) {
@@ -152,14 +146,8 @@ public class SensorListAdapter extends BaseAdapter {
         viewHolder.share.setVisibility(View.GONE);
         viewHolder.sensorName.setBackgroundResource(R.drawable.circle_shape_green);
         viewHolder.sensorUser.setTextColor(Color.parseColor("#11b29c"));
-
-        if(sensor.isAvailable()) {
-            viewHolder.sensorUser.setText("@" + sensor.getUser().getUsername());
-            viewHolder.sensorValue.setText(sensor.getSensorValue());
-        } else {
-            viewHolder.sensorUser.setText("@" + sensor.getUser().getUsername());
-            viewHolder.sensorValue.setText(R.string.tap_here);
-        }
+        viewHolder.sensorUser.setText("@" + sensor.getUser().getUsername());
+        viewHolder.sensorValue.setText(R.string.tap_here);
     }
 
     /**

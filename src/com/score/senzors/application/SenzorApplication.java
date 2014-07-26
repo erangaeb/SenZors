@@ -163,7 +163,7 @@ public class SenzorApplication extends Application {
             // TODO add more available sensors
             try {
                 User user = PreferenceUtils.getUser(this);
-                Sensor sensor = new Sensor("0", "Location", "LocationValue", true, false, user, null);
+                Sensor sensor = new Sensor("0", "Location", "LocationValue", true, user, null);
                 new SenzorsDbSource(this).addSensor(sensor);
 
                 // reset first time status

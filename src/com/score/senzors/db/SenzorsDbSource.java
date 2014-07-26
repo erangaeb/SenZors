@@ -179,7 +179,7 @@ public class SenzorsDbSource {
             // save to list
             user = new User(userId, username, email, "password");
             ArrayList<User> sharedUsers = getSharedUsers(sensorId, db);
-            sensor = new Sensor(sensorId, sensorName, sensorValue, isMySensor, false, user, sharedUsers);
+            sensor = new Sensor(sensorId, sensorName, sensorValue, isMySensor, user, sharedUsers);
             sensorList.add(sensor);
 
             Log.d(TAG, "GetSensors: sensor name - " + sensor.getSensorName());
