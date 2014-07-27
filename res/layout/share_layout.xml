@@ -53,7 +53,7 @@
                     android:layout_height="fill_parent"
                     android:layout_marginTop="20dp"
                     android:layout_marginBottom="20dp"
-                    android:orientation="vertical" >
+                    android:orientation="vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -63,11 +63,11 @@
                     android:layout_marginBottom="5dp"
                     android:textColor="#4a4a4a"
                     android:id="@+id/share_layout_username_label"
-                    android:text="Username">
+                    android:text="Phone no">
                 </TextView>
 
                 <EditText
-                        android:id="@+id/share_layout_username_text"
+                        android:id="@+id/share_layout_phone_no"
                         android:layout_width="fill_parent"
                         android:layout_height="45dp"
                         android:paddingLeft="10dp"
@@ -78,7 +78,7 @@
                         android:cursorVisible="true"
                         android:textCursorDrawable="@null"
                         android:background="@drawable/edit_text_shape"
-                        android:inputType="textEmailAddress"
+                        android:inputType="phone"
                         android:textSize="16sp" >
                 </EditText>
             </LinearLayout>

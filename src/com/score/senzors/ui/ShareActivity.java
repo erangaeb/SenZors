@@ -77,7 +77,7 @@ public class ShareActivity extends Activity implements Handler.Callback {
         Typeface typefaceThin = Typeface.createFromAsset(this.getAssets(), "fonts/vegur_2.otf");
 
         usernameLabel = (TextView) findViewById(R.id.share_layout_username_label);
-        usernameEditText = (EditText) findViewById(R.id.share_layout_username_text);
+        usernameEditText = (EditText) findViewById(R.id.share_layout_phone_no);
 
         // Set up action bar.
         // Specify that the Home button should show an "Up" caret, indicating that touching the

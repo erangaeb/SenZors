@@ -46,7 +46,7 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
     private RelativeLayout signUpButton;
 
     // keep user object to use in this activity
-    User thiUser;
+    User loginUser;
 
     /**
      * {@inheritDoc}
@@ -89,8 +89,8 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
     private void initUi() {
         Typeface typefaceThin = Typeface.createFromAsset(getAssets(), "fonts/vegur_2.otf");
 
-        editTextUsername = (EditText) findViewById(R.id.phone_no);
-        editTextPassword = (EditText) findViewById(R.id.password);
+        editTextUsername = (EditText) findViewById(R.id.login_phone_no);
+        editTextPassword = (EditText) findViewById(R.id.login_password);
         signInButton = (RelativeLayout) findViewById(R.id.sign_in_button_panel);
         signUpButton = (RelativeLayout) findViewById(R.id.not_registered);
         headerText = (TextView) findViewById(R.id.header_text);
@@ -123,12 +123,12 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
     }
 
     /**
-     * Initialize this user object
+     * Initialize login user object
      */
-    private void initThisUser() {
+    private void initLoginUser() {
         String username = editTextUsername.getText().toString().trim();
         String password = editTextPassword.getText().toString().trim();
-        thiUser = new User("0", username, username, password);
+        loginUser = new User("0", username, username, password);
     }
 
     /**
@@ -137,7 +137,6 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
     @Override
     public void onClick(View v) {
         if (v==signInButton) {
-            initThisUser();
             login();
         } else if(v==signUpButton) {
             switchToRegister();
@@ -150,7 +149,8 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
      */
     private void login() {
         if(NetworkUtil.isAvailableNetwork(LoginActivity.this)) {
-            if(ActivityUtils.isValidLoginFields(thiUser.getUsername(), thiUser.getPassword())) {
+            initLoginUser();
+            if(ActivityUtils.isValidLoginFields(loginUser)) {
                 // open web socket and send username password fields
                 // we are authenticate with web sockets
                 if(!application.getWebSocketConnection().isConnected()) {
@@ -211,7 +211,7 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
                 // so send PUT query to create user
                 try {
                     if(application.getWebSocketConnection().isConnected()) {
-                        String loginQuery = QueryHandler.getLoginQuery(thiUser.getUsername(), thiUser.getPassword(), PreferenceUtils.getSessionKey(this));
+                        String loginQuery = QueryHandler.getLoginQuery(loginUser, PreferenceUtils.getSessionKey(this));
                         System.out.println("------login query------");
                         System.out.println(loginQuery);
                         application.getWebSocketConnection().sendTextMessage(loginQuery);

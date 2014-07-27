@@ -49,7 +49,7 @@
                         android:inputType="phone"
                         android:layout_below="@+id/header_text"
                         android:background="@drawable/username_field_shape"
-                        android:id="@+id/phone_no">
+                        android:id="@+id/login_phone_no">
                 </EditText>
 
                 <EditText
@@ -64,9 +64,9 @@
                         android:textColor="#ffffff"
                         android:textColorHint="#ffffff"
                         android:inputType="text"
-                        android:layout_below="@+id/phone_no"
+                        android:layout_below="@+id/login_phone_no"
                         android:background="@drawable/username_field_shape"
-                        android:id="@+id/password">
+                        android:id="@+id/login_password">
                 </EditText>
             </RelativeLayout>
 

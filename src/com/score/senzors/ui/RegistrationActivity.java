@@ -35,17 +35,19 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
 
     private static final String TAG = RegistrationActivity.class.getName();
     private final WebSocketConnection webSocketConnection = new WebSocketConnection();
-
     private SenzorApplication application;
 
     // UI fields
     private EditText editTextPhoneNo;
-    private EditText editTextUsername;
+    private EditText editTextEmail;
     private EditText editTextPassword;
     private EditText editTextConfirmPassword;
     private TextView textViewHeaderText;
     private TextView textViewSignUpText;
     private RelativeLayout signUpButton;
+
+    // registration deal with User object
+    User registeringUser;
 
     /**
      * {@inheritDoc}
@@ -67,7 +69,7 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
         Typeface typefaceThin = Typeface.createFromAsset(getAssets(), "fonts/vegur_2.otf");
 
         editTextPhoneNo = (EditText) findViewById(R.id.registration_phone_no);
-        editTextUsername = (EditText) findViewById(R.id.registration_username);
+        editTextEmail = (EditText) findViewById(R.id.registration_email);
         editTextPassword = (EditText) findViewById(R.id.registration_password);
         editTextConfirmPassword = (EditText) findViewById(R.id.registration_confirm_password);
         signUpButton = (RelativeLayout) findViewById(R.id.registration_sign_up_button);
@@ -78,9 +80,20 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
         textViewHeaderText.setTypeface(typefaceThin, Typeface.BOLD);
         textViewSignUpText.setTypeface(typefaceThin, Typeface.BOLD);
         editTextPhoneNo.setTypeface(typefaceThin, Typeface.NORMAL);
-        editTextUsername.setTypeface(typefaceThin, Typeface.NORMAL);
+        editTextEmail.setTypeface(typefaceThin, Typeface.NORMAL);
         editTextPassword.setTypeface(typefaceThin, Typeface.NORMAL);
         editTextConfirmPassword.setTypeface(typefaceThin, Typeface.NORMAL);
+    }
+
+    /**
+     * Initialize user object
+     */
+    private void initRegisteringUser() {
+        String phoneNo = editTextPhoneNo.getText().toString().trim();
+        String email = editTextEmail.getText().toString().trim();
+        String password = editTextPassword.getText().toString().trim();
+
+        registeringUser = new User("0", phoneNo, email, password);
     }
 
     /**
@@ -99,14 +112,11 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
      * the user
      */
     private void signUp() {
-        // validate UI fields
-        String phoneNo = editTextPhoneNo.getText().toString().trim();
-        String username = editTextUsername.getText().toString().trim();
-        String password = editTextPassword.getText().toString().trim();
+        initRegisteringUser();
         String confirmPassword = editTextConfirmPassword.getText().toString().trim();
 
         try {
-            ActivityUtils.isValidRegistrationFields(phoneNo, username, password, confirmPassword);
+            ActivityUtils.isValidRegistrationFields(registeringUser, confirmPassword);
 
             ActivityUtils.hideSoftKeyboard(this);
             ActivityUtils.showProgressDialog(this, "Registering...");
@@ -167,12 +177,8 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
             if (payLoad.equalsIgnoreCase("SERVER_KEY_EXTRACTION_SUCCESS")) {
                 // server key extraction success
                 // so send PUT query to create user
-                String phoneNo = editTextPhoneNo.getText().toString().trim();
-                String username = editTextUsername.getText().toString().trim();
-                String password = editTextPassword.getText().toString().trim();
-
                 try {
-                    String putQuery = QueryHandler.getRegistrationQuery(phoneNo, username, password);
+                    String putQuery = QueryHandler.getRegistrationQuery(registeringUser);
                     System.out.println("------put query------");
                     System.out.println(putQuery);
 
@@ -196,11 +202,8 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
 
                 // create user from here
                 // we don't store passwords in DB, so when save user in shared preference need to set password
-                String username = editTextUsername.getText().toString().trim();
-                String email = editTextUsername.getText().toString().trim();
-                String password = editTextPassword.getText().toString().trim();
-                User user = new SenzorsDbSource(this).getOrCreateUser(username, email);
-                user.setPassword(password);
+                User user = new SenzorsDbSource(this).getOrCreateUser(registeringUser.getUsername(), registeringUser.getEmail());
+                user.setPassword(registeringUser.getPassword());
                 PreferenceUtils.saveUser(this, user);
 
                 // disconnect at the end

@@ -57,16 +57,16 @@
                         android:layout_height="40dp"
                         android:layout_marginTop="25dp"
                         android:paddingLeft="15dp"
-                        android:hint="Username"
+                        android:hint="Email"
                         android:textSize="16sp"
                         android:singleLine="true"
                         android:textStyle="bold"
                         android:textColor="#ffffff"
                         android:textColorHint="#ffffff"
-                        android:inputType="text"
+                        android:inputType="textEmailAddress"
                         android:layout_below="@+id/registration_phone_no"
                         android:background="@drawable/username_field_shape"
-                        android:id="@+id/registration_username">
+                        android:id="@+id/registration_email">
 
                 </EditText>
 
@@ -83,7 +83,7 @@
                         android:singleLine="true"
                         android:password="true"
                         android:background="@drawable/username_field_shape"
-                        android:layout_below="@+id/registration_username"
+                        android:layout_below="@+id/registration_email"
                         android:id="@+id/registration_password">
                 </EditText>
 

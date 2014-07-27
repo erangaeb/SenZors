@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.score.senzors.R;
 import com.score.senzors.exceptions.InvalidInputFieldsException;
 import com.score.senzors.exceptions.MismatchPasswordException;
+import com.score.senzors.pojos.User;
 
 /**
  * Utility class to handle activity related common functions
@@ -82,14 +83,16 @@ public class ActivityUtils {
      *      3. non empty passwords
      *      4. two passwords should be match
      *
+     * @param user User object
+     * @param confirmPassword password
      * @return valid or not
      */
-    public static boolean isValidRegistrationFields(String phoneNo, String username, String password, String confirmPassword) throws InvalidInputFieldsException, MismatchPasswordException {
-        if (phoneNo.isEmpty() || username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+    public static boolean isValidRegistrationFields(User user, String confirmPassword) throws InvalidInputFieldsException, MismatchPasswordException {
+        if (user.getUsername().isEmpty() || user.getEmail().isEmpty() || user.getPassword().isEmpty() || confirmPassword.isEmpty()) {
             throw new InvalidInputFieldsException();
         }
 
-        if (!password.equals(confirmPassword)) {
+        if (!user.getPassword().equals(confirmPassword)) {
             throw new MismatchPasswordException();
         }
 
@@ -98,13 +101,11 @@ public class ActivityUtils {
 
     /**
      * validate input fields of login form
-     * @param username username text
-     * @param password password text
+     * @param user login user
      * @return valid of not
      */
-    public static boolean isValidLoginFields(String username, String password) {
-        return !(username.isEmpty() || password.isEmpty());
-
+    public static boolean isValidLoginFields(User user) {
+        return !(user.getUsername().isEmpty() || user.getPassword().isEmpty());
     }
 
     /**
