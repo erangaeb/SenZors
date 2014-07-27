@@ -2,18 +2,12 @@ package com.score.senzors.ui;
 
 import android.app.ActionBar;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.NavUtils;
+import android.support.v4.app.*;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.score.senzors.R;
 import com.score.senzors.pojos.Sensor;
@@ -26,58 +20,92 @@ import com.score.senzors.utils.ActivityUtils;
  * @author erangaeb@gmail.com (eranga herath)
  */
 public class SensorDetailsActivity extends FragmentActivity {
-    ViewPager Tab;
-    TabPagerAdapater TabAdapter;
     ActionBar actionBar;
-    Typeface typefaceThin;
-    TextView actionBarTitle;
+    ViewPager viewPager;
+    TabPagerAdapter tabPagerAdapter;
 
-    // Activity deal with this Sensor
+    // activity interact with this Sensor
     Sensor thisSensor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sensor_details_layout);
-        initThisInvoice();
 
-        // set custom font for
-        //  1. action bar title
-        //  2. other ui texts
-        actionBar = getActionBar();
-        typefaceThin = Typeface.createFromAsset(this.getAssets(), "fonts/vegur_2.otf");
-        int titleId = getResources().getIdentifier("action_bar_title", "id", "android");
-        actionBarTitle = (TextView) (this.findViewById(titleId));
-        actionBarTitle.setTextColor(getResources().getColor(R.color.white));
-        actionBarTitle.setTypeface(typefaceThin);
-
-        TabAdapter = new TabPagerAdapater(getSupportFragmentManager());
-        Tab = (ViewPager)findViewById(R.id.pager);
-        Tab.setOnPageChangeListener(
-                new ViewPager.SimpleOnPageChangeListener() {
-                    @Override
-                    public void onPageSelected(int position) {
-                        actionBar = getActionBar();
-                        actionBar.setSelectedNavigationItem(position);
-                    }
-                });
-        Tab.setAdapter(TabAdapter);
-
-        //Enable Tabs on Action Bar
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setTitle("#Location @" + thisSensor.getUser().getUsername());
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-
-        setUp();
+        initThisSensor();
+        setUpActionBar();
+        setUpViewPager();
+        setUpTabListener();
     }
 
     /**
      * Sensor coming through bundle,
      * extract it and initialize the thisInvoice
      */
-    private void initThisInvoice() {
+    private void initThisSensor() {
         Bundle bundle = getIntent().getExtras();
         thisSensor = bundle.getParcelable("com.score.senzors.pojos.Sensor");
+    }
+
+    /**
+     * Set action bar title and font
+     */
+    private void setUpActionBar() {
+        actionBar = getActionBar();
+        int titleId = getResources().getIdentifier("action_bar_title", "id", "android");
+        TextView actionBarTitle = (TextView) (this.findViewById(titleId));
+
+        Typeface typefaceThin = Typeface.createFromAsset(this.getAssets(), "fonts/vegur_2.otf");
+        actionBarTitle.setTextColor(getResources().getColor(R.color.white));
+        actionBarTitle.setTypeface(typefaceThin);
+
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setTitle("#Location @" + thisSensor.getUser().getUsername());
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+    }
+
+    /**
+     * Set view pager components
+     */
+    private void setUpViewPager() {
+        tabPagerAdapter = new TabPagerAdapter(getSupportFragmentManager());
+        viewPager = (ViewPager)findViewById(R.id.pager);
+        viewPager.setOnPageChangeListener(
+                new ViewPager.SimpleOnPageChangeListener() {
+                    @Override
+                    public void onPageSelected(int position) {
+                        actionBar.setSelectedNavigationItem(position);
+                    }
+                });
+        viewPager.setAdapter(tabPagerAdapter);
+    }
+
+    /**
+     * Set actionbar tab listener
+     * Set custom view for tab
+     */
+    private void setUpTabListener() {
+        // tab listener
+        ActionBar.TabListener tabListener = new ActionBar.TabListener() {
+            @Override
+            public void onTabSelected(ActionBar.Tab tab, android.app.FragmentTransaction ft) {
+                viewPager.setCurrentItem(tab.getPosition());
+            }
+
+            @Override
+            public void onTabUnselected(ActionBar.Tab tab, android.app.FragmentTransaction ft) {
+            }
+
+            @Override
+            public void onTabReselected(ActionBar.Tab tab, android.app.FragmentTransaction ft) {
+            }
+        };
+
+        // custom view for tab
+        TextView locationTabTextView = ActivityUtils.getCustomTextView(this, "Location");
+        TextView sharingTabTextView = ActivityUtils.getCustomTextView(this, thisSensor.isMySensor() ? "Shared with" : "Shared by");
+        actionBar.addTab(actionBar.newTab().setCustomView(locationTabTextView).setTabListener(tabListener));
+        actionBar.addTab(actionBar.newTab().setCustomView(sharingTabTextView).setTabListener(tabListener));
     }
 
     /**
@@ -106,7 +134,6 @@ public class SensorDetailsActivity extends FragmentActivity {
         switch (item.getItemId()) {
             case android.R.id.home:
                 // navigate to home with effective navigation
-                Log.d("TAG", "OnOptionsItemSelected: click home menu");
                 NavUtils.navigateUpFromSameTask(this);
                 this.overridePendingTransition(R.anim.stay_in, R.anim.right_out);
                 ActivityUtils.hideSoftKeyboard(this);
@@ -114,8 +141,8 @@ public class SensorDetailsActivity extends FragmentActivity {
                 return true;
             case R.id.action_share:
                 // start share activity
-                Log.d("TAG", "OnOptionsItemSelected: click share menu");
                 Intent intent = new Intent(this, ShareActivity.class);
+                intent.putExtra("com.score.senzors.pojos.Sensor", thisSensor);
                 this.startActivity(intent);
                 this.overridePendingTransition(R.anim.bottom_in, R.anim.stay_in);
 
@@ -131,53 +158,31 @@ public class SensorDetailsActivity extends FragmentActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-
-        Log.d("TAG", "OnBackPressed: go back");
         this.overridePendingTransition(R.anim.stay_in, R.anim.right_out);
     }
 
-    private void setUp() {
-        ActionBar.TabListener tabListener = new ActionBar.TabListener() {
-            @Override
-            public void onTabSelected(ActionBar.Tab tab, android.app.FragmentTransaction ft) {
-                //To change body of implemented methods use File | Settings | File Templates.
-                Tab.setCurrentItem(tab.getPosition());
+    /**
+     * Tab adapter to implement swipe view
+     * Pass data to fragment on selection
+     */
+    public class TabPagerAdapter extends FragmentStatePagerAdapter {
+        public TabPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+        @Override
+        public Fragment getItem(int i) {
+            switch (i) {
+                case 0:
+                    return new SensorMapFragment();
+                case 1:
+                    return new FriendList();
             }
-
-            @Override
-            public void onTabUnselected(ActionBar.Tab tab, android.app.FragmentTransaction ft) {
-                //To change body of implemented methods use File | Settings | File Templates.
-            }
-
-            @Override
-            public void onTabReselected(ActionBar.Tab tab, android.app.FragmentTransaction ft) {
-                //To change body of implemented methods use File | Settings | File Templates.
-            }
-        };
-
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-
-        final TextView t1 = new TextView(this);
-        t1.setText("Location");
-        t1.setTypeface(typefaceThin);
-        t1.setTextColor(Color.parseColor("#4a4a4a"));
-        t1.setGravity(Gravity.CENTER);
-        t1.setTextSize(18);
-        t1.setLayoutParams(params);
-
-        final TextView t2 = new TextView(this);
-        if (thisSensor.isMySensor()) t2.setText("Shared with");
-        else t2.setText("Shared by");
-
-        t2.setTypeface(typefaceThin);
-        t2.setGravity(Gravity.CENTER);
-        t2.setTextColor(Color.parseColor("#4a4a4a"));
-        t2.setLayoutParams(params);
-        t2.setTextSize(18);
-
-        //Add New Tab
-        actionBar.addTab(actionBar.newTab().setCustomView(t1).setTabListener(tabListener));
-        actionBar.addTab(actionBar.newTab().setCustomView(t2).setTabListener(tabListener));
+            return null;
+        }
+        @Override
+        public int getCount() {
+            return 2;
+        }
     }
 
 }
