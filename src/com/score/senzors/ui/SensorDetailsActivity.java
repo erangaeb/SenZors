@@ -175,7 +175,7 @@ public class SensorDetailsActivity extends FragmentActivity {
                 case 0:
                     return new SensorMapFragment();
                 case 1:
-                    return new FriendList();
+                    return new SharingList();
             }
             return null;
         }

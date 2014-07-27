@@ -28,31 +28,24 @@ import java.util.Iterator;
  *
  * @author erangaeb@gmail.com (eranga herath)
  */
-public class FriendList extends Fragment implements Handler.Callback {
+public class SharingList extends Fragment implements Handler.Callback {
 
-    private static final String TAG = FriendList.class.getName();
+    private static final String TAG = SharingList.class.getName();
 
     // use to populate list
     private SenzorApplication application;
     private ListView friendListView;
     private ArrayList<User> userList;
-    private FriendListAdapter adapter;
-
-    Typeface typeface;
+    private SharingListAdapter adapter;
+    private ViewStub emptyView;
 
     private User unSharingUser;
-
-    // to handle empty view
-    private ViewStub emptyView;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
         // after creating fragment we initialize friend list
-        // TODO need to fill friend list with backend data
-        //getActivity().getActionBar().setTitle("Friends");
-        typeface = Typeface.createFromAsset(this.getActivity().getAssets(), "fonts/vegur_2.otf");
         application = (SenzorApplication) this.getActivity().getApplication();
         initEmptyView();
         initFriendList();
@@ -61,7 +54,7 @@ public class FriendList extends Fragment implements Handler.Callback {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
         ViewGroup root = (ViewGroup) inflater.inflate(R.layout.friend_list_layout, null);
-        initUI(root);
+        initUi(root);
 
         return root;
     }
@@ -76,7 +69,7 @@ public class FriendList extends Fragment implements Handler.Callback {
 
         // construct list adapter
         if(userList.size()>0) {
-            adapter = new FriendListAdapter(FriendList.this, userList);
+            adapter = new SharingListAdapter(SharingList.this, userList);
             friendListView.setAdapter(adapter);
         } else {
             friendListView.setEmptyView(emptyView);
@@ -86,7 +79,7 @@ public class FriendList extends Fragment implements Handler.Callback {
     /**
      * Initialize UI components
      */
-    private void initUI(View view) {
+    private void initUi(View view) {
         friendListView = (ListView)view.findViewById(R.id.friend_list_layout_friend_list);
 
         // add header and footer for list
@@ -101,7 +94,7 @@ public class FriendList extends Fragment implements Handler.Callback {
      * empty view need to be display when no sensors available
      */
     private void initEmptyView() {
-        //Log.d(TAG, "InitEmptyView: initializing empty view");
+        Typeface typeface = Typeface.createFromAsset(this.getActivity().getAssets(), "fonts/vegur_2.otf");
         emptyView = (ViewStub) getActivity().findViewById(R.id.sensor_list_layout_empty_view);
         View inflatedEmptyView = emptyView.inflate();
         TextView emptyText = (TextView) inflatedEmptyView.findViewById(R.id.empty_text);
@@ -127,7 +120,7 @@ public class FriendList extends Fragment implements Handler.Callback {
 
         // construct list adapter
         if(userList.size()>0) {
-            adapter = new FriendListAdapter(FriendList.this, userList);
+            adapter = new SharingListAdapter(SharingList.this, userList);
             friendListView.setAdapter(adapter);
         } else {
             friendListView.setEmptyView(emptyView);
@@ -155,7 +148,7 @@ public class FriendList extends Fragment implements Handler.Callback {
      *
      * @param user user
      */
-    public void unShare(User user) {
+    public void unshare(User user) {
         unSharingUser = user;
         String query = ":SHARE" + " " + "#lat #lon" + " " + "@" + user.getUsername().trim();
         Log.d(TAG, "UnShare: un-sharing query " + query);
@@ -210,8 +203,8 @@ public class FriendList extends Fragment implements Handler.Callback {
 
                         // get sensor list again
                         // refresh list
-                        FriendList.this.removeUserFromList(unSharingUser);
-                        FriendList.this.initFriendList();
+                        SharingList.this.removeUserFromList(unSharingUser);
+                        SharingList.this.initFriendList();
                     }
                 } else {
                     // friend sensor
