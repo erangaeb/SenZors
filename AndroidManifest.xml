@@ -103,6 +103,16 @@
         </activity>
 
         <activity
+                android:name=".ui.FriendListActivity"
+                android:screenOrientation="portrait"
+                android:configChanges="orientation"
+                android:theme="@style/Theme.Yello"
+                android:windowSoftInputMode="stateHidden"
+                android:launchMode="singleTask"
+                android:parentActivityName="com.score.senzors.ui.SensorDetailsActivity">
+        </activity>
+
+        <activity
             android:name=".ui.SplashActivity"
             android:screenOrientation="portrait"
             android:configChanges="orientation"

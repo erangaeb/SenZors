@@ -122,6 +122,10 @@ public class SenzorApplication extends Application implements ContactReaderListe
         this.mySensorList = mySensorList;
     }
 
+    public ArrayList<User> getContactList() {
+        return contactList;
+    }
+
     public Query getRequestQuery() {
         return requestQuery;
     }

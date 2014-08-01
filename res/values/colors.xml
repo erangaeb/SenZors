@@ -26,4 +26,5 @@
     <color name="gray">#333333</color>
     <color name="light_gray">#515151</color>
     <color name="transparent">#00000000</color>
+    <color name="yello">#ffc027</color>
 </resources>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:background="@drawable/my_sensor_background"
+        android:layout_height="60dp">
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+        <RelativeLayout
+            android:layout_width="60dp"
+            android:id="@+id/friend_list_row_layout_user_icon"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_height="fill_parent">
+            <!--<ImageView-->
+                <!--android:layout_height="32dp"-->
+                <!--android:layout_width="32dp"-->
+                <!--android:id="@+id/user_icon"-->
+                <!--android:layout_centerInParent="true"-->
+                <!--android:src="@drawable/my_icon">-->
+            <!--</ImageView>-->
+            <TextView
+                android:id="@+id/icon_text"
+                android:layout_centerInParent="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="30sp"
+                android:text="#"/>
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/friend_list_row_layout_name"
+            android:layout_toRightOf="@+id/friend_list_row_layout_user_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:textSize="20dp"
+            android:text="itseranga"
+            android:textColor="#4a4a4a">
+        </TextView>
+
+        <!-- divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_alignParentBottom="true"
+            android:background="#DADADC" >
+        </View>
+    </RelativeLayout>
+
+</LinearLayout>
