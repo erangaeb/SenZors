@@ -63,7 +63,7 @@
                         android:textStyle="bold"
                         android:textColor="#ffffff"
                         android:textColorHint="#ffffff"
-                        android:inputType="text"
+                        android:inputType="textPassword"
                         android:layout_below="@+id/login_phone_no"
                         android:background="@drawable/username_field_shape"
                         android:id="@+id/login_password">

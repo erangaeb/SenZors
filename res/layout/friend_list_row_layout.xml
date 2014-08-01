@@ -10,24 +10,20 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent">
         <RelativeLayout
-            android:layout_width="60dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_margin="10dp"
             android:id="@+id/friend_list_row_layout_user_icon"
             android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:layout_height="fill_parent">
-            <!--<ImageView-->
-                <!--android:layout_height="32dp"-->
-                <!--android:layout_width="32dp"-->
-                <!--android:id="@+id/user_icon"-->
-                <!--android:layout_centerInParent="true"-->
-                <!--android:src="@drawable/my_icon">-->
-            <!--</ImageView>-->
+            android:background="@drawable/circle_shape_gray"
+            android:layout_centerVertical="true">
             <TextView
                 android:id="@+id/icon_text"
                 android:layout_centerInParent="true"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="30sp"
+                android:textSize="24sp"
+                android:textColor="#ffffff"
                 android:text="#"/>
         </RelativeLayout>
 
@@ -37,6 +33,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
+            android:layout_marginLeft="5dp"
             android:textSize="20dp"
             android:text="itseranga"
             android:textColor="#4a4a4a">

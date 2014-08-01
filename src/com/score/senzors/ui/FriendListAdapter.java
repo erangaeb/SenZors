@@ -85,11 +85,10 @@ public class FriendListAdapter extends BaseAdapter implements Filterable {
             LayoutInflater layoutInflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             view = layoutInflater.inflate(R.layout.friend_list_row_layout, parent, false);
             holder = new ViewHolder();
-            //holder.userIcon = (ImageView) view.findViewById(R.id.user_icon);
             holder.iconText = (TextView) view.findViewById(R.id.icon_text);
             holder.name = (TextView) view.findViewById(R.id.friend_list_row_layout_name);
             holder.iconText.setTypeface(typeface, Typeface.BOLD);
-            holder.iconText.setTextColor(activity.getResources().getColor(R.color.yello));
+            holder.iconText.setTextColor(activity.getResources().getColor(R.color.white));
             holder.name.setTypeface(typeface, Typeface.NORMAL);
 
             view.setTag(holder);
@@ -99,7 +98,6 @@ public class FriendListAdapter extends BaseAdapter implements Filterable {
         }
 
         // bind text with view holder content view for efficient use
-        //holder.userIcon.setBackgroundResource(R.drawable.my_icon);
         holder.iconText.setText("#");
         holder.name.setText(user.getEmail());
         view.setBackgroundResource(R.drawable.friend_list_selector);
@@ -124,7 +122,6 @@ public class FriendListAdapter extends BaseAdapter implements Filterable {
      * Keep reference to children view to avoid unnecessary calls
      */
     static class ViewHolder {
-        ImageView userIcon;
         TextView iconText;
         TextView name;
     }

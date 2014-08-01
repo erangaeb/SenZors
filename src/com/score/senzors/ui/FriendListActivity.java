@@ -5,8 +5,11 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.SearchView;
@@ -14,6 +17,7 @@ import android.widget.TextView;
 import com.score.senzors.R;
 import com.score.senzors.application.SenzorApplication;
 import com.score.senzors.pojos.User;
+import com.score.senzors.utils.ActivityUtils;
 
 import java.util.ArrayList;
 
@@ -57,6 +61,23 @@ public class FriendListActivity extends Activity implements SearchView.OnQueryTe
         searchView.setOnQueryTextListener(this);
 
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                FriendListActivity.this.finish();
+                FriendListActivity.this.overridePendingTransition(R.anim.stay_in, R.anim.bottom_out);
+                ActivityUtils.hideSoftKeyboard(this);
+
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     /**
@@ -115,7 +136,7 @@ public class FriendListActivity extends Activity implements SearchView.OnQueryTe
     @Override
     public boolean onQueryTextChange(String newText) {
         friendListAdapter.getFilter().filter(newText);
-        
+
         return true;
     }
 }
