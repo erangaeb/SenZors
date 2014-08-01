@@ -1,10 +1,16 @@
 package com.score.senzors.ui;
 
 import android.app.Activity;
+import android.app.SearchManager;
+import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.TextView;
 import com.score.senzors.R;
 import com.score.senzors.application.SenzorApplication;
@@ -17,7 +23,7 @@ import java.util.ArrayList;
  *
  * @author eranga herath(erangeb@gmail.com)
  */
-public class FriendListActivity extends Activity {
+public class FriendListActivity extends Activity implements SearchView.OnQueryTextListener {
 
     private SenzorApplication application;
     private ListView friendListView;
@@ -34,6 +40,24 @@ public class FriendListActivity extends Activity {
 
         setActionBar();
         initFriendList();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.search_menu, menu);
+
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE );
+        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setSubmitButtonEnabled(true);
+        searchView.setOnQueryTextListener(this);
+
+        return true;
     }
 
     /**
@@ -66,6 +90,7 @@ public class FriendListActivity extends Activity {
         friendListView.addHeaderView(headerView);
         friendListView.addFooterView(footerView);
         friendListView.setAdapter(friendListAdapter);
+        friendListView.setTextFilterEnabled(true);
     }
 
     /**
@@ -75,5 +100,29 @@ public class FriendListActivity extends Activity {
     public void onBackPressed() {
         super.onBackPressed();
         this.overridePendingTransition(R.anim.stay_in, R.anim.bottom_out);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        // search adapter according to search text
+        if (TextUtils.isEmpty(newText)) {
+            friendListView.clearTextFilter();
+        }
+        else {
+            friendListView.setFilterText(newText.toString());
+        }
+
+        return true;
     }
 }

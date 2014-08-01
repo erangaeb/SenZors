@@ -5,9 +5,7 @@ import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.*;
 import com.score.senzors.R;
 import com.score.senzors.pojos.User;
 
@@ -18,11 +16,13 @@ import java.util.ArrayList;
  *
  * @author eranga herath(erangaeb@gmail.com)
  */
-public class FriendListAdapter extends BaseAdapter {
+public class FriendListAdapter extends BaseAdapter implements Filterable {
 
     private FriendListActivity activity;
+    private FriendFilter friendFilter;
     private Typeface typeface;
     private ArrayList<User> friendList;
+    private ArrayList<User> filteredList;
 
     /**
      * Initialize context variables
@@ -32,8 +32,10 @@ public class FriendListAdapter extends BaseAdapter {
     public FriendListAdapter(FriendListActivity activity, ArrayList<User> friendList) {
         this.activity = activity;
         this.friendList = friendList;
-
+        this.filteredList = friendList;
         typeface = Typeface.createFromAsset(activity.getAssets(), "fonts/vegur_2.otf");
+
+        getFilter();
     }
 
     /**
@@ -42,7 +44,7 @@ public class FriendListAdapter extends BaseAdapter {
      */
     @Override
     public int getCount() {
-        return friendList.size();
+        return filteredList.size();
     }
 
     /**
@@ -52,7 +54,7 @@ public class FriendListAdapter extends BaseAdapter {
      */
     @Override
     public Object getItem(int i) {
-        return friendList.get(i);
+        return filteredList.get(i);
     }
 
     /**
@@ -98,11 +100,24 @@ public class FriendListAdapter extends BaseAdapter {
 
         // bind text with view holder content view for efficient use
         //holder.userIcon.setBackgroundResource(R.drawable.my_icon);
-        holder.name.setText(user.getEmail());
+        holder.iconText.setText("#");
         holder.name.setText(user.getEmail());
         view.setBackgroundResource(R.drawable.friend_list_selector);
 
         return view;
+    }
+
+    /**
+     * Get custom filter
+     * @return filter
+     */
+    @Override
+    public Filter getFilter() {
+        if (friendFilter == null) {
+            friendFilter = new FriendFilter();
+        }
+
+        return friendFilter;
     }
 
     /**
@@ -112,6 +127,48 @@ public class FriendListAdapter extends BaseAdapter {
         ImageView userIcon;
         TextView iconText;
         TextView name;
+    }
+
+    /**
+     * Custom filter for friend list
+     * Filter content in friend list according to the search text
+     */
+    private class FriendFilter extends Filter {
+
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            FilterResults filterResults = new FilterResults();
+            if (constraint!=null && constraint.length()>0) {
+                ArrayList<User> tempList = new ArrayList<User>();
+
+                // search content in friend list
+                for (User user : friendList) {
+                    if (user.getEmail().toLowerCase().contains(constraint.toString().toLowerCase())) {
+                        tempList.add(user);
+                    }
+                }
+
+                filterResults.count = tempList.size();
+                filterResults.values = tempList;
+            } else {
+                filterResults.count = friendList.size();
+                filterResults.values = friendList;
+            }
+
+            return filterResults;
+        }
+
+        /**
+         * Notify about filtered list to ui
+         * @param constraint
+         * @param results
+         */
+        @SuppressWarnings("unchecked")
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            filteredList = (ArrayList<User>) results.values;
+            notifyDataSetChanged();
+        }
     }
 
 }
