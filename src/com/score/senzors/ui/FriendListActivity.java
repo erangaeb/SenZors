@@ -3,14 +3,14 @@ package com.score.senzors.ui;
 import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -111,6 +111,30 @@ public class FriendListActivity extends Activity implements SearchView.OnQueryTe
         friendListView.addFooterView(footerView);
         friendListView.setAdapter(friendListAdapter);
         friendListView.setTextFilterEnabled(false);
+
+        // set up click listener
+        friendListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if(position>0 && position <= friendList.size()) {
+                    ActivityUtils.hideSoftKeyboard(FriendListActivity.this);
+                    handelListItemClick(friendList.get(position-1));
+                }
+            }
+        });
+    }
+
+    /**
+     * Navigate to share activity form here
+     * @param user user
+     */
+    private void handelListItemClick(User user) {
+        // pass selected user and sensor to share activity
+        Intent intent = new Intent(this, ShareActivity.class);
+        intent.putExtra("com.score.senzors.pojos.User", user);
+        intent.putExtra("com.score.senzors.pojos.Sensor", application.getCurrentSensor());
+        this.startActivity(intent);
+        this.overridePendingTransition(R.anim.right_in, R.anim.stay_in);
     }
 
     /**

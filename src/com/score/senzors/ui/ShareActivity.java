@@ -19,7 +19,6 @@ import com.score.senzors.db.SenzorsDbSource;
 import com.score.senzors.pojos.User;
 import com.score.senzors.utils.ActivityUtils;
 import com.score.senzors.utils.NetworkUtil;
-import com.score.senzors.utils.Utils;
 
 /**
  * Activity class for sharing
@@ -41,7 +40,6 @@ public class ShareActivity extends Activity implements Handler.Callback {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.share_layout);
-
         application = (SenzorApplication) getApplication();
 
         initUi();
