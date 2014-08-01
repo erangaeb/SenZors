@@ -30,6 +30,8 @@ public class FriendListActivity extends Activity implements SearchView.OnQueryTe
 
     private SenzorApplication application;
     private ListView friendListView;
+    private SearchView searchView;
+    private MenuItem searchMenuItem;
     private FriendListAdapter friendListAdapter;
     private ArrayList<User> friendList;
 
@@ -54,7 +56,8 @@ public class FriendListActivity extends Activity implements SearchView.OnQueryTe
         inflater.inflate(R.menu.search_menu, menu);
 
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE );
-        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        searchMenuItem = menu.findItem(R.id.search);
+        searchView = (SearchView) searchMenuItem.getActionView();
 
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setSubmitButtonEnabled(true);
@@ -117,8 +120,7 @@ public class FriendListActivity extends Activity implements SearchView.OnQueryTe
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if(position>0 && position <= friendList.size()) {
-                    ActivityUtils.hideSoftKeyboard(FriendListActivity.this);
-                    handelListItemClick(friendList.get(position-1));
+                    handelListItemClick((User)friendListAdapter.getItem(position - 1));
                 }
             }
         });
@@ -129,6 +131,12 @@ public class FriendListActivity extends Activity implements SearchView.OnQueryTe
      * @param user user
      */
     private void handelListItemClick(User user) {
+        // close search view if its visible
+        if (searchView.isShown()) {
+            searchMenuItem.collapseActionView();
+            searchView.setQuery("", false);
+        }
+
         // pass selected user and sensor to share activity
         Intent intent = new Intent(this, ShareActivity.class);
         intent.putExtra("com.score.senzors.pojos.User", user);

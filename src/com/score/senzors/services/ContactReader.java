@@ -84,9 +84,7 @@ public class ContactReader extends AsyncTask<String, String, String > {
                     }
                     phoneCursor.close();
 
-                    System.out.println(name);
-                    System.out.println(phoneNumber);
-                    this.contactList.add(new User(contact_id, PhoneNumberUtils.formatNumber(phoneNumber), name, "password"));
+                    this.contactList.add(new User(contact_id, PhoneNumberUtils.formatNumber(phoneNumber).replace(" ", ""), name.toLowerCase(), "password"));
                 }
             }
         }

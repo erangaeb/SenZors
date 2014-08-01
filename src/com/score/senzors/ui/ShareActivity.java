@@ -6,7 +6,6 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.NavUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,6 +15,7 @@ import android.widget.Toast;
 import com.score.senzors.application.SenzorApplication;
 import com.score.senzors.R;
 import com.score.senzors.db.SenzorsDbSource;
+import com.score.senzors.pojos.Sensor;
 import com.score.senzors.pojos.User;
 import com.score.senzors.utils.ActivityUtils;
 import com.score.senzors.utils.NetworkUtil;
@@ -31,19 +31,19 @@ public class ShareActivity extends Activity implements Handler.Callback {
     private static final String TAG = ShareActivity.class.getName();
 
     private SenzorApplication application;
+    private Sensor sharingSensor;
+    private User sharingUser;
 
     private TextView usernameLabel;
     private EditText usernameEditText;
-
-    private User sharingUser;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.share_layout);
         application = (SenzorApplication) getApplication();
 
+        initSharingData();
         initUi();
-        Log.d(TAG, "OnCreate: activity created");
     }
 
     /**
@@ -52,8 +52,6 @@ public class ShareActivity extends Activity implements Handler.Callback {
     protected void onResume() {
         super.onResume();
 
-        // register handler from here
-        Log.d(TAG, "OnResume: set handler callback ShareActivity");
         application.setCallback(this);
     }
 
@@ -63,8 +61,6 @@ public class ShareActivity extends Activity implements Handler.Callback {
     protected void onPause() {
         super.onPause();
 
-        // un-register handler from here
-        Log.d(TAG, "OnPause: reset handler callback ShareActivity");
         application.setCallback(null);
     }
 
@@ -72,18 +68,18 @@ public class ShareActivity extends Activity implements Handler.Callback {
      * Initialize UI components
      */
     private void initUi() {
-        Log.d(TAG, "InitUI: initializing UI components");
         Typeface typefaceThin = Typeface.createFromAsset(this.getAssets(), "fonts/vegur_2.otf");
 
         usernameLabel = (TextView) findViewById(R.id.share_layout_username_label);
         usernameEditText = (EditText) findViewById(R.id.share_layout_phone_no);
+        usernameEditText.setText(sharingUser.getUsername());
 
         // Set up action bar.
         // Specify that the Home button should show an "Up" caret, indicating that touching the
         // button will take the user one step up in the application's hierarchy.
         final ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setTitle("Share");
+        actionBar.setTitle("Share @" + sharingUser.getEmail().toLowerCase());
 
         // set custom font for
         //  1. action bar title
@@ -94,6 +90,18 @@ public class ShareActivity extends Activity implements Handler.Callback {
         actionBarTitle.setTypeface(typefaceThin);
         usernameLabel.setTypeface(typefaceThin);
         usernameEditText.setTypeface(typefaceThin);
+    }
+
+    /**
+     * Initialize
+     *      1. Sensor
+     *      2. User
+     * extract it and initialize the thisInvoice
+     */
+    private void initSharingData() {
+        Bundle bundle = getIntent().getExtras();
+        sharingSensor = bundle.getParcelable("com.score.senzors.pojos.Sensor");
+        sharingUser = bundle.getParcelable("com.score.senzors.pojos.User");
     }
 
     /**
@@ -113,16 +121,12 @@ public class ShareActivity extends Activity implements Handler.Callback {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                // navigate to home with effective navigation
-                Log.d(TAG, "OnOptionsItemSelected: click home menu");
-                NavUtils.navigateUpFromSameTask(this);
-                ShareActivity.this.overridePendingTransition(R.anim.stay_in, R.anim.bottom_out);
+                ShareActivity.this.finish();
+                ShareActivity.this.overridePendingTransition(R.anim.stay_in, R.anim.right_out);
                 ActivityUtils.hideSoftKeyboard(this);
 
                 return true;
             case R.id.action_share_done:
-                // share sensor data
-                Log.d(TAG, "OnOptionsItemSelected: click share menu");
                 share();
 
                 return true;
@@ -146,14 +150,11 @@ public class ShareActivity extends Activity implements Handler.Callback {
             sharingUser = new User("id", username, "email : " + username, "password");
             if(application.getCurrentSensor().getSharedUsers().contains(sharingUser)) {
                 // already shared sensor
-                Log.d(TAG, "Share: already shared sensor with this user " + username);
                 Toast.makeText(ShareActivity.this, "Sensor already shared with " + username, Toast.LENGTH_LONG).show();
             } else {
-                Log.d(TAG, "Share: sensor not shared with this user " + username);
                 if(NetworkUtil.isAvailableNetwork(ShareActivity.this)) {
                     // construct query and send to server via web socket
                     if(application.getWebSocketConnection().isConnected()) {
-                        Log.w(TAG, "Share: sending query to server");
                         ActivityUtils.showProgressDialog(this, "Sharing sensor...");
                         application.getWebSocketConnection().sendTextMessage(query);
                     } else {
@@ -163,12 +164,10 @@ public class ShareActivity extends Activity implements Handler.Callback {
 
                     ActivityUtils.hideSoftKeyboard(this);
                 } else {
-                    Log.w(TAG, "Share: no network connection");
                     Toast.makeText(ShareActivity.this, "Cannot connect to server, Please check your network connection", Toast.LENGTH_LONG).show();
                 }
             }
         } else {
-            Log.e(TAG, "Share: empty username");
             Toast.makeText(ShareActivity.this, "Make sure non empty username", Toast.LENGTH_LONG).show();
         }
     }
@@ -192,7 +191,6 @@ public class ShareActivity extends Activity implements Handler.Callback {
         if(message.obj instanceof String) {
             String payLoad = (String)message.obj;
             ActivityUtils.cancelProgressDialog();
-            Log.d(TAG, "HandleMessage: message is a string " + payLoad);
 
             // successful login returns "ShareDone"
             if(payLoad.equalsIgnoreCase("ShareDone")) {
