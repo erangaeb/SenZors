@@ -19,6 +19,7 @@ import com.score.senzors.db.SenzorsDbSource;
 import com.score.senzors.pojos.User;
 import com.score.senzors.utils.ActivityUtils;
 import com.score.senzors.utils.NetworkUtil;
+import com.score.senzors.utils.Utils;
 
 /**
  * Activity class for sharing

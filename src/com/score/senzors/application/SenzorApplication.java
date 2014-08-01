@@ -5,10 +5,12 @@ import android.os.Handler;
 import android.os.Message;
 import com.score.senzors.db.SenzorsDbSource;
 import com.score.senzors.exceptions.NoUserException;
+import com.score.senzors.listeners.ContactReaderListener;
 import com.score.senzors.pojos.LatLon;
 import com.score.senzors.pojos.Query;
 import com.score.senzors.pojos.Sensor;
 import com.score.senzors.pojos.User;
+import com.score.senzors.services.ContactReader;
 import com.score.senzors.utils.PreferenceUtils;
 import de.tavendo.autobahn.WebSocket;
 import de.tavendo.autobahn.WebSocketConnection;
@@ -20,7 +22,7 @@ import java.util.ArrayList;
  *
  * @author erangaeb@gmail.com (eranga herath)
  */
-public class SenzorApplication extends Application {
+public class SenzorApplication extends Application implements ContactReaderListener {
 
     // determine sensor type
     //  1. my sensors
@@ -44,6 +46,9 @@ public class SenzorApplication extends Application {
     //  2. friends sensors(sensors shared by friends to me)
     private ArrayList<Sensor> friendSensorList;
     private ArrayList<Sensor> mySensorList;
+
+    // Contact list
+    private ArrayList<User> contactList;
 
     // to types of queries need to be shared in application
     //  1. GET query from friend
@@ -145,11 +150,15 @@ public class SenzorApplication extends Application {
      * Set up SenZors app, we do
      *  1. set the app for first time
      *  2. initialize sensors
+     *  3. read contact list
      */
     public void setUpSenzors() {
         addMySensorsToDb();
         initMySensors();
         initFriendsSensors();
+
+        // read contact list in background
+        new ContactReader(this).execute("READ");
     }
 
     /**
@@ -199,4 +208,12 @@ public class SenzorApplication extends Application {
         }
     }
 
+    /**
+     * Trigger contact reader task finish
+     * @param contactList user list
+     */
+    @Override
+    public void onPostReadContacts(ArrayList<User> contactList) {
+        this.contactList = contactList;
+    }
 }
