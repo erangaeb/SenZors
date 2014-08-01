@@ -53,7 +53,7 @@ public class SharingList extends Fragment implements Handler.Callback {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-        ViewGroup root = (ViewGroup) inflater.inflate(R.layout.friend_list_layout, null);
+        ViewGroup root = (ViewGroup) inflater.inflate(R.layout.sharing_list_layout, null);
         initUi(root);
 
         return root;
@@ -80,7 +80,7 @@ public class SharingList extends Fragment implements Handler.Callback {
      * Initialize UI components
      */
     private void initUi(View view) {
-        friendListView = (ListView)view.findViewById(R.id.friend_list_layout_friend_list);
+        friendListView = (ListView)view.findViewById(R.id.sharing_list);
 
         // add header and footer for list
         View headerView = View.inflate(this.getActivity(), R.layout.list_header, null);
@@ -95,7 +95,7 @@ public class SharingList extends Fragment implements Handler.Callback {
      */
     private void initEmptyView() {
         Typeface typeface = Typeface.createFromAsset(this.getActivity().getAssets(), "fonts/vegur_2.otf");
-        emptyView = (ViewStub) getActivity().findViewById(R.id.sensor_list_layout_empty_view);
+        emptyView = (ViewStub) getActivity().findViewById(R.id.sharing_list_empty_view);
         View inflatedEmptyView = emptyView.inflate();
         TextView emptyText = (TextView) inflatedEmptyView.findViewById(R.id.empty_text);
         emptyText.setText("Sensor not shared with any user");
