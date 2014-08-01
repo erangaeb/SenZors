@@ -5,7 +5,6 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
@@ -90,7 +89,7 @@ public class FriendListActivity extends Activity implements SearchView.OnQueryTe
         friendListView.addHeaderView(headerView);
         friendListView.addFooterView(footerView);
         friendListView.setAdapter(friendListAdapter);
-        friendListView.setTextFilterEnabled(true);
+        friendListView.setTextFilterEnabled(false);
     }
 
     /**
@@ -115,14 +114,8 @@ public class FriendListActivity extends Activity implements SearchView.OnQueryTe
      */
     @Override
     public boolean onQueryTextChange(String newText) {
-        // search adapter according to search text
-        if (TextUtils.isEmpty(newText)) {
-            friendListView.clearTextFilter();
-        }
-        else {
-            friendListView.setFilterText(newText.toString());
-        }
-
+        friendListAdapter.getFilter().filter(newText);
+        
         return true;
     }
 }
