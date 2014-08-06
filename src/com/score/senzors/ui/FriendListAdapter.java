@@ -157,8 +157,8 @@ public class FriendListAdapter extends BaseAdapter implements Filterable {
 
         /**
          * Notify about filtered list to ui
-         * @param constraint
-         * @param results
+         * @param constraint text
+         * @param results filtered result
          */
         @SuppressWarnings("unchecked")
         @Override
