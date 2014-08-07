@@ -65,7 +65,7 @@ public class ContactReader extends AsyncTask<String, String, String > {
         String NUMBER = ContactsContract.CommonDataKinds.Phone.NUMBER;
 
         ContentResolver contentResolver = application.getContentResolver();
-        Cursor cursor = contentResolver.query(CONTENT_URI, null,null, null, null);
+        Cursor cursor = contentResolver.query(CONTENT_URI, null,null, null, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC");
 
         // Loop for every contact in the phone
         if (cursor.getCount() > 0) {
