@@ -78,7 +78,7 @@ public class HomeActivity extends FragmentActivity {
     protected void onPause() {
         super.onPause();
 
-        // un-register broadcast receiver from here
+        // unregister broadcast receiver from here
         if (dataUpdateReceiver != null) unregisterReceiver(dataUpdateReceiver);
     }
 

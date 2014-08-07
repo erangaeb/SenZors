@@ -23,7 +23,7 @@ import com.score.senzors.utils.ActivityUtils;
 import java.util.ArrayList;
 
 /**
- * Contact list when sharing sensor
+ * Display Contact list when sharing sensor
  *
  * @author eranga herath(erangeb@gmail.com)
  */
