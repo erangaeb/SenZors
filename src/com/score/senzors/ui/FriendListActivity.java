@@ -166,17 +166,17 @@ public class FriendListActivity extends Activity implements SearchView.OnQueryTe
     /**
      * {@inheritDoc}
      */
-@Override
-public boolean onQueryTextChange(String newText) {
-//friendListAdapter.getFilter().filter(newText);
-// search adapter according to search text
-if (TextUtils.isEmpty(newText)) {
-friendListView.clearTextFilter();
-}
-else {
-friendListView.setFilterText(newText.toString());
-}
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        //friendListAdapter.getFilter().filter(newText);
+        // search adapter according to search text
+        if (TextUtils.isEmpty(newText)) {
+            friendListView.clearTextFilter();
+        }
+        else {
+            friendListView.setFilterText(newText.toString());
+        }
 
-return true;
-}
+        return true;
+    }
 }
