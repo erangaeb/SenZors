@@ -34,7 +34,6 @@ public class SenzorApplication extends Application implements ContactReaderListe
     // web socket server up and running in this API
     // need to connect this server when starting the app
     //public final static String WEB_SOCKET_URI = "ws://10.2.4.14:8080";
-    //public final static String WEB_SOCKET_URI = "ws://mysensors.ucsc.lk:9000";
     public final static String WEB_SOCKET_URI = "ws://connect.mysensors.mobi:8080";
 
     // web socket connection share in application
