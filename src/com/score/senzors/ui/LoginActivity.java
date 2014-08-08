@@ -110,12 +110,12 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
 
     /**
      * Set user fields in UI
-     * actually display username and password in UI
+     * actually display phone no and password in UI
      */
     private void displayUserCredentials() {
         try {
             User user = PreferenceUtils.getUser(LoginActivity.this);
-            editTextPhoneNo.setText(user.getUsername());
+            editTextPhoneNo.setText(user.getPassword());
             editTextPassword.setText(user.getPassword());
         } catch (NoUserException e) {
             e.printStackTrace();
@@ -126,9 +126,9 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
      * Initialize login user object
      */
     private void initLoginUser() {
-        String username = editTextPhoneNo.getText().toString().trim();
+        String phoneNo = editTextPhoneNo.getText().toString().trim();
         String password = editTextPassword.getText().toString().trim();
-        loginUser = new User("0", username, username, password);
+        loginUser = new User("id", phoneNo, "username", password);
     }
 
     /**
@@ -145,13 +145,12 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
 
     /**
      * Login action
-     * Connect to web socket and send username password to server
+     * Connect to web socket and send phone no password to server
      */
     private void login() {
         if(NetworkUtil.isAvailableNetwork(LoginActivity.this)) {
             initLoginUser();
             if(ActivityUtils.isValidLoginFields(loginUser)) {
-                // open web socket and send username password fields
                 // we are authenticate with web sockets
                 if(!application.getWebSocketConnection().isConnected()) {
                     ActivityUtils.hideSoftKeyboard(this);
@@ -163,7 +162,7 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
                     Log.d(TAG, "Login: already connected to web socket");
                 }
             } else {
-                Log.d(TAG, "Login: empty username/password");
+                Log.d(TAG, "Login: empty phone no/password");
                 Toast.makeText(LoginActivity.this, "Invalid input fields", Toast.LENGTH_LONG).show();
             }
         } else {

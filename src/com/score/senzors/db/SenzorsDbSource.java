@@ -40,28 +40,28 @@ public class SenzorsDbSource {
 
         // content values to inset
         ContentValues values = new ContentValues();
+        values.put(SenzorsDbContract.User.COLUMN_NAME_PHONE, user.getPhoneNo());
         values.put(SenzorsDbContract.User.COLUMN_NAME_USERNAME, user.getUsername());
-        values.put(SenzorsDbContract.User.COLUMN_NAME_EMAIL, user.getEmail());
 
         // Insert the new row, if fails throw an error
-        db.insertOrThrow(SenzorsDbContract.User.TABLE_NAME, SenzorsDbContract.User.COLUMN_NAME_EMAIL, values);
+        db.insertOrThrow(SenzorsDbContract.User.TABLE_NAME, SenzorsDbContract.User.COLUMN_NAME_PHONE, values);
         db.close();
     }
 
     /**
      * Get user if exists in the database, other wise create user and return
+     * @param phoneNo phone no
      * @param username username
-     * @param email email address
      * @return user
      */
-    public User getOrCreateUser(String username, String email) {
-        Log.d(TAG, "GetOrCreateUser: " + username);
+    public User getOrCreateUser(String phoneNo, String username) {
+        Log.d(TAG, "GetOrCreateUser: " + phoneNo);
 
         // get matching user if exists
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
         Cursor cursor = db.query(SenzorsDbContract.User.TABLE_NAME, // table
-                null, SenzorsDbContract.User.COLUMN_NAME_USERNAME + "=?", // constraint
-                new String[]{username}, // prams
+                null, SenzorsDbContract.User.COLUMN_NAME_PHONE+ "=?", // constraint
+                new String[]{phoneNo}, // prams
                 null, // order by
                 null, // group by
                 null); // join
@@ -71,28 +71,28 @@ public class SenzorsDbSource {
             // so get user data
             // we return id as password since we no storing users password in database
             String id = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User._ID));
+            String _phoneNo = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_PHONE));
             String _username = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_USERNAME));
-            String _email = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_EMAIL));
 
             // clear
             cursor.close();
             db.close();
 
             Log.d(TAG, "GetOrCreateUser: have user, so return it: " + username);
-            return new User(id, _username, _email, "password");
+            return new User(id, _phoneNo, _username, "password");
         } else {
             // no matching user
             // so create user
             ContentValues values = new ContentValues();
+            values.put(SenzorsDbContract.User.COLUMN_NAME_PHONE, phoneNo);
             values.put(SenzorsDbContract.User.COLUMN_NAME_USERNAME, username);
-            values.put(SenzorsDbContract.User.COLUMN_NAME_EMAIL, email);
 
             // inset data
-            long id = db.insert(SenzorsDbContract.User.TABLE_NAME, SenzorsDbContract.User.COLUMN_NAME_EMAIL, values);
+            long id = db.insert(SenzorsDbContract.User.TABLE_NAME, SenzorsDbContract.User.COLUMN_NAME_PHONE, values);
             db.close();
 
             Log.d(TAG, "GetOrCreateUser: no user, so user created:" + username);
-            return new User(Long.toString(id), username, email, "");
+            return new User(Long.toString(id), phoneNo, username, "");
         }
     }
 
@@ -158,8 +158,8 @@ public class SenzorsDbSource {
         String sensorValue;
         boolean isMySensor;
         String userId;
+        String phoneNo;
         String username;
-        String email;
         User user;
         Sensor sensor;
 
@@ -173,11 +173,11 @@ public class SenzorsDbSource {
 
             // get user attributes
             userId = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User._ID));
+            phoneNo = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_PHONE));
             username = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_USERNAME));
-            email = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_EMAIL));
 
             // save to list
-            user = new User(userId, username, email, "password");
+            user = new User(userId, phoneNo, username, "password");
             ArrayList<User> sharedUsers = getSharedUsers(sensorId, db);
             sensor = new Sensor(sensorId, sensorName, sensorValue, isMySensor, user, sharedUsers);
             sensorList.add(sensor);
@@ -213,19 +213,19 @@ public class SenzorsDbSource {
 
         // user attributes
         String userId;
+        String phoneNo;
         String username;
-        String email;
         User user;
 
         // extract attributes
         while (cursor.moveToNext()) {
             // get user attributes
             userId = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User._ID));
+            phoneNo = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_PHONE));
             username = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_USERNAME));
-            email = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_EMAIL));
 
             // save to list
-            user = new User(userId, username, email, "password");
+            user = new User(userId, phoneNo, username, "password");
             userList.add(user);
             Log.d(TAG, "GetSharedUsers: user - " + user.getUsername());
         }

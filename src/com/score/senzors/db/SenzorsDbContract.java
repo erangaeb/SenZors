@@ -27,7 +27,6 @@ public class SenzorsDbContract {
         public static final String TABLE_NAME = "user";
         public static final String COLUMN_NAME_PHONE = "phone";
         public static final String COLUMN_NAME_USERNAME = "username";
-        public static final String COLUMN_NAME_EMAIL = "email";
     }
 
     /* Inner class that defines the shared_user table contents */
