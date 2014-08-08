@@ -34,8 +34,8 @@ public class ShareActivity extends Activity implements Handler.Callback {
     private Sensor sharingSensor;
     private User sharingUser;
 
-    private TextView usernameLabel;
-    private EditText usernameEditText;
+    private TextView phoneNoLable;
+    private EditText phoneNoEditText;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,9 +70,9 @@ public class ShareActivity extends Activity implements Handler.Callback {
     private void initUi() {
         Typeface typefaceThin = Typeface.createFromAsset(this.getAssets(), "fonts/vegur_2.otf");
 
-        usernameLabel = (TextView) findViewById(R.id.share_layout_username_label);
-        usernameEditText = (EditText) findViewById(R.id.share_layout_phone_no);
-        usernameEditText.setText(sharingUser.getUsername());
+        phoneNoLable = (TextView) findViewById(R.id.share_layout_phone_no_label);
+        phoneNoEditText = (EditText) findViewById(R.id.share_layout_phone_no);
+        phoneNoEditText.setText(sharingUser.getPhoneNo());
 
         // Set up action bar.
         // Specify that the Home button should show an "Up" caret, indicating that touching the
@@ -88,8 +88,8 @@ public class ShareActivity extends Activity implements Handler.Callback {
         TextView actionBarTitle = (TextView) (this.findViewById(titleId));
         actionBarTitle.setTextColor(getResources().getColor(R.color.white));
         actionBarTitle.setTypeface(typefaceThin);
-        usernameLabel.setTypeface(typefaceThin);
-        usernameEditText.setTypeface(typefaceThin);
+        phoneNoLable.setTypeface(typefaceThin);
+        phoneNoEditText.setTypeface(typefaceThin);
     }
 
     /**
@@ -140,17 +140,15 @@ public class ShareActivity extends Activity implements Handler.Callback {
      * Need to send share query to server via web socket
      */
     private void share() {
-        String username = usernameEditText.getText().toString().trim();
-        String query = "SHARE" + " " + "#lat #lon" + " " + "@"+usernameEditText.getText().toString().trim();
+        String query = "SHARE" + " " + "#lat #lon" + " " + "@" + sharingUser.getPhoneNo();
         Log.d(TAG, "Share: sharing query " + query);
 
         // validate share attribute first
-        if(!username.equalsIgnoreCase("")) {
+        if(!sharingUser.getPhoneNo().equalsIgnoreCase("")) {
             // check weather sensor already shared with given user
-            sharingUser = new User("id", username, "email : " + username, "password");
             if(application.getCurrentSensor().getSharedUsers().contains(sharingUser)) {
                 // already shared sensor
-                Toast.makeText(ShareActivity.this, "Sensor already shared with " + username, Toast.LENGTH_LONG).show();
+                Toast.makeText(ShareActivity.this, "Sensor already shared with " + sharingUser.getUsername(), Toast.LENGTH_LONG).show();
             } else {
                 if(NetworkUtil.isAvailableNetwork(ShareActivity.this)) {
                     // construct query and send to server via web socket
@@ -201,7 +199,7 @@ public class ShareActivity extends Activity implements Handler.Callback {
                 // create shared connection(sharedUser) in db
                 // refresh sensor list
                 SenzorsDbSource dbSource = new SenzorsDbSource(ShareActivity.this);
-                User user = dbSource.getOrCreateUser(sharingUser.getUsername(), sharingUser.getUsername());
+                User user = dbSource.getOrCreateUser(sharingUser.getPhoneNo(), sharingUser.getUsername());
                 dbSource.addSharedUser(application.getCurrentSensor(), user);
                 application.getCurrentSensor().getSharedUsers().add(user);
 

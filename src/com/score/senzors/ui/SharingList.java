@@ -136,7 +136,7 @@ public class SharingList extends Fragment implements Handler.Callback {
         Iterator<User> it = userList.iterator();
         while (it.hasNext()) {
             User user = it.next();
-            if (user.getUsername().equals(removingUser.getUsername())) {
+            if (user.getPhoneNo().equals(removingUser.getPhoneNo())) {
                 it.remove();
             }
         }
@@ -150,11 +150,11 @@ public class SharingList extends Fragment implements Handler.Callback {
      */
     public void unshare(User user) {
         unSharingUser = user;
-        String query = ":SHARE" + " " + "#lat #lon" + " " + "@" + user.getUsername().trim();
+        String query = ":SHARE" + " " + "#lat #lon" + " " + "@" + user.getPhoneNo().trim();
         Log.d(TAG, "UnShare: un-sharing query " + query);
 
         // validate share attribute first
-        if(!user.getUsername().equalsIgnoreCase("")) {
+        if(!user.getPhoneNo().equalsIgnoreCase("")) {
             if(NetworkUtil.isAvailableNetwork(this.getActivity())) {
                 // construct query and send to server via web socket
                 if(application.getWebSocketConnection().isConnected()) {

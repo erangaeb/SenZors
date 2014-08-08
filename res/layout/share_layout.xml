@@ -62,7 +62,7 @@
                     android:layout_marginLeft="20dp"
                     android:layout_marginBottom="5dp"
                     android:textColor="#4a4a4a"
-                    android:id="@+id/share_layout_username_label"
+                    android:id="@+id/share_layout_phone_no_label"
                     android:text="Phone no">
                 </TextView>
 
@@ -75,6 +75,9 @@
                         android:layout_marginLeft="20dp"
                         android:layout_marginRight="20dp"
                         android:textColor="#000"
+                        android:editable="false"
+                        android:focusableInTouchMode="false"
+                        android:clickable="false"
                         android:cursorVisible="true"
                         android:textCursorDrawable="@null"
                         android:background="@drawable/edit_text_shape"

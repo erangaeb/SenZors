@@ -114,21 +114,12 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
      */
     private void displayUserCredentials() {
         try {
-            User user = PreferenceUtils.getUser(LoginActivity.this);
-            editTextPhoneNo.setText(user.getPassword());
-            editTextPassword.setText(user.getPassword());
+            loginUser = PreferenceUtils.getUser(LoginActivity.this);
+            editTextPhoneNo.setText(loginUser.getPhoneNo());
+            editTextPassword.setText(loginUser.getPassword());
         } catch (NoUserException e) {
             e.printStackTrace();
         }
-    }
-
-    /**
-     * Initialize login user object
-     */
-    private void initLoginUser() {
-        String phoneNo = editTextPhoneNo.getText().toString().trim();
-        String password = editTextPassword.getText().toString().trim();
-        loginUser = new User("id", phoneNo, "username", password);
     }
 
     /**
@@ -149,7 +140,6 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
      */
     private void login() {
         if(NetworkUtil.isAvailableNetwork(LoginActivity.this)) {
-            initLoginUser();
             if(ActivityUtils.isValidLoginFields(loginUser)) {
                 // we are authenticate with web sockets
                 if(!application.getWebSocketConnection().isConnected()) {

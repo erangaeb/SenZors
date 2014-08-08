@@ -153,7 +153,7 @@ public class Sensor implements Parcelable {
     public boolean equals(Object obj) {
         if(obj instanceof Sensor) {
             Sensor toCompare = (Sensor) obj;
-            return (this.getUser().getUsername().equalsIgnoreCase(toCompare.getUser().getUsername()) && this.sensorName.equalsIgnoreCase(toCompare.getSensorName()));
+            return (this.getUser().getPhoneNo().equalsIgnoreCase(toCompare.getUser().getPhoneNo()) && this.sensorName.equalsIgnoreCase(toCompare.getSensorName()));
         }
 
         return false;

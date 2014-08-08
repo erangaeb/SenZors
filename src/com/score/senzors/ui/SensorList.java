@@ -215,7 +215,7 @@ public class SensorList extends Fragment implements Handler.Callback {
                 if(NetworkUtil.isAvailableNetwork(SensorList.this.getActivity())) {
                     if(application.getWebSocketConnection().isConnected()) {
                         ActivityUtils.showProgressDialog(SensorList.this.getActivity(), "Accessing location ...");
-                        application.getWebSocketConnection().sendTextMessage("GET #lat #lon " + "@" + sensor.getUser().getUsername());
+                        application.getWebSocketConnection().sendTextMessage("GET #lat #lon " + "@" + sensor.getUser().getPhoneNo());
                     } else {
                         Log.w(TAG, "handleSensorListItemClick: web socket not connected");
                         Toast.makeText(SensorList.this.getActivity(), "You are disconnected from senZors service", Toast.LENGTH_LONG).show();

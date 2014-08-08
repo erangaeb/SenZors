@@ -49,7 +49,7 @@ public class QueryHandler {
         builder.append(sessionKey);
         String key = builder.toString();
         params.put("hkey", CryptoUtils.encodeMessage(key));
-        params.put("name", user.getUsername());
+        params.put("name", user.getPhoneNo());
 
         return QueryParser.getMessage(new Query(command, "mysensors", params));
     }
@@ -141,9 +141,10 @@ public class QueryHandler {
      * @param query parsed query
      */
     private static void handleShareQuery(SenzorApplication application, Query query) {
-        // get or create match user
+        // get or create matching user
         // create/save new sensor in db
-        User user = new SenzorsDbSource(application.getApplicationContext()).getOrCreateUser(query.getUser(), "email");
+        String username = PhoneBookUtils.getContactName(application, query.getUser());
+        User user = new SenzorsDbSource(application.getApplicationContext()).getOrCreateUser(query.getUser(), username);
         Sensor sensor = new Sensor("0", "Location", "Location", false, user, null);
 
         try {
@@ -169,7 +170,8 @@ public class QueryHandler {
      */
     private static void handleUnShareQuery(SenzorApplication application, Query query) {
         // get match user and sensor
-        User user = new SenzorsDbSource(application.getApplicationContext()).getOrCreateUser(query.getUser(), "email");
+        String username = PhoneBookUtils.getContactName(application, query.getUser());
+        User user = new SenzorsDbSource(application.getApplicationContext()).getOrCreateUser(query.getUser(), username);
         Sensor sensor = new Sensor("0", "Location", "Location", false, user, null);
         try {
             // delete sensor  from db
