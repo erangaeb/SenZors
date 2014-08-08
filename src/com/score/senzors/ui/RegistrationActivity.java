@@ -202,7 +202,7 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
 
                 // create user from here
                 // we don't store passwords in DB, so when save user in shared preference need to set password
-                User user = new SenzorsDbSource(this).getOrCreateUser(registeringUser.getUsername(), registeringUser.getEmail());
+                User user = new SenzorsDbSource(this).getOrCreateUser(registeringUser.getPhoneNo(), registeringUser.getUsername());
                 user.setPassword(registeringUser.getPassword());
                 PreferenceUtils.saveUser(this, user);
 

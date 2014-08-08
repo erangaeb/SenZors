@@ -99,7 +99,7 @@ public class FriendListAdapter extends BaseAdapter implements Filterable {
 
         // bind text with view holder content view for efficient use
         holder.iconText.setText("#");
-        holder.name.setText(user.getEmail());
+        holder.name.setText(user.getUsername());
         view.setBackgroundResource(R.drawable.friend_list_selector);
 
         return view;
@@ -140,7 +140,7 @@ public class FriendListAdapter extends BaseAdapter implements Filterable {
 
                 // search content in friend list
                 for (User user : friendList) {
-                    if (user.getEmail().toLowerCase().contains(constraint.toString().toLowerCase())) {
+                    if (user.getUsername().toLowerCase().contains(constraint.toString().toLowerCase())) {
                         tempList.add(user);
                     }
                 }

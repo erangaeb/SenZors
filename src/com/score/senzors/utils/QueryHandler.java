@@ -68,8 +68,8 @@ public class QueryHandler {
 
         // encode password/pin with SHA1 and encode with Base64
         params.put("hkey", CryptoUtils.encodeMessage(user.getPassword()));
-        params.put("name", user.getUsername());
-        params.put("email", user.getEmail());
+        params.put("name", user.getPhoneNo());
+        params.put("email", user.getUsername());
 
         return QueryParser.getMessage(new Query(command, "mysensors", params));
     }

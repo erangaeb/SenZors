@@ -79,7 +79,7 @@ public class ShareActivity extends Activity implements Handler.Callback {
         // button will take the user one step up in the application's hierarchy.
         final ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setTitle("Share @" + sharingUser.getEmail().toLowerCase());
+        actionBar.setTitle("Share @" + sharingUser.getUsername().toLowerCase());
 
         // set custom font for
         //  1. action bar title
@@ -192,7 +192,7 @@ public class ShareActivity extends Activity implements Handler.Callback {
             String payLoad = (String)message.obj;
             ActivityUtils.cancelProgressDialog();
 
-            // successful login returns "ShareDone"
+            // successful sharing returns "ShareDone"
             if(payLoad.equalsIgnoreCase("ShareDone")) {
                 Log.d(TAG, "HandleMessage: sharing success");
                 Toast.makeText(ShareActivity.this, "Sensor has been shared successfully", Toast.LENGTH_LONG).show();
@@ -201,7 +201,7 @@ public class ShareActivity extends Activity implements Handler.Callback {
                 // create shared connection(sharedUser) in db
                 // refresh sensor list
                 SenzorsDbSource dbSource = new SenzorsDbSource(ShareActivity.this);
-                User user = dbSource.getOrCreateUser(sharingUser.getUsername(), sharingUser.getEmail());
+                User user = dbSource.getOrCreateUser(sharingUser.getUsername(), sharingUser.getUsername());
                 dbSource.addSharedUser(application.getCurrentSensor(), user);
                 application.getCurrentSensor().getSharedUsers().add(user);
 
