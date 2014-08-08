@@ -39,7 +39,7 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
 
     // UI fields
     private EditText editTextPhoneNo;
-    private EditText editTextEmail;
+    private EditText editTextUsername;
     private EditText editTextPassword;
     private EditText editTextConfirmPassword;
     private TextView textViewHeaderText;
@@ -69,7 +69,7 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
         Typeface typefaceThin = Typeface.createFromAsset(getAssets(), "fonts/vegur_2.otf");
 
         editTextPhoneNo = (EditText) findViewById(R.id.registration_phone_no);
-        editTextEmail = (EditText) findViewById(R.id.registration_email);
+        editTextUsername = (EditText) findViewById(R.id.registration_username);
         editTextPassword = (EditText) findViewById(R.id.registration_password);
         editTextConfirmPassword = (EditText) findViewById(R.id.registration_confirm_password);
         signUpButton = (RelativeLayout) findViewById(R.id.registration_sign_up_button);
@@ -80,7 +80,7 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
         textViewHeaderText.setTypeface(typefaceThin, Typeface.BOLD);
         textViewSignUpText.setTypeface(typefaceThin, Typeface.BOLD);
         editTextPhoneNo.setTypeface(typefaceThin, Typeface.NORMAL);
-        editTextEmail.setTypeface(typefaceThin, Typeface.NORMAL);
+        editTextUsername.setTypeface(typefaceThin, Typeface.NORMAL);
         editTextPassword.setTypeface(typefaceThin, Typeface.NORMAL);
         editTextConfirmPassword.setTypeface(typefaceThin, Typeface.NORMAL);
     }
@@ -90,10 +90,10 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
      */
     private void initRegisteringUser() {
         String phoneNo = editTextPhoneNo.getText().toString().trim();
-        String email = editTextEmail.getText().toString().trim();
+        String username = editTextUsername.getText().toString().trim();
         String password = editTextPassword.getText().toString().trim();
 
-        registeringUser = new User("0", phoneNo, email, password);
+        registeringUser = new User("0", phoneNo, username, password);
     }
 
     /**

@@ -36,4 +36,5 @@ public class SenzorsDbContract {
         public static final String COLUMN_NAME_USER = "user";
         public static final String COLUMN_NAME_SENSOR = "sensor";
     }
+
 }
