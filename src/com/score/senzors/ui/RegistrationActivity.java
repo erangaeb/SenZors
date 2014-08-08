@@ -179,8 +179,8 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
                 // so send PUT query to create user
                 try {
                     String putQuery = QueryHandler.getRegistrationQuery(registeringUser);
-                    System.out.println("------put query------");
-                    System.out.println(putQuery);
+                    Log.d(TAG, "------put query------");
+                    Log.d(TAG, putQuery);
 
                     if(webSocketConnection.isConnected()) {
                         webSocketConnection.sendTextMessage(putQuery);

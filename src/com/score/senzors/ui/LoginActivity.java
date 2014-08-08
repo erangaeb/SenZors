@@ -37,7 +37,7 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
     private SenzorApplication application;
     private DataUpdateReceiver dataUpdateReceiver;
 
-    private EditText editTextUsername;
+    private EditText editTextPhoneNo;
     private EditText editTextPassword;
     private TextView headerText;
     private TextView signUpText;
@@ -89,7 +89,7 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
     private void initUi() {
         Typeface typefaceThin = Typeface.createFromAsset(getAssets(), "fonts/vegur_2.otf");
 
-        editTextUsername = (EditText) findViewById(R.id.login_phone_no);
+        editTextPhoneNo = (EditText) findViewById(R.id.login_phone_no);
         editTextPassword = (EditText) findViewById(R.id.login_password);
         signInButton = (RelativeLayout) findViewById(R.id.sign_in_button_panel);
         signUpButton = (RelativeLayout) findViewById(R.id.not_registered);
@@ -101,7 +101,7 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
 
         headerText.setTypeface(typefaceThin, Typeface.BOLD);
         signUpText.setTypeface(typefaceThin, Typeface.BOLD);
-        editTextUsername.setTypeface(typefaceThin, Typeface.NORMAL);
+        editTextPhoneNo.setTypeface(typefaceThin, Typeface.NORMAL);
         editTextPassword.setTypeface(typefaceThin, Typeface.NORMAL);
         link.setTypeface(typefaceThin, Typeface.BOLD);
 
@@ -115,7 +115,7 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
     private void displayUserCredentials() {
         try {
             User user = PreferenceUtils.getUser(LoginActivity.this);
-            editTextUsername.setText(user.getUsername());
+            editTextPhoneNo.setText(user.getUsername());
             editTextPassword.setText(user.getPassword());
         } catch (NoUserException e) {
             e.printStackTrace();
@@ -126,7 +126,7 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
      * Initialize login user object
      */
     private void initLoginUser() {
-        String username = editTextUsername.getText().toString().trim();
+        String username = editTextPhoneNo.getText().toString().trim();
         String password = editTextPassword.getText().toString().trim();
         loginUser = new User("0", username, username, password);
     }
