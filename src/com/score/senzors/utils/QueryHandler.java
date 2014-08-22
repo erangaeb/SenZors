@@ -144,6 +144,7 @@ public class QueryHandler {
         // get or create matching user
         // create/save new sensor in db
         String username = PhoneBookUtils.getContactName(application, query.getUser());
+        if (username == null) username = "";
         User user = new SenzorsDbSource(application.getApplicationContext()).getOrCreateUser(query.getUser(), username);
         Sensor sensor = new Sensor("0", "Location", "Location", false, user, null);
 

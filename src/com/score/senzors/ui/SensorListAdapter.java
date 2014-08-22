@@ -136,7 +136,8 @@ public class SensorListAdapter extends BaseAdapter {
         viewHolder.share.setVisibility(View.GONE);
         viewHolder.sensorName.setBackgroundResource(R.drawable.circle_shape_red);
         viewHolder.sensorUser.setTextColor(Color.parseColor("#d96459"));
-        viewHolder.sensorUser.setText("@" + sensor.getUser().getUsername());
+        String userText = (sensor.getUser().getUsername().equals("") ? sensor.getUser().getPhoneNo() : sensor.getUser().getUsername());
+        viewHolder.sensorUser.setText("@" + userText);
         viewHolder.sensorValue.setText(R.string.tap_here);
     }
 
