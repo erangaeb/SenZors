@@ -127,6 +127,9 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
         } catch (MismatchPasswordException e) {
             Log.e(TAG, e.toString());
             Toast.makeText(this, "Mismatching passwords", Toast.LENGTH_LONG).show();
+        } catch (InvalidPhoneNoException e) {
+            Log.e(TAG, e.toString());
+            Toast.makeText(this, "Phone no should contains 10 digits", Toast.LENGTH_LONG).show();
         }
     }
 

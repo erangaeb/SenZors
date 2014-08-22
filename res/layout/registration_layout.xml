@@ -40,13 +40,31 @@
                         android:layout_width="fill_parent"
                         android:layout_height="40dp"
                         android:paddingLeft="15dp"
-                        android:hint="Phone no"
+                        android:hint="Country"
                         android:textSize="16sp"
                         android:singleLine="true"
                         android:textStyle="bold"
                         android:textColor="#ffffff"
                         android:textColorHint="#ffffff"
                         android:layout_below="@+id/registration_header_text"
+                        android:inputType="phone"
+                        android:background="@drawable/username_field_shape"
+                        android:id="@+id/registration_country">
+                </EditText>
+
+                <EditText
+                        android:layout_width="fill_parent"
+                        android:layout_height="40dp"
+                        android:paddingLeft="15dp"
+                        android:layout_marginTop="25dp"
+
+                        android:hint="Phone no(with country code)"
+                        android:textSize="16sp"
+                        android:singleLine="true"
+                        android:textStyle="bold"
+                        android:textColor="#ffffff"
+                        android:textColorHint="#ffffff"
+                        android:layout_below="@+id/registration_country"
                         android:inputType="phone"
                         android:background="@drawable/username_field_shape"
                         android:id="@+id/registration_phone_no">

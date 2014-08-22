@@ -140,7 +140,7 @@ public class ShareActivity extends Activity implements Handler.Callback {
      * Need to send share query to server via web socket
      */
     private void share() {
-        String query = "SHARE" + " " + "#lat #lon" + " " + "@" + sharingUser.getPhoneNo();
+        String query = "SHARE" + " " + "#lat #lon" + " " + "@" + phoneNoEditText.getText().toString().trim();
         Log.d(TAG, "Share: sharing query " + query);
 
         // validate share attribute first

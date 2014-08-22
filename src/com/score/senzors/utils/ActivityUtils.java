@@ -13,6 +13,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.score.senzors.R;
 import com.score.senzors.exceptions.InvalidInputFieldsException;
+import com.score.senzors.exceptions.InvalidPhoneNoException;
 import com.score.senzors.exceptions.MismatchPasswordException;
 import com.score.senzors.pojos.User;
 
@@ -87,10 +88,13 @@ public class ActivityUtils {
      * @param confirmPassword password
      * @return valid or not
      */
-    public static boolean isValidRegistrationFields(User user, String confirmPassword) throws InvalidInputFieldsException, MismatchPasswordException {
+    public static boolean isValidRegistrationFields(User user, String confirmPassword) throws InvalidInputFieldsException, MismatchPasswordException, InvalidPhoneNoException {
         if (user.getPhoneNo().isEmpty() || user.getUsername().isEmpty() || user.getPassword().isEmpty() || confirmPassword.isEmpty()) {
             throw new InvalidInputFieldsException();
         }
+
+        if (user.getPhoneNo().length() != 10)
+            throw new InvalidPhoneNoException();
 
         if (!user.getPassword().equals(confirmPassword)) {
             throw new MismatchPasswordException();
