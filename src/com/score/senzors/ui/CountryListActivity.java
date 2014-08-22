@@ -16,24 +16,23 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import com.score.senzors.R;
 import com.score.senzors.application.SenzorApplication;
-import com.score.senzors.pojos.User;
+import com.score.senzors.pojos.Country;
 import com.score.senzors.utils.ActivityUtils;
 
 import java.util.ArrayList;
 
 /**
- * Display Contact list when sharing sensor
+ * Activity class to display countries and Country codes
  *
- * @author eranga herath(erangeb@gmail.com)
+ * @author eranga herath(erangaeb@gmail.com)
  */
-public class FriendListActivity extends Activity implements SearchView.OnQueryTextListener {
-
+public class CountryListActivity extends Activity implements SearchView.OnQueryTextListener {
     private SenzorApplication application;
-    private ListView friendListView;
+    private ListView countryListView;
     private SearchView searchView;
     private MenuItem searchMenuItem;
-    private FriendListAdapter friendListAdapter;
-    private ArrayList<User> friendList;
+    private CountryListAdapter countryListAdapter;
+    private ArrayList<Country> countryList;
 
     /**
      * {@inheritDoc}
@@ -44,7 +43,7 @@ public class FriendListActivity extends Activity implements SearchView.OnQueryTe
         application = (SenzorApplication) this.getApplication();
 
         setActionBar();
-        initFriendList();
+        initCountryList();
     }
 
     /**
@@ -73,8 +72,8 @@ public class FriendListActivity extends Activity implements SearchView.OnQueryTe
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                FriendListActivity.this.finish();
-                FriendListActivity.this.overridePendingTransition(R.anim.stay_in, R.anim.bottom_out);
+                CountryListActivity.this.finish();
+                CountryListActivity.this.overridePendingTransition(R.anim.stay_in, R.anim.bottom_out);
                 ActivityUtils.hideSoftKeyboard(this);
 
                 return true;
@@ -90,7 +89,7 @@ public class FriendListActivity extends Activity implements SearchView.OnQueryTe
      */
     private void setActionBar() {
         getActionBar().setDisplayHomeAsUpEnabled(true);
-        getActionBar().setTitle("Friends");
+        getActionBar().setTitle("Select your country");
 
         Typeface typeface = Typeface.createFromAsset(this.getAssets(), "fonts/vegur_2.otf");
         int titleId = getResources().getIdentifier("action_bar_title", "id", "android");
@@ -100,37 +99,37 @@ public class FriendListActivity extends Activity implements SearchView.OnQueryTe
     }
 
     /**
-     * Initialize friend list
+     * Initialize country list
      */
-    private void initFriendList() {
-        friendList = application.getContactList();
-        friendListView = (ListView) findViewById(R.id.list_view);
-        friendListAdapter = new FriendListAdapter(this, friendList);
+    private void initCountryList() {
+        countryList = new ArrayList<Country>();
+        countryListView = (ListView) findViewById(R.id.list_view);
+        countryListAdapter = new CountryListAdapter(this, countryList);
 
         // add header and footer for list
         View headerView = View.inflate(this, R.layout.list_header, null);
         View footerView = View.inflate(this, R.layout.list_header, null);
-        friendListView.addHeaderView(headerView);
-        friendListView.addFooterView(footerView);
-        friendListView.setAdapter(friendListAdapter);
-        friendListView.setTextFilterEnabled(false);
+        countryListView.addHeaderView(headerView);
+        countryListView.addFooterView(footerView);
+        countryListView.setAdapter(countryListAdapter);
+        countryListView.setTextFilterEnabled(false);
 
         // set up click listener
-        friendListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        countryListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if(position>0 && position <= friendList.size()) {
-                    handelListItemClick((User)friendListAdapter.getItem(position - 1));
+                if(position>0 && position <= countryList.size()) {
+                    handelListItemClick((Country)countryListAdapter.getItem(position - 1));
                 }
             }
         });
     }
 
     /**
-     * Navigate to share activity form here
-     * @param user user
+     * Navigate to register activity form here
+     * @param country country
      */
-    private void handelListItemClick(User user) {
+    private void handelListItemClick(Country country) {
         // close search view if its visible
         if (searchView.isShown()) {
             searchMenuItem.collapseActionView();
@@ -139,8 +138,8 @@ public class FriendListActivity extends Activity implements SearchView.OnQueryTe
 
         // pass selected user and sensor to share activity
         Intent intent = new Intent(this, ShareActivity.class);
-        intent.putExtra("com.score.senzors.pojos.User", user);
-        intent.putExtra("com.score.senzors.pojos.Sensor", application.getCurrentSensor());
+        //intent.putExtra("com.score.senzors.pojos.User", user);
+        //intent.putExtra("com.score.senzors.pojos.Sensor", application.getCurrentSensor());
         this.startActivity(intent);
         this.overridePendingTransition(R.anim.right_in, R.anim.stay_in);
     }
@@ -167,8 +166,9 @@ public class FriendListActivity extends Activity implements SearchView.OnQueryTe
      */
     @Override
     public boolean onQueryTextChange(String newText) {
-        friendListAdapter.getFilter().filter(newText);
+        countryListAdapter.getFilter().filter(newText);
 
         return true;
     }
+
 }
