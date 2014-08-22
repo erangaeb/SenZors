@@ -178,7 +178,7 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
      * This method will be call after successful login
      */
     private void switchToRegister() {
-        Intent intent = new Intent(this, CountryListActivity.class);
+        Intent intent = new Intent(this, RegistrationActivity.class);
         this.startActivity(intent);
         LoginActivity.this.overridePendingTransition(R.anim.bottom_in, R.anim.stay_in);
     }

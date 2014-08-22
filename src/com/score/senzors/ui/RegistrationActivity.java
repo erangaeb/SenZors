@@ -17,6 +17,7 @@ import com.score.senzors.db.SenzorsDbSource;
 import com.score.senzors.exceptions.*;
 import com.score.senzors.pojos.User;
 import com.score.senzors.utils.ActivityUtils;
+import com.score.senzors.utils.PhoneBookUtils;
 import com.score.senzors.utils.PreferenceUtils;
 import com.score.senzors.utils.QueryHandler;
 import de.tavendo.autobahn.WebSocketConnection;
@@ -42,6 +43,7 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
     private EditText editTextUsername;
     private EditText editTextPassword;
     private EditText editTextConfirmPassword;
+    private TextView countryCodeText;
     private TextView textViewHeaderText;
     private TextView textViewSignUpText;
     private RelativeLayout signUpButton;
@@ -63,6 +65,7 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
 
     /**
      * Initialize UI components,
+     * Set country code text
      * set custom font for UI fields
      */
     private void initUi() {
@@ -76,6 +79,9 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
         textViewHeaderText = (TextView) findViewById(R.id.registration_header_text);
         textViewSignUpText = (TextView) findViewById(R.id.registration_sign_up_text);
         signUpButton.setOnClickListener(RegistrationActivity.this);
+
+        countryCodeText = (TextView) findViewById(R.id.country_code);
+        countryCodeText.setText(PhoneBookUtils.getCountryCode(this));
 
         textViewHeaderText.setTypeface(typefaceThin, Typeface.BOLD);
         textViewSignUpText.setTypeface(typefaceThin, Typeface.BOLD);

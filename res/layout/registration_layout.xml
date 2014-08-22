@@ -36,39 +36,43 @@
                         android:text="#SignUp">
                 </TextView>
 
-                <EditText
-                        android:layout_width="fill_parent"
-                        android:layout_height="40dp"
-                        android:paddingLeft="15dp"
-                        android:hint="Country"
-                        android:textSize="16sp"
-                        android:singleLine="true"
-                        android:textStyle="bold"
-                        android:textColor="#ffffff"
-                        android:textColorHint="#ffffff"
-                        android:layout_below="@+id/registration_header_text"
-                        android:inputType="phone"
-                        android:background="@drawable/username_field_shape"
-                        android:id="@+id/registration_country">
-                </EditText>
+                <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="40dp"
+                    android:id="@+id/phone_no_field"
+                    android:layout_below="@+id/registration_header_text">
 
-                <EditText
-                        android:layout_width="fill_parent"
-                        android:layout_height="40dp"
-                        android:paddingLeft="15dp"
-                        android:layout_marginTop="25dp"
-
-                        android:hint="Phone no(with country code)"
+                    <TextView
+                        android:layout_width="60dp"
+                        android:id="@+id/country_code"
                         android:textSize="16sp"
-                        android:singleLine="true"
                         android:textStyle="bold"
+                        android:gravity="center"
                         android:textColor="#ffffff"
-                        android:textColorHint="#ffffff"
-                        android:layout_below="@+id/registration_country"
-                        android:inputType="phone"
                         android:background="@drawable/username_field_shape"
-                        android:id="@+id/registration_phone_no">
-                </EditText>
+                        android:layout_height="match_parent">
+
+                    </TextView>
+
+                    <EditText
+                            android:layout_width="fill_parent"
+                            android:layout_height="40dp"
+                            android:paddingLeft="15dp"
+                            android:hint="Phone no"
+                            android:textSize="16sp"
+                            android:layout_marginLeft="5dp"
+                            android:singleLine="true"
+                            android:textStyle="bold"
+                            android:textColor="#ffffff"
+                            android:textColorHint="#ffffff"
+                            android:inputType="phone"
+                            android:layout_toRightOf="@+id/country_code"
+                            android:background="@drawable/username_field_shape"
+                            android:id="@+id/registration_phone_no">
+                    </EditText>
+
+                </RelativeLayout>
+
 
                 <EditText
                         android:layout_width="fill_parent"
@@ -82,7 +86,7 @@
                         android:textColor="#ffffff"
                         android:textColorHint="#ffffff"
                         android:inputType="text"
-                        android:layout_below="@+id/registration_phone_no"
+                        android:layout_below="@+id/phone_no_field"
                         android:background="@drawable/username_field_shape"
                         android:id="@+id/registration_username">
 

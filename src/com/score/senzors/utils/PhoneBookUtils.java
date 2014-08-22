@@ -6,6 +6,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
 import android.telephony.PhoneNumberUtils;
+import android.telephony.TelephonyManager;
+import com.score.senzors.R;
 import com.score.senzors.pojos.User;
 
 import java.util.ArrayList;
@@ -89,6 +91,26 @@ public class PhoneBookUtils {
         cursor.close();
 
         return contactList;
+    }
+
+    /**
+     * Get country code according to SIM card details
+     * @param context application context
+     * @return country telephone code (ex: +94)
+     */
+    public static String getCountryCode(Context context) {
+        TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+        String countryId = telephonyManager.getSimCountryIso().toUpperCase();
+        String[] countryCodes = context.getResources().getStringArray(R.array.CountryCodes);
+
+        for(int i=0; i<countryCodes.length; i++) {
+            String[] tmp = countryCodes[i].split(",");
+            if(tmp[1].trim().equals(countryId.trim())) {
+                return "+" + tmp[0];
+            }
+        }
+
+        return "";
     }
 
 }
