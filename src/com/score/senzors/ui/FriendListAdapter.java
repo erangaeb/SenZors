@@ -87,9 +87,11 @@ public class FriendListAdapter extends BaseAdapter implements Filterable {
             holder = new ViewHolder();
             holder.iconText = (TextView) view.findViewById(R.id.icon_text);
             holder.name = (TextView) view.findViewById(R.id.friend_list_row_layout_name);
+            holder.phoneNo = (TextView) view.findViewById(R.id.friend_list_row_layout_phone);
             holder.iconText.setTypeface(typeface, Typeface.BOLD);
             holder.iconText.setTextColor(activity.getResources().getColor(R.color.white));
             holder.name.setTypeface(typeface, Typeface.NORMAL);
+            holder.phoneNo.setTypeface(typeface, Typeface.NORMAL);
 
             view.setTag(holder);
         } else {
@@ -100,6 +102,7 @@ public class FriendListAdapter extends BaseAdapter implements Filterable {
         // bind text with view holder content view for efficient use
         holder.iconText.setText("#");
         holder.name.setText(user.getUsername());
+        holder.phoneNo.setText(user.getPhoneNo());
         view.setBackgroundResource(R.drawable.friend_list_selector);
 
         return view;
@@ -124,6 +127,7 @@ public class FriendListAdapter extends BaseAdapter implements Filterable {
     static class ViewHolder {
         TextView iconText;
         TextView name;
+        TextView phoneNo;
     }
 
     /**

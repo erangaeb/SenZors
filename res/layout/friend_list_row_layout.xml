@@ -4,7 +4,7 @@
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:background="@drawable/my_sensor_background"
-        android:layout_height="60dp">
+        android:layout_height="80dp">
 
     <RelativeLayout
         android:layout_width="fill_parent"
@@ -27,17 +27,36 @@
                 android:text="#"/>
         </RelativeLayout>
 
-        <TextView
-            android:id="@+id/friend_list_row_layout_name"
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:gravity="center_vertical"
             android:layout_toRightOf="@+id/friend_list_row_layout_user_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="5dp"
-            android:textSize="20dp"
-            android:text="itseranga"
-            android:textColor="#4a4a4a">
-        </TextView>
+            android:layout_height="fill_parent">
+            <TextView
+                    android:id="@+id/friend_list_row_layout_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:gravity="center_vertical"
+                    android:layout_marginLeft="5dp"
+                    android:textSize="20dp"
+                    android:text="Eranga herath"
+                    android:textColor="#4a4a4a">
+            </TextView>
+
+            <TextView
+                    android:id="@+id/friend_list_row_layout_phone"
+                    android:layout_width="wrap_content"
+                    android:gravity="center_vertical"
+                    android:layout_below="@+id/friend_list_row_layout_name"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="5dp"
+                    android:textSize="15dp"
+                    android:text="0775434015"
+                    android:textColor="#4a4a4a">
+            </TextView>
+
+        </RelativeLayout>
+
 
         <!-- divider -->
         <View

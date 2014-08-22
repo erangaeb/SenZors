@@ -5,8 +5,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
-import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
+import com.google.i18n.phonenumbers.NumberParseException;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.score.senzors.R;
 import com.score.senzors.pojos.User;
 
@@ -83,7 +84,7 @@ public class PhoneBookUtils {
                     }
                     phoneCursor.close();
 
-                    contactList.add(new User(contact_id, PhoneNumberUtils.formatNumber(phoneNumber).replace(" ", ""), name.toLowerCase(), "password"));
+                    contactList.add(new User(contact_id, getFormattedPhoneNo(phoneNumber), name.toLowerCase(), "password"));
                 }
             }
         }
@@ -111,6 +112,30 @@ public class PhoneBookUtils {
         }
 
         return "";
+    }
+
+    /**
+     * Remove unwanted characters and get internationalized phone no
+     * Actually format local no to international format
+     * @param phoneNo phone no
+     * @return internationalized phone no (ex: +94775432015)
+     */
+    private static String getFormattedPhoneNo(String phoneNo) {
+        String formattedPhoneNo = phoneNo.replaceAll("[^+0-9]", "");
+
+        try {
+            // phone must begin with '+'
+            // verify it is a internationalized no
+            PhoneNumberUtil.getInstance().parse(formattedPhoneNo, "");
+        } catch (NumberParseException e) {
+            // non internationalized no(local no)
+            if (formattedPhoneNo.length() >= 10)
+                formattedPhoneNo = "+94" + formattedPhoneNo.substring(formattedPhoneNo.length() - 9);
+            else
+                formattedPhoneNo = "+94" + formattedPhoneNo;
+        }
+
+        return formattedPhoneNo;
     }
 
 }
