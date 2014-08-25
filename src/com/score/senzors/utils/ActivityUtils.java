@@ -93,7 +93,7 @@ public class ActivityUtils {
             throw new InvalidInputFieldsException();
         }
 
-        if (user.getPhoneNo().length() != 10)
+        if (user.getPhoneNo().length() < 9)
             throw new InvalidPhoneNoException();
 
         if (!user.getPassword().equals(confirmPassword)) {

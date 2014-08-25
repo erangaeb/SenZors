@@ -187,6 +187,9 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
                 // server key extraction success
                 // so send PUT query to create user
                 try {
+                    String countryCode = countryCodeText.getText().toString().trim();
+                    String phone = countryCode + registeringUser.getPhoneNo().substring(registeringUser.getPhoneNo().length() - 9);
+                    registeringUser.setPhoneNo(phone);
                     String putQuery = QueryHandler.getRegistrationQuery(registeringUser);
                     Log.d(TAG, "------put query------");
                     Log.d(TAG, putQuery);
