@@ -126,7 +126,7 @@ public class QueryHandler {
         if (query.getParams().containsKey("login")) {
             // login status
             status = query.getParams().get("login");
-        } else if (query.getParams().containsKey("share")){
+        } else if (query.getParams().containsKey("share")) {
             // share status
             status = query.getParams().get("share");
         }
