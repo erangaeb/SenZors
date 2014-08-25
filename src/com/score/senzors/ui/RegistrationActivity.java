@@ -40,7 +40,6 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
 
     // UI fields
     private EditText editTextPhoneNo;
-    private EditText editTextUsername;
     private EditText editTextPassword;
     private EditText editTextConfirmPassword;
     private TextView countryCodeText;
@@ -72,7 +71,6 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
         Typeface typefaceThin = Typeface.createFromAsset(getAssets(), "fonts/vegur_2.otf");
 
         editTextPhoneNo = (EditText) findViewById(R.id.registration_phone_no);
-        editTextUsername = (EditText) findViewById(R.id.registration_username);
         editTextPassword = (EditText) findViewById(R.id.registration_password);
         editTextConfirmPassword = (EditText) findViewById(R.id.registration_confirm_password);
         signUpButton = (RelativeLayout) findViewById(R.id.registration_sign_up_button);
@@ -86,7 +84,6 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
         textViewHeaderText.setTypeface(typefaceThin, Typeface.BOLD);
         textViewSignUpText.setTypeface(typefaceThin, Typeface.BOLD);
         editTextPhoneNo.setTypeface(typefaceThin, Typeface.NORMAL);
-        editTextUsername.setTypeface(typefaceThin, Typeface.NORMAL);
         editTextPassword.setTypeface(typefaceThin, Typeface.NORMAL);
         editTextConfirmPassword.setTypeface(typefaceThin, Typeface.NORMAL);
     }
@@ -96,10 +93,9 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
      */
     private void initRegisteringUser() {
         String phoneNo = editTextPhoneNo.getText().toString().trim();
-        String username = editTextUsername.getText().toString().trim();
         String password = editTextPassword.getText().toString().trim();
 
-        registeringUser = new User("0", phoneNo, username, password);
+        registeringUser = new User("0", phoneNo, "username", password);
     }
 
     /**
@@ -214,7 +210,7 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
 
                 // create user from here
                 // we don't store passwords in DB, so when save user in shared preference need to set password
-                User user = new SenzorsDbSource(this).getOrCreateUser(registeringUser.getPhoneNo(), registeringUser.getUsername());
+                User user = new SenzorsDbSource(this).getOrCreateUser(registeringUser.getPhoneNo());
                 user.setPassword(registeringUser.getPassword());
                 PreferenceUtils.saveUser(this, user);
 

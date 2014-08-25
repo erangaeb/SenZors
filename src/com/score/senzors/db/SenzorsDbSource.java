@@ -35,7 +35,7 @@ public class SenzorsDbSource {
      * @param user user
      */
     public void createUser(User user) {
-        Log.d(TAG, "AddUser: adding user - " + user.getUsername());
+        Log.d(TAG, "AddUser: adding user - " + user.getPhoneNo());
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
 
         // content values to inset
@@ -75,7 +75,7 @@ public class SenzorsDbSource {
             cursor.close();
             db.close();
 
-            Log.d(TAG, "GetOrCreateUser: have user, so return it: " + phoneNo);
+            Log.d(TAG, "have user, so return it: " + phoneNo);
             return new User(id, _phoneNo, "username", "password");
         } else {
             // no matching user
@@ -87,7 +87,7 @@ public class SenzorsDbSource {
             long id = db.insert(SenzorsDbContract.User.TABLE_NAME, SenzorsDbContract.User.COLUMN_NAME_PHONE, values);
             db.close();
 
-            Log.d(TAG, "GetOrCreateUser: no user, so user created:" + phoneNo);
+            Log.d(TAG, "no user, so user created:" + phoneNo);
             return new User(Long.toString(id), phoneNo, "username", "password");
         }
     }
@@ -118,7 +118,7 @@ public class SenzorsDbSource {
      */
     public void deleteSensorOfUser(Sensor sensor) {
         Log.d(TAG, "deleteSensor: deleting sensor - " + sensor.getSensorName());
-        Log.d(TAG, "deleteSensor: deleting sensor - " + sensor.getUser().getUsername());
+        Log.d(TAG, "deleteSensor: deleting sensor - " + sensor.getUser().getPhoneNo());
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
 
         // delete sensor matching sensor of given user
@@ -155,7 +155,6 @@ public class SenzorsDbSource {
         boolean isMySensor;
         String userId;
         String phoneNo;
-        String username;
         User user;
         Sensor sensor;
 
@@ -209,7 +208,6 @@ public class SenzorsDbSource {
         // user attributes
         String userId;
         String phoneNo;
-        String username;
         User user;
 
         // extract attributes
@@ -221,7 +219,7 @@ public class SenzorsDbSource {
             // save to list
             user = new User(userId, phoneNo, "username", "password");
             userList.add(user);
-            Log.d(TAG, "GetSharedUsers: user - " + user.getUsername());
+            Log.d(TAG, "GetSharedUsers: user - " + user.getPhoneNo());
         }
 
         // clean cursor
@@ -237,7 +235,7 @@ public class SenzorsDbSource {
      * @param user user
      */
     public void addSharedUser(Sensor sensor, User user) {
-        Log.d(TAG, "AddSharedUser: add data - " + sensor.getSensorName() + " " + user.getUsername());
+        Log.d(TAG, "AddSharedUser: add data - " + sensor.getSensorName() + " " + user.getPhoneNo());
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
 
         // content values to inset
@@ -257,7 +255,7 @@ public class SenzorsDbSource {
      * @param user user
      */
     public void deleteSharedUser(User user) {
-        Log.d(TAG, "DeleteSharedUser: deleting shared user - " + user.getUsername());
+        Log.d(TAG, "DeleteSharedUser: deleting shared user - " + user.getPhoneNo());
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
 
         // delete shared user

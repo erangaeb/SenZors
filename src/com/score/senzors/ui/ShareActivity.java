@@ -34,7 +34,7 @@ public class ShareActivity extends Activity implements Handler.Callback {
     private Sensor sharingSensor;
     private User sharingUser;
 
-    private TextView phoneNoLable;
+    private TextView phoneNoLabel;
     private EditText phoneNoEditText;
 
     public void onCreate(Bundle savedInstanceState) {
@@ -70,7 +70,7 @@ public class ShareActivity extends Activity implements Handler.Callback {
     private void initUi() {
         Typeface typefaceThin = Typeface.createFromAsset(this.getAssets(), "fonts/vegur_2.otf");
 
-        phoneNoLable = (TextView) findViewById(R.id.share_layout_phone_no_label);
+        phoneNoLabel = (TextView) findViewById(R.id.share_layout_phone_no_label);
         phoneNoEditText = (EditText) findViewById(R.id.share_layout_phone_no);
         phoneNoEditText.setText(sharingUser.getPhoneNo());
 
@@ -88,7 +88,7 @@ public class ShareActivity extends Activity implements Handler.Callback {
         TextView actionBarTitle = (TextView) (this.findViewById(titleId));
         actionBarTitle.setTextColor(getResources().getColor(R.color.white));
         actionBarTitle.setTypeface(typefaceThin);
-        phoneNoLable.setTypeface(typefaceThin);
+        phoneNoLabel.setTypeface(typefaceThin);
         phoneNoEditText.setTypeface(typefaceThin);
     }
 
@@ -199,7 +199,7 @@ public class ShareActivity extends Activity implements Handler.Callback {
                 // create shared connection(sharedUser) in db
                 // refresh sensor list
                 SenzorsDbSource dbSource = new SenzorsDbSource(ShareActivity.this);
-                User user = dbSource.getOrCreateUser(sharingUser.getPhoneNo(), sharingUser.getUsername());
+                User user = dbSource.getOrCreateUser(sharingUser.getPhoneNo());
                 dbSource.addSharedUser(application.getCurrentSensor(), user);
                 application.getCurrentSensor().getSharedUsers().add(user);
 

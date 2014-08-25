@@ -69,7 +69,6 @@ public class QueryHandler {
         // encode password/pin with SHA1 and encode with Base64
         params.put("hkey", CryptoUtils.encodeMessage(user.getPassword()));
         params.put("name", user.getPhoneNo());
-        params.put("email", user.getUsername());
 
         return QueryParser.getMessage(new Query(command, "mysensors", params));
     }
@@ -144,8 +143,8 @@ public class QueryHandler {
         // get or create matching user
         // create/save new sensor in db
         String username = PhoneBookUtils.getContactName(application, query.getUser());
-        if (username == null) username = "";
-        User user = new SenzorsDbSource(application.getApplicationContext()).getOrCreateUser(query.getUser(), username);
+        User user = new SenzorsDbSource(application.getApplicationContext()).getOrCreateUser(query.getUser());
+        user.setUsername(username);
         Sensor sensor = new Sensor("0", "Location", "Location", false, user, null);
 
         try {
@@ -171,15 +170,14 @@ public class QueryHandler {
      */
     private static void handleUnShareQuery(SenzorApplication application, Query query) {
         // get match user and sensor
-        String username = PhoneBookUtils.getContactName(application, query.getUser());
-        User user = new SenzorsDbSource(application.getApplicationContext()).getOrCreateUser(query.getUser(), username);
+        User user = new SenzorsDbSource(application.getApplicationContext()).getOrCreateUser(query.getUser());
         Sensor sensor = new Sensor("0", "Location", "Location", false, user, null);
         try {
             // delete sensor  from db
             // new SenzorsDbSource(application.getApplicationContext()).deleteSharedUser(user);
             new SenzorsDbSource(application.getApplicationContext()).deleteSensorOfUser(sensor);
             application.initFriendsSensors();
-            Log.d(TAG, "HandleUnShareQuery: deleted sensor from - " + user.getUsername());
+            Log.d(TAG, "HandleUnShareQuery: deleted sensor from - " + user.getPhoneNo());
 
             // currently we have to launch friend sensor
             // update notification to notify user about incoming query/ share request
