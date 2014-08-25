@@ -41,7 +41,6 @@ public class SenzorsDbSource {
         // content values to inset
         ContentValues values = new ContentValues();
         values.put(SenzorsDbContract.User.COLUMN_NAME_PHONE, user.getPhoneNo());
-        values.put(SenzorsDbContract.User.COLUMN_NAME_USERNAME, user.getUsername());
 
         // Insert the new row, if fails throw an error
         db.insertOrThrow(SenzorsDbContract.User.TABLE_NAME, SenzorsDbContract.User.COLUMN_NAME_PHONE, values);
@@ -51,10 +50,9 @@ public class SenzorsDbSource {
     /**
      * Get user if exists in the database, other wise create user and return
      * @param phoneNo phone no
-     * @param username username
      * @return user
      */
-    public User getOrCreateUser(String phoneNo, String username) {
+    public User getOrCreateUser(String phoneNo) {
         Log.d(TAG, "GetOrCreateUser: " + phoneNo);
 
         // get matching user if exists
@@ -72,27 +70,25 @@ public class SenzorsDbSource {
             // we return id as password since we no storing users password in database
             String id = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User._ID));
             String _phoneNo = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_PHONE));
-            String _username = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_USERNAME));
 
             // clear
             cursor.close();
             db.close();
 
-            Log.d(TAG, "GetOrCreateUser: have user, so return it: " + username);
-            return new User(id, _phoneNo, _username, "password");
+            Log.d(TAG, "GetOrCreateUser: have user, so return it: " + phoneNo);
+            return new User(id, _phoneNo, "username", "password");
         } else {
             // no matching user
             // so create user
             ContentValues values = new ContentValues();
             values.put(SenzorsDbContract.User.COLUMN_NAME_PHONE, phoneNo);
-            values.put(SenzorsDbContract.User.COLUMN_NAME_USERNAME, username);
 
             // inset data
             long id = db.insert(SenzorsDbContract.User.TABLE_NAME, SenzorsDbContract.User.COLUMN_NAME_PHONE, values);
             db.close();
 
-            Log.d(TAG, "GetOrCreateUser: no user, so user created:" + username);
-            return new User(Long.toString(id), phoneNo, username, "");
+            Log.d(TAG, "GetOrCreateUser: no user, so user created:" + phoneNo);
+            return new User(Long.toString(id), phoneNo, "username", "password");
         }
     }
 
@@ -174,10 +170,9 @@ public class SenzorsDbSource {
             // get user attributes
             userId = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User._ID));
             phoneNo = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_PHONE));
-            username = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_USERNAME));
 
             // save to list
-            user = new User(userId, phoneNo, username, "password");
+            user = new User(userId, phoneNo, "username", "password");
             ArrayList<User> sharedUsers = getSharedUsers(sensorId, db);
             sensor = new Sensor(sensorId, sensorName, sensorValue, isMySensor, user, sharedUsers);
             sensorList.add(sensor);
@@ -222,10 +217,9 @@ public class SenzorsDbSource {
             // get user attributes
             userId = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User._ID));
             phoneNo = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_PHONE));
-            username = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_USERNAME));
 
             // save to list
-            user = new User(userId, phoneNo, username, "password");
+            user = new User(userId, phoneNo, "username", "password");
             userList.add(user);
             Log.d(TAG, "GetSharedUsers: user - " + user.getUsername());
         }

@@ -38,9 +38,8 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
     private static final String SQL_CREATE_USER =
             "CREATE TABLE " + SenzorsDbContract.User.TABLE_NAME + " (" +
                     SenzorsDbContract.Sensor._ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + "," +
-                    SenzorsDbContract.User.COLUMN_NAME_PHONE + TEXT_TYPE + "UNIQUE NOT NULL" + "," +
-                    SenzorsDbContract.User.COLUMN_NAME_USERNAME + TEXT_TYPE +
-                    " )";
+                    SenzorsDbContract.User.COLUMN_NAME_PHONE + TEXT_TYPE + "UNIQUE NOT NULL" +
+            " )";
     private static final String SQL_CREATE_SHARED_USER =
             "CREATE TABLE " + SenzorsDbContract.SharedUser.TABLE_NAME + " (" +
                     SenzorsDbContract.SharedUser._ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + "," +
