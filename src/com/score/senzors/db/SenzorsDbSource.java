@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 import com.score.senzors.pojos.Sensor;
 import com.score.senzors.pojos.User;
+import com.score.senzors.utils.PhoneBookUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,7 +77,9 @@ public class SenzorsDbSource {
             db.close();
 
             Log.d(TAG, "have user, so return it: " + phoneNo);
-            return new User(id, _phoneNo, "username", "password");
+            User user = new User(id, _phoneNo, "password");
+            user.setUsername(PhoneBookUtils.getContactName(context, _phoneNo));
+            return user;
         } else {
             // no matching user
             // so create user
@@ -88,7 +91,9 @@ public class SenzorsDbSource {
             db.close();
 
             Log.d(TAG, "no user, so user created:" + phoneNo);
-            return new User(Long.toString(id), phoneNo, "username", "password");
+            User user = new User(Long.toString(id), phoneNo, "password");
+            user.setUsername(PhoneBookUtils.getContactName(context, phoneNo));
+            return user;
         }
     }
 
@@ -171,14 +176,18 @@ public class SenzorsDbSource {
             phoneNo = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_PHONE));
 
             // save to list
-            user = new User(userId, phoneNo, "username", "password");
+            user = new User(userId, phoneNo, "password");
+            if (isMySensor)
+                user.setUsername("Me");
+            else
+                user.setUsername(PhoneBookUtils.getContactName(context, phoneNo));
             ArrayList<User> sharedUsers = getSharedUsers(sensorId, db);
             sensor = new Sensor(sensorId, sensorName, sensorValue, isMySensor, user, sharedUsers);
             sensorList.add(sensor);
 
             Log.d(TAG, "GetSensors: sensor name - " + sensor.getSensorName());
             Log.d(TAG, "GetSensors: is my sensor - " + sensor.isMySensor());
-            Log.d(TAG, "GetSensors: user - " + user.getUsername());
+            Log.d(TAG, "GetSensors: user - " + user.getPhoneNo());
         }
 
         // clean
@@ -217,7 +226,8 @@ public class SenzorsDbSource {
             phoneNo = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_PHONE));
 
             // save to list
-            user = new User(userId, phoneNo, "username", "password");
+            user = new User(userId, phoneNo, "password");
+            user.setUsername(PhoneBookUtils.getContactName(context, phoneNo));
             userList.add(user);
             Log.d(TAG, "GetSharedUsers: user - " + user.getPhoneNo());
         }

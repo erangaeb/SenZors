@@ -84,7 +84,9 @@ public class PhoneBookUtils {
                     }
                     phoneCursor.close();
 
-                    contactList.add(new User(contact_id, getFormattedPhoneNo(phoneNumber), name.toLowerCase(), "password"));
+                    User user = new User(contact_id, getFormattedPhoneNo(phoneNumber), "password");
+                    user.setUsername(name.toLowerCase());
+                    contactList.add(user);
                 }
             }
         }

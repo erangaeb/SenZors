@@ -61,10 +61,12 @@ public class PreferenceUtils {
         String username = preferences.getString("username", "");
         String password = preferences.getString("password", "");
 
-        if(username.isEmpty() || password.isEmpty())
+        if(phoneNo.isEmpty() || password.isEmpty())
             throw new NoUserException();
 
-        return new User(id, phoneNo, username, password);
+        User user = new User(id, phoneNo, password);
+        user.setUsername(username);
+        return user;
     }
 
     /**

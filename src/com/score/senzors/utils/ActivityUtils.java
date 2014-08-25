@@ -89,7 +89,7 @@ public class ActivityUtils {
      * @return valid or not
      */
     public static boolean isValidRegistrationFields(User user, String confirmPassword) throws InvalidInputFieldsException, MismatchPasswordException, InvalidPhoneNoException {
-        if (user.getPhoneNo().isEmpty() || user.getUsername().isEmpty() || user.getPassword().isEmpty() || confirmPassword.isEmpty()) {
+        if (user.getPhoneNo().isEmpty() || user.getPassword().isEmpty() || confirmPassword.isEmpty()) {
             throw new InvalidInputFieldsException();
         }
 

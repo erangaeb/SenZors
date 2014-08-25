@@ -95,7 +95,8 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
         String phoneNo = editTextPhoneNo.getText().toString().trim();
         String password = editTextPassword.getText().toString().trim();
 
-        registeringUser = new User("0", phoneNo, "username", password);
+        registeringUser = new User("0", phoneNo, password);
+        registeringUser.setUsername("Me");
     }
 
     /**
