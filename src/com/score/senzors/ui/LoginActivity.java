@@ -139,6 +139,8 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
      * Connect to web socket and send phone no password to server
      */
     private void login() {
+        initLoginUser();
+
         if(NetworkUtil.isAvailableNetwork(LoginActivity.this)) {
             if(ActivityUtils.isValidLoginFields(loginUser)) {
                 // we are authenticate with web sockets
@@ -159,6 +161,15 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
             Log.w(TAG, "Login: no network connection");
             Toast.makeText(LoginActivity.this, "Cannot connect to server, Please check your network connection", Toast.LENGTH_LONG).show();
         }
+    }
+
+    /**
+     * Initialize login user according to diplay content
+     */
+    private void initLoginUser() {
+        String phoneNo = editTextPhoneNo.getText().toString().trim();
+        String password = editTextPassword.getText().toString().trim();
+        loginUser = new User("0", phoneNo, password);
     }
 
     /**

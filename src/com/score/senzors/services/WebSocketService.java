@@ -6,14 +6,24 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.util.Log;
+import android.widget.Toast;
 import com.score.senzors.R;
 import com.score.senzors.application.SenzorApplication;
+import com.score.senzors.exceptions.NoUserException;
+import com.score.senzors.pojos.User;
+import com.score.senzors.utils.ActivityUtils;
 import com.score.senzors.utils.NotificationUtils;
+import com.score.senzors.utils.PreferenceUtils;
 import com.score.senzors.utils.QueryHandler;
 import de.tavendo.autobahn.WebSocketConnectionHandler;
 import de.tavendo.autobahn.WebSocketException;
+
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * Service for listen to a web socket
@@ -21,7 +31,7 @@ import de.tavendo.autobahn.WebSocketException;
  *
  * @author erangaeb@gmail.com (eranga herath)
  */
-public class WebSocketService extends Service {
+public class WebSocketService extends Service implements Handler.Callback {
 
     private static final String TAG = WebSocketService.class.getName();
     private SenzorApplication application;
@@ -133,6 +143,7 @@ public class WebSocketService extends Service {
      * We maximum try 10 times, after that ignore connecting
      */
     private void reconnectToWebSocket() {
+        application.setCallback(this);
         if(WebSocketService.RECONNECT_COUNT <= WebSocketService.MAX_RECONNECT_COUNT) {
             if(application.getWebSocketConnection().isConnected()) {
                 Log.e(TAG, "ReconnectToWebSocket: web socket already connected");
@@ -181,6 +192,49 @@ public class WebSocketService extends Service {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean handleMessage(Message message) {
+        ActivityUtils.cancelProgressDialog();
+
+        // we handle string messages only from here
+        if(message.obj instanceof String) {
+            String payLoad = (String)message.obj;
+            if (payLoad.equalsIgnoreCase("SERVER_KEY_EXTRACTION_SUCCESS")) {
+                Log.d(TAG, "HandleMessage: server key extracted");
+
+                // server key extraction success
+                // so send PUT query to create user
+                try {
+                    if(application.getWebSocketConnection().isConnected()) {
+                        User loginUser = PreferenceUtils.getUser(this);
+                        String loginQuery = QueryHandler.getLoginQuery(loginUser, PreferenceUtils.getSessionKey(this));
+                        System.out.println("------login query------");
+                        System.out.println(loginQuery);
+                        application.getWebSocketConnection().sendTextMessage(loginQuery);
+                    }
+                } catch (UnsupportedEncodingException e) {
+                    Log.e(TAG, e.getMessage());
+                } catch (NoSuchAlgorithmException e) {
+                    Log.e(TAG, e.getMessage());
+                } catch (NoUserException e) {
+                    Log.e(TAG, e.getMessage());
+                }
+            } else if(payLoad.equalsIgnoreCase("LoginSUCCESS")) {
+                Log.d(TAG, "HandleMessage: login success");
+                application.setCallback(null);
+            } else {
+                Log.d(TAG, "HandleMessage: login fail");
+            }
+        } else {
+            Log.e(TAG, "HandleMessage: message is NOT a string(may be location object)");
+        }
+
+        return false;
     }
 
 }

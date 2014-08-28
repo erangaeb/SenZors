@@ -48,6 +48,7 @@
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:gravity="center"
+                        android:text="+94"
                         android:textColor="#ffffff"
                         android:background="@drawable/username_field_shape"
                         android:layout_height="match_parent">

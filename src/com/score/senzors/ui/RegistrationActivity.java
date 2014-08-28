@@ -78,8 +78,10 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
         textViewSignUpText = (TextView) findViewById(R.id.registration_sign_up_text);
         signUpButton.setOnClickListener(RegistrationActivity.this);
 
+        String countryCode = PhoneBookUtils.getCountryCode(this);
         countryCodeText = (TextView) findViewById(R.id.country_code);
-        countryCodeText.setText(PhoneBookUtils.getCountryCode(this));
+        if (!countryCode.isEmpty())
+            countryCodeText.setText(countryCode);
 
         textViewHeaderText.setTypeface(typefaceThin, Typeface.BOLD);
         textViewSignUpText.setTypeface(typefaceThin, Typeface.BOLD);
