@@ -4,14 +4,12 @@ import android.app.Application;
 import android.os.Handler;
 import android.os.Message;
 import com.score.senzors.db.SenzorsDbSource;
-import com.score.senzors.exceptions.NoUserException;
 import com.score.senzors.listeners.ContactReaderListener;
 import com.score.senzors.pojos.LatLon;
 import com.score.senzors.pojos.Query;
 import com.score.senzors.pojos.Sensor;
 import com.score.senzors.pojos.User;
 import com.score.senzors.services.ContactReader;
-import com.score.senzors.utils.PreferenceUtils;
 import de.tavendo.autobahn.WebSocket;
 import de.tavendo.autobahn.WebSocketConnection;
 
@@ -156,34 +154,11 @@ public class SenzorApplication extends Application implements ContactReaderListe
      *  3. read contact list
      */
     public void setUpSenzors() {
-        addMySensorsToDb();
         initMySensors();
         initFriendsSensors();
 
         // read contact list in background
         new ContactReader(this).execute("READ");
-    }
-
-    /**
-     * First time setup of the app
-     * We add my sensors to database
-     */
-    private void addMySensorsToDb() {
-        if (PreferenceUtils.isFirstTime(this)) {
-            // this is first time app launch
-            // add my sensors and users to database
-            // TODO add more available sensors
-            try {
-                User user = PreferenceUtils.getUser(this);
-                Sensor sensor = new Sensor("0", "Location", "LocationValue", true, user, null);
-                new SenzorsDbSource(this).addSensor(sensor);
-
-                // reset first time status
-                PreferenceUtils.setFirstTime(this, false);
-            } catch (NoUserException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     /**

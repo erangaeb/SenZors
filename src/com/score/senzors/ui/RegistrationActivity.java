@@ -16,10 +16,7 @@ import com.score.senzors.application.SenzorApplication;
 import com.score.senzors.db.SenzorsDbSource;
 import com.score.senzors.exceptions.*;
 import com.score.senzors.pojos.User;
-import com.score.senzors.utils.ActivityUtils;
-import com.score.senzors.utils.PhoneBookUtils;
-import com.score.senzors.utils.PreferenceUtils;
-import com.score.senzors.utils.QueryHandler;
+import com.score.senzors.utils.*;
 import de.tavendo.autobahn.WebSocketConnection;
 import de.tavendo.autobahn.WebSocketConnectionHandler;
 import de.tavendo.autobahn.WebSocketException;
@@ -94,10 +91,12 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
      * Initialize user object
      */
     private void initRegisteringUser() {
-        String phoneNo = editTextPhoneNo.getText().toString().trim();
+        String countryCode = countryCodeText.getText().toString().trim();
+        String phoneNo = editTextPhoneNo.getText().toString().trim().replaceFirst("^0+(?!$)", "");
         String password = editTextPassword.getText().toString().trim();
+        String internationalPhoneNo = countryCode + phoneNo;
 
-        registeringUser = new User("0", phoneNo, password);
+        registeringUser = new User("0", internationalPhoneNo, password);
         registeringUser.setUsername("Me");
     }
 
@@ -213,9 +212,11 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
 
                 // create user from here
                 // we don't store passwords in DB, so when save user in shared preference need to set password
+                // save my sensors in db
                 User user = new SenzorsDbSource(this).getOrCreateUser(registeringUser.getPhoneNo());
                 user.setPassword(registeringUser.getPassword());
                 PreferenceUtils.saveUser(this, user);
+                SenzUtils.addMySensorsToDb(this, user);
 
                 // disconnect at the end
                 webSocketConnection.disconnect();

@@ -31,25 +31,6 @@ public class PreferenceUtils {
     }
 
     /**
-     * Already have a registered user,
-     * when having registered user, user should saved in shared preference
-     * @param context application context
-     * @return saved user having or not
-     */
-    public static boolean haveRegisteredUser(Context context) {
-        // get saved used and display credentials
-        try {
-            getUser(context);
-
-            return true;
-        } catch (NoUserException e) {
-            e.printStackTrace();
-
-            return false;
-        }
-    }
-
-    /**
      * Get user details from shared preference
      * @param context application context
      * @return user object
@@ -67,28 +48,6 @@ public class PreferenceUtils {
         User user = new User(id, phoneNo, password);
         user.setUsername(username);
         return user;
-    }
-
-    /**
-     * Get first time status from shared preference
-     * @param context application context
-     * @return true/false
-     */
-    public static boolean isFirstTime(Context context) {
-        SharedPreferences preferences = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        return preferences.getBoolean("is_first_time", true);
-    }
-
-    /**
-     * Save first time status on shared preference
-     * @param context application context
-     * @param isFirstTime first time status
-     */
-    public static void setFirstTime(Context context, boolean isFirstTime) {
-        SharedPreferences preferences = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor =  preferences.edit();
-        editor.putBoolean("is_first_time", isFirstTime);
-        editor.commit();
     }
 
     /**
