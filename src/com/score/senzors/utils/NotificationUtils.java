@@ -64,6 +64,7 @@ public class NotificationUtils {
     public static void cancelNotification(Context context) {
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancel(MESSAGE_NOTIFICATION_ID);
+        notificationManager.cancel(SERVICE_NOTIFICATION_ID);
     }
 
 }

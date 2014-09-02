@@ -189,6 +189,7 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
         drawerLayout.closeDrawer(drawerContainer);
 
         // disconnect from sensor service
+        stopService(new Intent(getApplicationContext(), WebSocketService.class));
     }
 
     /**
@@ -266,15 +267,11 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
     }
 
     /**
-     * Navigate to login activity
-     * This happens when logout
+     * Exit from activity
      */
-    private void switchToLogin() {
-        Intent intent = new Intent(this, LoginActivity.class);
-        this.startActivity(intent);
+    private void exit() {
         HomeActivity.this.finish();
-
-        HomeActivity.this.overridePendingTransition(R.anim.left_in, R.anim.right_out);
+        //HomeActivity.this.overridePendingTransition(R.anim.stay_in, R.anim.right_out);
     }
 
     /**
@@ -291,7 +288,7 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
             if (intent.getAction().equals(WebSocketService.WEB_SOCKET_DISCONNECTED)) {
                 // cancel existing notifications after disconnect
                 Log.d(TAG, "OnReceive: received broadcast message " + WebSocketService.WEB_SOCKET_DISCONNECTED);
-                switchToLogin();
+                exit();
             }
         }
     }

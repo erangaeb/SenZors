@@ -34,6 +34,7 @@ public class WebSocketService extends Service implements Handler.Callback {
 
     private static final String TAG = WebSocketService.class.getName();
     private SenzorApplication application;
+    private boolean isRunning;
 
     public static final String WEB_SOCKET_CONNECTED = "WEB_SOCKET_CONNECTED";
     public static final String WEB_SOCKET_DISCONNECTED = "WEB_SOCKET_DISCONNECTED";
@@ -49,6 +50,7 @@ public class WebSocketService extends Service implements Handler.Callback {
     @Override
     public void onCreate() {
         application = (SenzorApplication) getApplication();
+        isRunning = false;
     }
 
     /**
@@ -57,6 +59,7 @@ public class WebSocketService extends Service implements Handler.Callback {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         connectToWebSocket(application);
+        isRunning = true;
 
         // If we get killed, after returning from here, restart
         return START_NOT_STICKY;
@@ -81,16 +84,12 @@ public class WebSocketService extends Service implements Handler.Callback {
         //  2. delete all sensors in my sensor list
         //  3. send broadcast message about service disconnecting
         stopForeground(true);
-
-        Notification notification = NotificationUtils.getNotification(WebSocketService.this, R.drawable.logo_gray,
-                getString(R.string.app_name), getString(R.string.disconnected));
-        notification.flags |= Notification.FLAG_AUTO_CANCEL;
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(NotificationUtils.SERVICE_NOTIFICATION_ID, notification);
+        isRunning = false;
 
         application.emptyMySensors();
         Intent disconnectMessage = new Intent(WebSocketService.WEB_SOCKET_DISCONNECTED);
         sendBroadcast(disconnectMessage);
+        NotificationUtils.cancelNotification(this);
         Log.d(TAG, "OnDestroy: service destroyed");
     }
 
@@ -129,7 +128,12 @@ public class WebSocketService extends Service implements Handler.Callback {
                     Log.d(TAG, "ConnectToWebSocket: code - " + code);
                     Log.d(TAG, "ConnectToWebSocket: reason - " + reason);
 
-                    if(code<4000) new WebSocketReConnector().execute();
+                    // we only reconnect if service is running
+                    if (isRunning) {
+                        if (code < 4000) new WebSocketReConnector().execute();
+                    } else {
+                        Log.d(TAG, "ConnectToWebSocket: Service not running, so no reconnect");
+                    }
                 }
             });
         } catch (WebSocketException e) {
@@ -212,8 +216,8 @@ public class WebSocketService extends Service implements Handler.Callback {
                     if(application.getWebSocketConnection().isConnected()) {
                         User loginUser = PreferenceUtils.getUser(this);
                         String loginQuery = QueryHandler.getLoginQuery(loginUser, PreferenceUtils.getSessionKey(this));
-                        System.out.println("------login query------");
-                        System.out.println(loginQuery);
+                        Log.d(TAG, "------login query------");
+                        Log.d(TAG, loginQuery);
                         application.getWebSocketConnection().sendTextMessage(loginQuery);
                     }
                 } catch (UnsupportedEncodingException e) {
