@@ -1,10 +1,9 @@
 package com.score.senzors.ui;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.*;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -13,6 +12,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -181,6 +181,8 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
         if (view == logout) {
             // simply stop service
             drawerLayout.closeDrawer(drawerContainer);
+            android.support.v4.app.DialogFragment dialogFragment = new LogoutMessageDialog();
+            dialogFragment.show(getSupportFragmentManager(), "missiles");
         }
     }
 
@@ -286,6 +288,57 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
                 Log.d(TAG, "OnReceive: received broadcast message " + WebSocketService.WEB_SOCKET_DISCONNECTED);
                 switchToLogin();
             }
+        }
+    }
+
+    /**
+     * Dialog fragment when display logout
+     * If user request to log out need to disconnect from service and exit
+     * from the app
+     */
+    private class LogoutMessageDialog extends android.support.v4.app.DialogFragment {
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            LayoutInflater inflater = getActivity().getLayoutInflater();
+            View alertView = inflater.inflate(R.layout.log_out_dialog, null);
+
+            // set dialog texts
+            TextView logoText = (TextView) alertView.findViewById(R.id.logo_text);
+            TextView messageHeaderTextView = (TextView) alertView.findViewById(R.id.information_message_dialog_layout_message_header_text);
+            TextView messageTextView = (TextView) alertView.findViewById(R.id.information_message_dialog_layout_message_text);
+            messageHeaderTextView.setText("Disconnect");
+            messageTextView.setText("Are you sure you want to disconnect from senzors?");
+
+            // set custom font
+            Typeface face = Typeface.createFromAsset(this.getActivity().getAssets(), "fonts/vegur_2.otf");
+            logoText.setTypeface(face);
+            messageHeaderTextView.setTypeface(face);
+            messageHeaderTextView.setTypeface(null, Typeface.BOLD);
+            messageTextView.setTypeface(face);
+
+            builder.setView(alertView).
+                    setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) {
+                            drawerLayout.closeDrawer(drawerContainer);
+
+                            // disconnect from services and exit
+                            // switchToLogin();
+                        }
+                    })
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            // ignore here
+                            drawerLayout.closeDrawer(drawerContainer);
+                        }
+                    });
+
+            final AlertDialog alertDialog = builder.create();
+            alertDialog.setCanceledOnTouchOutside(false);
+
+            return alertDialog;
         }
     }
 
