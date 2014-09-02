@@ -1,7 +1,7 @@
 package com.score.senzors.utils;
 
 import android.app.Activity;
-import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -24,8 +24,7 @@ import com.score.senzors.pojos.User;
  */
 public class ActivityUtils {
 
-    // use to create custom progress dialog
-    private static Dialog progressDialog;
+    private static ProgressDialog progressDialog;
 
     /**
      * Hide keyboard
@@ -50,19 +49,8 @@ public class ActivityUtils {
      * @param message message to be display
      */
     public static void showProgressDialog(Context context, String message) {
-        progressDialog = new Dialog(context);
-        progressDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        progressDialog.setCanceledOnTouchOutside(false);
-        progressDialog.setContentView(R.layout.progress_dialog_layout);
-        progressDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-
-        // set dialog texts
-        TextView messageText = (TextView) progressDialog.findViewById(R.id.progress_message);
-        messageText.setText(message);
-
-        // set custom font
-        Typeface face= Typeface.createFromAsset(context.getAssets(), "fonts/vegur_2.otf");
-        messageText.setTypeface(face);
+        progressDialog = ProgressDialog.show(context, null, message, true);
+        progressDialog.setCancelable(true);
 
         progressDialog.show();
     }

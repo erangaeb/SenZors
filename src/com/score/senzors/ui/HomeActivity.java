@@ -31,7 +31,7 @@ import java.util.ArrayList;
  *
  * @author erangaeb@gmail.com (eranga herath)
  */
-public class HomeActivity extends FragmentActivity {
+public class HomeActivity extends FragmentActivity implements View.OnClickListener {
 
     private static final String TAG = HomeActivity.class.getName();
 
@@ -41,6 +41,7 @@ public class HomeActivity extends FragmentActivity {
     private ListView drawerListView;
     private DrawerLayout drawerLayout;
     private RelativeLayout drawerContainer;
+    private RelativeLayout logout;
     private HomeActionBarDrawerToggle homeActionBarDrawerToggle;
 
     // drawer components
@@ -114,6 +115,8 @@ public class HomeActivity extends FragmentActivity {
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerContainer = (RelativeLayout) findViewById(R.id.drawer_container);
+        logout = (RelativeLayout) findViewById(R.id.home_logout);
+        logout.setOnClickListener(this);
 
         // set custom sign out button
         TextView signOutTextView = (TextView) findViewById(R.id.sign_out_text);
@@ -168,6 +171,17 @@ public class HomeActivity extends FragmentActivity {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         homeActionBarDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onClick(View view) {
+        if (view == logout) {
+            // simply stop service
+            drawerLayout.closeDrawer(drawerContainer);
+        }
     }
 
     /**
