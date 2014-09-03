@@ -29,8 +29,7 @@
         <item name="android:actionModeBackground">@drawable/cab_background_top_yello</item>
         <item name="android:actionModeSplitBackground">@drawable/cab_background_bottom_yello</item>
         <item name="android:actionModeCloseButtonStyle">@style/ActionButton.CloseMode.Yello</item>
-        
-        
+        <item name="android:actionBarDivider">@null</item>
     </style>
 
     <style name="ActionBar.Solid.Yello" parent="@android:style/Widget.Holo.ActionBar.Solid">
