@@ -88,6 +88,9 @@ public class WebSocketService extends Service implements Handler.Callback {
         Intent disconnectMessage = new Intent(WebSocketService.WEB_SOCKET_DISCONNECTED);
         sendBroadcast(disconnectMessage);
         NotificationUtils.cancelNotification(this);
+
+        if (application.getWebSocketConnection().isConnected())
+            application.getWebSocketConnection().disconnect();
         Log.d(TAG, "OnDestroy: service destroyed");
     }
 

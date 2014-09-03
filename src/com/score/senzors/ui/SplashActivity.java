@@ -72,23 +72,22 @@ public class SplashActivity extends Activity implements Handler.Callback {
         } catch (NoUserException e) {
             e.printStackTrace();
 
-            // no user means navigate to registration
-            navigateToRegistration();
+            // no user means navigate to login
+            navigateToLogin();
         }
     }
 
     /**
-     * Navigate to registration activity
+     * Navigate to login activity
      */
-    private void navigateToRegistration() {
+    private void navigateToLogin() {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Intent intent = new Intent(SplashActivity.this, RegistrationActivity.class);
+                Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 SplashActivity.this.startActivity(intent);
-                SplashActivity.this.overridePendingTransition(R.anim.stay_in, R.anim.bottom_in);
-                // SplashActivity.this.finish();
+                SplashActivity.this.finish();
             }
         }, SPLASH_DISPLAY_LENGTH);
     }
@@ -148,9 +147,7 @@ public class SplashActivity extends Activity implements Handler.Callback {
                 switchToHome();
             } else {
                 Log.d(TAG, "HandleMessage: login fail");
-                if(application.getWebSocketConnection().isConnected()) {
-                    application.getWebSocketConnection().disconnect();
-                }
+                stopService(new Intent(getApplicationContext(), WebSocketService.class));
 
                 Toast.makeText(SplashActivity.this, "Login fail", Toast.LENGTH_LONG).show();
             }

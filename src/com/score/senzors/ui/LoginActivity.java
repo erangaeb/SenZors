@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.score.senzors.R;
 import com.score.senzors.application.SenzorApplication;
+import com.score.senzors.db.SenzorsDbSource;
 import com.score.senzors.exceptions.NoUserException;
 import com.score.senzors.pojos.User;
 import com.score.senzors.services.WebSocketService;
@@ -167,9 +168,13 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
      * Initialize login user according to diplay content
      */
     private void initLoginUser() {
-        String phoneNo = editTextPhoneNo.getText().toString().trim();
+        String countryCode = PhoneBookUtils.getCountryCode(this);
+        String phoneNo = editTextPhoneNo.getText().toString().trim().replaceFirst("^0+(?!$)", "");
         String password = editTextPassword.getText().toString().trim();
-        loginUser = new User("0", phoneNo, password);
+        String internationalPhoneNo = countryCode + phoneNo;
+
+        loginUser = new User("0", internationalPhoneNo, password);
+        loginUser.setUsername("Me");
     }
 
     /**
@@ -195,6 +200,26 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
     }
 
     /**
+     * Set up app when user first time login to the system
+     * Create user if no saved user
+     * save my sensors in db
+     */
+    private void setUpApp() {
+        try {
+            PreferenceUtils.getUser(LoginActivity.this);
+        } catch (NoUserException e) {
+            e.printStackTrace();
+
+            // no user means first time login
+            User user = new SenzorsDbSource(this).getOrCreateUser(loginUser.getPhoneNo());
+            user.setPassword(loginUser.getPassword());
+            PreferenceUtils.saveUser(this, user);
+            SenzUtils.addMySensorsToDb(this, user);
+            application.setUpSenzors();
+        }
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -212,8 +237,8 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
                 try {
                     if(application.getWebSocketConnection().isConnected()) {
                         String loginQuery = QueryHandler.getLoginQuery(loginUser, PreferenceUtils.getSessionKey(this));
-                        System.out.println("------login query------");
-                        System.out.println(loginQuery);
+                        Log.d(TAG, "------login query------");
+                        Log.d(TAG, loginQuery);
                         application.getWebSocketConnection().sendTextMessage(loginQuery);
                     }
                 } catch (UnsupportedEncodingException e) {
@@ -223,13 +248,12 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
                 }
             } else if(payLoad.equalsIgnoreCase("LoginSUCCESS")) {
                 Log.d(TAG, "HandleMessage: login success");
-                application.setUpSenzors();
+
+                setUpApp();
                 switchToHome();
             } else {
                 Log.d(TAG, "HandleMessage: login fail");
-                if(application.getWebSocketConnection().isConnected()) {
-                    application.getWebSocketConnection().disconnect();
-                }
+                stopService(new Intent(getApplicationContext(), WebSocketService.class));
 
                 Toast.makeText(LoginActivity.this, "Login fail", Toast.LENGTH_LONG).show();
             }
