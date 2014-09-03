@@ -84,9 +84,11 @@ public class PhoneBookUtils {
                     }
                     phoneCursor.close();
 
-                    User user = new User(contact_id, getFormattedPhoneNo(phoneNumber), "password");
-                    user.setUsername(name.toLowerCase());
-                    contactList.add(user);
+                    if (name != null && phoneNumber != null) {
+                        User user = new User(contact_id, getFormattedPhoneNo(phoneNumber), "password");
+                        user.setUsername(name.toLowerCase());
+                        contactList.add(user);
+                    }
                 }
             }
         }

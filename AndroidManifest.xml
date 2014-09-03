@@ -2,8 +2,8 @@
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.score.senzors"
-    android:versionCode="6"
-    android:versionName="1.5">
+    android:versionCode="7"
+    android:versionName="1.6">
 
     <uses-sdk
         android:minSdkVersion="14"
@@ -37,14 +37,14 @@
         android:name=".application.SenzorApplication">
 
         <!-- production key -->
-        <!--<meta-data-->
-            <!--android:name="com.google.android.maps.v2.API_KEY"-->
-            <!--android:value="AIzaSyDQBL4MsO4B5qpA3VvX3HtRCQG2I09p7t0"/>-->
-
-        <!-- debug key -->
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyAzW1LOJz7zGeKTohFwzmRPDtb1yqt0bC8"/>
+            android:value="AIzaSyDQBL4MsO4B5qpA3VvX3HtRCQG2I09p7t0"/>
+
+        <!-- debug key -->
+        <!--<meta-data-->
+            <!--android:name="com.google.android.maps.v2.API_KEY"-->
+            <!--android:value="AIzaSyAzW1LOJz7zGeKTohFwzmRPDtb1yqt0bC8"/>-->
 
         <meta-data
             android:name="com.google.android.gms.version"
