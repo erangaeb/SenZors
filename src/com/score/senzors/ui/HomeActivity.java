@@ -271,7 +271,6 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
      */
     private void exit() {
         HomeActivity.this.finish();
-        //HomeActivity.this.overridePendingTransition(R.anim.stay_in, R.anim.right_out);
     }
 
     /**
