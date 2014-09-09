@@ -92,9 +92,9 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
      */
     private void initRegisteringUser() {
         String countryCode = countryCodeText.getText().toString().trim();
-        String phoneNo = editTextPhoneNo.getText().toString().trim().replaceFirst("^0+(?!$)", "");
+        String phoneNo = editTextPhoneNo.getText().toString().trim();
         String password = editTextPassword.getText().toString().trim();
-        String internationalPhoneNo = countryCode + phoneNo;
+        String internationalPhoneNo = countryCode + phoneNo.substring(phoneNo.length() - 9);
 
         registeringUser = new User("0", internationalPhoneNo, password);
         registeringUser.setUsername("Me");

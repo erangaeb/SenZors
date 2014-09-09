@@ -165,13 +165,13 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
     }
 
     /**
-     * Initialize login user according to diplay content
+     * Initialize login user according to display content
      */
     private void initLoginUser() {
         String countryCode = PhoneBookUtils.getCountryCode(this);
-        String phoneNo = editTextPhoneNo.getText().toString().trim().replaceFirst("^0+(?!$)", "");
+        String phoneNo = editTextPhoneNo.getText().toString().trim();
         String password = editTextPassword.getText().toString().trim();
-        String internationalPhoneNo = countryCode + phoneNo;
+        String internationalPhoneNo = countryCode + phoneNo.substring(phoneNo.length() - 9);
 
         loginUser = new User("0", internationalPhoneNo, password);
         loginUser.setUsername("Me");
@@ -215,6 +215,7 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
             user.setPassword(loginUser.getPassword());
             PreferenceUtils.saveUser(this, user);
             SenzUtils.addMySensorsToDb(this, user);
+        } finally {
             application.setUpSenzors();
         }
     }
