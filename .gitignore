@@ -21,3 +21,6 @@ out/
 .idea/
 .DS_Store
 proguard_logs/
+.gradle/
+build/
+senz/build/
